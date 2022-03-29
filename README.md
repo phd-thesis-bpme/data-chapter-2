@@ -1,1 +1,1 @@
-# phylo-traits-detectability
+# multispecies-qpad-detectability
