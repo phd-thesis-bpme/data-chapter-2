@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 00-extract-binomial-names.R
 # Created March 2022
-# Last Updated March 2022
+# Last Updated April 2022
 
 ####### Import Libraries and External Files #######
 
@@ -15,12 +15,17 @@
 load("data/counts.rda")
 
 codes <- read.csv("util/IBP-Alpha-Codes20.csv")
+families <- read.csv("util/NACC_list_species.csv")
 
 ####### Main Code #################################
 
 # Extract all binomial names for species that NA-POPS has data for
 codes_red <- codes[which(codes$SPEC %in% unique(project_counts$Species)), ]
-binomial <- codes_red[, c("SPEC", "COMMONNAME", "SCINAME")]
+codes_family <- merge(codes_red, families[, c("species", "family")], 
+                      by.x = "SCINAME", by.y = "species")
+
+binomial <- codes_family[, c("SPEC", "COMMONNAME", "SCINAME", "family")]
+names(binomial) <- c("Code", "English", "Scientific", "Family")
 
 ####### Output ####################################
 
