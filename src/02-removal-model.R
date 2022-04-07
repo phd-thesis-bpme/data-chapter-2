@@ -125,11 +125,11 @@ model <- stan_model(file = "models/removal.stan")
 stan_job <- sampling(model,
                           data = stan_data,
                           verbose = TRUE,
-                          chains = 3,
-                          iter = 20,
-                          warmup = 10,
-                          cores = 3,
-                          pars = c("log_phi"),
+                          chains = 4,
+                          iter = 2000,
+                          warmup = 1000,
+                          cores = 4,
+                          pars = c("log_phi", "tau", "mu"),
                           control = list(adapt_delta = 0.8,
                                          max_treedepth = 15))
 
