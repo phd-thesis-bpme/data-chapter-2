@@ -27,6 +27,9 @@ codes_family <- merge(codes_red, families[, c("species", "family")],
 binomial <- codes_family[, c("SPEC", "COMMONNAME", "SCINAME", "family")]
 names(binomial) <- c("Code", "English", "Scientific", "Family")
 
+binomial[which(binomial$Scientific == "Ixoreus naevius"), "Scientific"] <- "Zoothera naevia"
+
+
 ####### Output ####################################
 
 write.table(binomial,
