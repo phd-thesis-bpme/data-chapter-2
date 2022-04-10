@@ -1,0 +1,48 @@
+\documentclass[]{article}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+
+%opening
+\title{A multi-species model of landbird detectability that considers phylogeny}
+\author{Brandon P.M. Edwards}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Introduction}
+
+\par Detectability is an important component of bird surveys.
+
+\par In birds, detectability has been shown to vary at least partially based on phylogeny. \citet{johnston_species_2014} show that different species traits explain the variability in detectability among different UK birds. \citet{solymos_phylogeny_2018} show that phylogenetic structure is an important predictor of cue rate, and that species traits are more important for estimating effective detection radius.
+
+\par The NA-POPS project has produced estimates of detectability for 338 species of North American landbirds \citep{edwards_point_nodate}, but only in a single-species modelling framework.
+
+\par Here, we derive estimates of detectability under a multi-species framework.
+
+\section{Methods}
+
+\par We accessed the raw count data from the NA-POPS organization for 11 species of Turdidae thrushes \citep{edwards_point_nodate}. The species were: American Robin (\textit{Turdus migratorius}), Eastern Bluebird (\textit{Sialia sialis}), Western Bluebird (\textit{Sialia mexicana}), Mountain Bluebird \textit{Sialia currucoides}, Townsend's Solitaire (\textit{Myadestes townsendi}), Varied Thrush (\textit{Ixoreau naevius}), Wood Thrush (\textit{Hylocichla mustelina}), Swainson's Thrush (\textit{Catharus ustulatus}), Gray-cheeked Thrush (\textit{Catharus minimus}), Hermit Thrush (\textit{Catharus guttatus}), and Veery (\textit{Catharus fuscescens}).  
+
+We requested a subsetted phylogeny of the 11 Turdidae species from the birdtree.org website \citep{jetz_global_nodate}, specifying 1000 random trees from an Ericson backbone. Using the "ape" package in R \citep{paradis_ape_2019}, we generated a consensus tree from these 1000 random trees, and generated a correlation matrix following the methods in \citet{solymos_phylogeny_2018} (Figure \ref{fig:phylo_corr}).
+
+\section{Results}
+
+\section{Discussion}
+
+\bibliography{references}
+
+\section{Figures}
+
+\begin{figure}
+	\includegraphics[width=\linewidth]{../plots/turdidae_phylo_corr.png}
+	\caption{TO DO}
+	\label{fig:phylo_corr}
+\end{figure}
+
+\end{document}
