@@ -142,5 +142,5 @@ stan_job <- sampling(model,
 ####### Output ####################################
 
 save(stan_job, file = "output/removal_turdidae_model.rda")
-save(stan_data, file = "output/removal_turdidae_data.rda)
+save(stan_data, file = "output/removal_turdidae_data.rda")
 
