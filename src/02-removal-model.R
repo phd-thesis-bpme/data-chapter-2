@@ -17,6 +17,7 @@ rstan_options(auto_write = TRUE)
 load("data/time_count_matrix.rda")
 load("data/time_design.rda")
 load("output/turdidae_corr_matrix.rda")
+binomial <- read.csv("output/binomial_names.csv")
 
 ####### Wrangle Data for Modelling ################
 
@@ -56,8 +57,12 @@ for (i in col_names)
   counts[indices, i] <- ifelse(is.na(design[indices, i]), NA, 0)
 }
 
-# Build matrices by species
+# Re-order the species so that they match the correlation matrix
 species <- sort(as.character(unique(counts$Species)))
+bin_turdidae <- binomial[which(binomial$Code %in% species), ]
+bin_turdidae$Scientific <- gsub(" ", "_", bin_turdidae$Scientific)
+bin_turdidae <- bin_turdidae[match(colnames(corr_matrix), bin_turdidae$Scientific),]
+species <- bin_turdidae$Code
 
 # List of input counts
 Y <- vector(mode = "list", length = length(species))
@@ -94,7 +99,8 @@ total_abund_per_sample <- unname(apply(Y, 1, function(x) sum(x, na.rm = TRUE)))
 
 #' Factored list of species
 #' Corresponds with "species" in removal.stan
-sp_list_numeric <- as.numeric(as.factor(sp_list[,1]))
+sp_list_numeric <- as.numeric(factor(sp_list[,1],
+                                     levels = species))
 
 #' Corresponds with "abund_per_band" in removal.stan
 abundance_per_band <- Y
