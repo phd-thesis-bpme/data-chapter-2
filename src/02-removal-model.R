@@ -132,8 +132,8 @@ stan_job <- sampling(model,
                           data = stan_data,
                           verbose = TRUE,
                           chains = 4,
-                          iter = 2000,
-                          warmup = 1000,
+                          iter = 1000,
+                          warmup = 500,
                           cores = 4,
                           pars = c("log_phi", "tau", "mu"),
                           control = list(adapt_delta = 0.8,
@@ -141,4 +141,6 @@ stan_job <- sampling(model,
 
 ####### Output ####################################
 
-save(stan_job, file = "output/removal_turdidae.rda")
+save(stan_job, file = "output/removal_turdidae_model.rda")
+save(stan_data, file = "output/removal_turdidae_data.rda)
+
