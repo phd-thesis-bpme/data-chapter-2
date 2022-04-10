@@ -20,7 +20,7 @@ model {
   matrix[n_samples, max_intervals] Pi;   // probabilities
   
   tau ~ cauchy(0, 2.5);
-  mu ~ normal(0, 5);
+  mu ~ normal(0, 1);
   
   log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr, tau));
   
