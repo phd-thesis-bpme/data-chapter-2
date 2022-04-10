@@ -11,7 +11,7 @@ data {
 }
 
 parameters {
-  row_vector[n_species] mu;
+  row_vector<lower = 0>[n_species] mu;
   vector<lower = 0>[n_species] sigma;
   vector[n_species] log_tau;
 }
@@ -20,7 +20,7 @@ model {
   matrix[n_samples, max_intervals] Pi;   // probabilities
   
   sigma ~ cauchy(0, 2.5);
-  mu ~ normal(0, 1);
+  mu ~ lognormal(1, 1);
   
   log_tau ~ multi_normal(mu, quad_form_diag(phylo_corr, sigma));
   
