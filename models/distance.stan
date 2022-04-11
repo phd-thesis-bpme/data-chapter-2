@@ -13,7 +13,7 @@ data {
 parameters {
   row_vector<lower = 0>[n_species] mu;
   vector<lower = 0>[n_species] sigma;
-  vector[n_species] log_tau;
+  vector<lower = 0>[n_species] log_tau;
 }
 
 model {
@@ -23,7 +23,7 @@ model {
   mu ~ lognormal(1, 1);
   
   log_tau ~ multi_normal(mu, quad_form_diag(phylo_corr, sigma));
-  
+
   Pi = rep_matrix(0, n_samples, max_intervals);
   
   for (i in 1:n_samples)
@@ -35,7 +35,9 @@ model {
       (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
     }
     Pi[i,1] = 1 - sum(Pi[i,]);
-    
+print(Pi[i,]);
+   
     abund_per_band[i,] ~ multinomial(to_vector(Pi[i,]));
   }
 }
+
