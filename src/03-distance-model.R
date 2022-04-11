@@ -23,6 +23,10 @@ binomial <- read.csv("output/binomial_names.csv")
 
 # Most of this code adopted from Edwards et al. 2022
 
+# Drop method I
+dist_count_matrix <- dist_count_matrix[-which(dist_count_matrix$Distance_Method == "I"), ]
+dist_design <- dist_design[-which(dist_design$Method == "I"), ]
+
 max_bands <- ncol(dist_design) - 2
 count_names <- c("Sample_ID", "Species", "Distance_Method",
                  paste0(rep("Int", times = max_bands), 1:max_bands))
