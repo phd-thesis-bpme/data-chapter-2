@@ -21,6 +21,9 @@ binomial <- read.csv("output/binomial_names.csv")
 
 ####### Wrangle Data for Modelling ################
 
+# Change infinite values to some other very large number to avoid Stan issues
+dist_design <- do.call(data.frame,lapply(dist_design, function(x) replace(x, is.infinite(x),1000)))
+
 # Most of this code adopted from Edwards et al. 2022
 
 # Drop method I
@@ -132,46 +135,25 @@ model <- stan_model(file = "models/distance.stan")
 stan_job <- sampling(model,
                      data = stan_data,
                      verbose = TRUE,
-                     chains = 1,
-                     iter = 100,
-                     warmup = 50,
-                     cores = 1,
+                     chains = 4,
+                     iter = 1000,
+                     warmup = 500,
+                     cores = 4,
                      pars = c("log_tau", "sigma", "mu"),
                      control = list(adapt_delta = 0.8,
                                     max_treedepth = 15),
-                     init = list(list("log_tau[1]" = 3,
-                                      "log_tau[2]" = 3,
-                                      "log_tau[3]" = 3,
-                                      "log_tau[4]" = 3,
-                                      "log_tau[5]" = 3,
-                                      "log_tau[6]" = 3,
-                                      "log_tau[7]" = 3,
-                                      "log_tau[8]" = 3,
-                                      "log_tau[9]" = 3,
-                                      "log_tau[10]" = 3,
-                                      "log_tau[11]" = 3,
-                                      "mu[1]" = 3,
-                                      "mu[2]" = 3,
-                                      "mu[3]" = 3,
-                                      "mu[4]" = 3,
-                                      "mu[5]" = 3,
-                                      "mu[6]" = 3,
-                                      "mu[7]" = 3,
-                                      "mu[8]" = 3,
-                                      "mu[9]" = 3,
-                                      "mu[10]" = 3,
-                                      "mu[11]" = 3,
-                                      "sigma[1]" = 1,
-                                      "sigma[2]" = 1,
-                                      "sigma[3]" = 1,
-                                      "sigma[4]" = 1,
-                                      "sigma[5]" = 1,
-                                      "sigma[6]" = 1,
-                                      "sigma[7]" = 1,
-                                      "sigma[8]" = 1,
-                                      "sigma[9]" = 1,
-                                      "sigma[10]" = 1,
-                                      "sigma[11]" = 1)))
+                     init = list(list(log_tau = rnorm(11, 4, 0.5),
+                                      mu = rnorm(1, 4, 0.5),
+                                      sigma = rep(1,11)),
+                                 list(log_tau = rnorm(11, 4, 0.5),
+                                      mu = rnorm(1, 4, 0.5),
+                                      sigma = rep(1,11)),
+                                 list(log_tau = rnorm(11, 4, 0.5),
+                                      mu = rnorm(1, 4, 0.5),
+                                      sigma = rep(1,11)),
+                                 list(log_tau = rnorm(11, 4, 0.5),
+                                      mu = rnorm(1, 4, 0.5),
+                                      sigma = rep(1,11))))
 
 ####### Output ####################################
 
