@@ -26,7 +26,6 @@ model {
   mu_vector = rep_array(mu, n_species);
   
   log_tau ~ multi_normal(to_row_vector(mu_vector), quad_form_diag(phylo_corr, sigma));
-  print(log_tau);
 
   Pi = rep_matrix(0, n_samples, max_intervals);
   
