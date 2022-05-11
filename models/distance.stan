@@ -11,7 +11,7 @@ data {
 }
 
 parameters {
-  real<lower = 0> mu;
+  real<lower = 3> mu;
   vector<lower = 0>[n_species] sigma;
   vector<lower = 0>[n_species] log_tau;
 }
