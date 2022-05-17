@@ -30,6 +30,7 @@ codes <- bin_red$Code
 
 # Create empty data frame
 removal_df <- data.frame(Species = rep(codes, 2),
+                         N = NA,
                          Estimate = NA,
                          Lower = NA,
                          Upper = NA,
@@ -46,6 +47,10 @@ for (sp in codes)
                      removal_df$Model == "Single"), "Lower"] <- napops_est$CR_2.5[1]
   removal_df[which(removal_df$Species == sp & 
                      removal_df$Model == "Single"), "Upper"] <- napops_est$CR_97.5[1]
+  removal_df[which(removal_df$Species == sp & 
+                     removal_df$Model == "Single"), "N"] <- nrow(covariates_removal(species = sp))
+  removal_df[which(removal_df$Species == sp & 
+                     removal_df$Model == "Multi"), "N"] <- nrow(covariates_removal(species = sp))
   
   removal_df[which(removal_df$Species == sp & 
                      removal_df$Model == "Multi"), "Estimate"] <- exp(stan_summary$mean[i])
@@ -59,11 +64,12 @@ for (sp in codes)
 
 removal_df$Species <- factor(removal_df$Species, levels = codes)
 removal_df$Model <- factor(removal_df$Model, levels = c("Single", "Multi"))
+removal_df$Log_N <- log(removal_df$N)
 
 # Plot single vs multi
 comparison_plot <- ggplot(data = removal_df, aes(x = Species, y = Estimate, group = Model, color = Model)) +
-  geom_point(position = position_dodge(width = 0.2)) +
-  geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0, position = position_dodge(width = 0.2)) +
+  geom_point(aes(size = Log_N), position = position_dodge(width = 0.4)) +
+  geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0, position = position_dodge(width = 0.4)) +
   ylim(0,0.5) +
   ylab("Cue Rate") +
   NULL
