@@ -45,11 +45,12 @@ save(corr_matrix, file = "output/turdidae_corr_matrix.rda")
 
 png(filename = "plots/turdidae_phylo_corr.png",
     width = 6, height = 6, units = "in", res = 300)
-par(mfrow = c(1, 2))
-plot(tree_consensus)
-
 data <- cbind(expand.grid(dimnames(corr_matrix)), value = as.vector(corr_matrix))
 print(ggplot(data = data, aes(x = Var1, y = Var2, fill = value)) +
-  geom_tile())
+        geom_tile())
+dev.off()
 
+png(filename = "plots/turdidae_phylo.png",
+    width = 6, height = 6, units = "in", res = 300)
+plot(tree_consensus)
 dev.off()
