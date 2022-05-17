@@ -68,10 +68,9 @@ distance_df$Log_N <- log(distance_df$N)
 
 # Plot single vs multi
 comparison_plot <- ggplot(data = distance_df, aes(x = Species, y = Estimate, group = Model, color = Model)) +
-  geom_point(aes(size = Log_N), position = position_dodge(width = 0.4)) +
+  geom_point(position = position_dodge(width = 0.4)) +
   geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0, position = position_dodge(width = 0.4)) +
-  ylim(0,0.5) +
-  ylab("Cue Rate") +
+  ylab("EDR") +
   NULL
 
 
