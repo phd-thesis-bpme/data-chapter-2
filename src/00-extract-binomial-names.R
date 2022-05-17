@@ -12,10 +12,10 @@
 
 #' This file comes directly from NA-POPS: analysis/01-combine-data.R
 #' which is not publicly available. Will be loaded in as "project_counts"
-load("data/counts.rda")
+load("data/raw/counts.rda")
 
-codes <- read.csv("util/IBP-Alpha-Codes20.csv")
-families <- read.csv("util/NACC_list_species.csv")
+codes <- read.csv("data/raw/IBP-Alpha-Codes20.csv")
+families <- read.csv("data/raw/NACC_list_species.csv")
 
 ####### Main Code #################################
 
@@ -33,6 +33,6 @@ binomial[which(binomial$Scientific == "Ixoreus naevius"), "Scientific"] <- "Zoot
 ####### Output ####################################
 
 write.table(binomial,
-            file = "output/binomial_names.csv",
+            file = "data/generated/binomial_names.csv",
             sep = ",",
             row.names = FALSE)

@@ -13,8 +13,8 @@ library(ggplot2)
 
 ####### Read Data #################################
 
-turdidae <- ape::read.nexus(file = "data/turdidae.nex")
-binomial <- read.csv("output/binomial_names.csv")
+turdidae <- ape::read.nexus(file = "data/raw/turdidae.nex")
+binomial <- read.csv("data/generated/binomial_names.csv")
 
 ####### Main Code #################################
 
@@ -41,7 +41,7 @@ corr_matrix <- as.matrix(Matrix::nearPD(vvv, corr = CORR)$mat)
 
 ####### Output ####################################
 
-save(corr_matrix, file = "output/turdidae_corr_matrix.rda")
+save(corr_matrix, file = "data/generated/turdidae_corr_matrix.rda")
 
 png(filename = "plots/turdidae_phylo_corr.png",
     width = 6, height = 6, units = "in", res = 300)

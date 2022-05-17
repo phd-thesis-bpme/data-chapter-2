@@ -15,10 +15,10 @@ theme_set(theme_pubclean())
 
 ####### Read Data #################################
 
-load("output/turdidae_corr_matrix.rda")
-load("output/distance_turdidae_model.rda")
-load("output/distance_turdidae_data.rda")
-binomial <- read.csv("output/binomial_names.csv")
+load("data/generated/turdidae_corr_matrix.rda")
+load("data/generated/distance_turdidae_model.rda")
+load("data/generated/distance_turdidae_data.rda")
+binomial <- read.csv("data/generated/binomial_names.csv")
 
 ####### Main Code #################################
 

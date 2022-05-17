@@ -14,10 +14,10 @@ rstan_options(auto_write = TRUE)
 
 ####### Read Data #################################
 
-load("data/time_count_matrix.rda")
-load("data/time_design.rda")
-load("output/turdidae_corr_matrix.rda")
-binomial <- read.csv("output/binomial_names.csv")
+load("data/raw/time_count_matrix.rda")
+load("data/raw/time_design.rda")
+load("data/generated/turdidae_corr_matrix.rda")
+binomial <- read.csv("data/generated/binomial_names.csv")
 
 ####### Wrangle Data for Modelling ################
 
@@ -141,6 +141,6 @@ stan_job <- sampling(model,
 
 ####### Output ####################################
 
-save(stan_job, file = "output/removal_turdidae_model.rda")
-save(stan_data, file = "output/removal_turdidae_data.rda")
+save(stan_job, file = "data/generated/removal_turdidae_model.rda")
+save(stan_data, file = "data/generated/removal_turdidae_data.rda")
 
