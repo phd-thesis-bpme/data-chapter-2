@@ -36,7 +36,8 @@ model {
     }
     Pi[i,1] = 1 - sum(Pi[i,]);
     
-    abund_per_band[i,] ~ multinomial(to_vector(Pi[i,]));
+    target += multinomial_lpmf(abund_per_band[i,] | to_vector(Pi[i,]));
+   //  abund_per_band[i,] ~ multinomial(to_vector(Pi[i,]));
   }
 
 }
