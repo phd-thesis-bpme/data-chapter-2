@@ -122,13 +122,13 @@ binomial_remaining[which(binomial_remaining$English == "Eastern Yellow Wagtail")
                    "Taxonomy"] <- 
   birdtree[which(birdtree$English_BT == "Yellow Wagtail"), "Taxonomy"]
 
-#' Thick-billed Longspur got changed from Smith's Longspur
+#' Thick-billed Longspur got changed from McCown's Longspur
 binomial_remaining[which(binomial_remaining$English == "Thick-billed Longspur"),
                    "Scientific_BT"] <- 
-  birdtree[which(birdtree$English_BT == "Smith's Longspur"), "Scientific_BT"]
+  birdtree[which(birdtree$English_BT == "McCown's Longspur"), "Scientific_BT"]
 binomial_remaining[which(binomial_remaining$English == "Thick-billed Longspur"),
                    "Taxonomy"] <- 
-  birdtree[which(birdtree$English_BT == "Smith's Longspur"), "Taxonomy"]
+  birdtree[which(birdtree$English_BT == "McCown's Longspur"), "Taxonomy"]
 
 #' Black-throated Gray Warbler is Black-throated Grey Warbler in BirdTree
 #' with a different sci name
