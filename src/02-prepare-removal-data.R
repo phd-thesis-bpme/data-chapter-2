@@ -1,23 +1,27 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 02-removal-model.R
-# Created April 2022
-# Last Updated April 2022
+# 02-prepare-removal-data.R
+# Created August 2022
+# Last Updated August 2022
 
 ####### Import Libraries and External Files #######
 
+library(ape)
+library(Matrix)
 library(plyr)
-library(rstan)
-options(mc.cores = parallel::detectCores())
-rstan_options(auto_write = TRUE)
+library(magrittr)
+
+source("src/functions/generate-phylo-corr.R")
 
 ####### Read Data #################################
 
 load("data/raw/time_count_matrix.rda")
 load("data/raw/time_design.rda")
-load("data/generated/turdidae_corr_matrix.rda")
+phylo_tree <- ape::read.nexus(file = "data/raw/all_species.nex")
 binomial <- read.csv("data/generated/binomial_names.csv")
+#load("data/generated/turdidae_corr_matrix.rda")
+#binomial <- read.csv("data/generated/binomial_names.csv")
 
 ####### Wrangle Data for Modelling ################
 
@@ -57,12 +61,20 @@ for (i in col_names)
   counts[indices, i] <- ifelse(is.na(design[indices, i]), NA, 0)
 }
 
-# Re-order the species so that they match the correlation matrix
+# Subset the NA-POPS phylogeny to only birds with removal data
 species <- sort(as.character(unique(counts$Species)))
-bin_turdidae <- binomial[which(binomial$Code %in% species), ]
-bin_turdidae$Scientific <- gsub(" ", "_", bin_turdidae$Scientific)
-bin_turdidae <- bin_turdidae[match(colnames(corr_matrix), bin_turdidae$Scientific),]
-species <- bin_turdidae$Code
+binomial$Scientific_BT <- gsub(" ", "_", binomial$Scientific_BT)
+bin_removal <- binomial[which(binomial$Code %in% species), ]
+dropped <- setdiff(binomial$Scientific_BT, bin_removal$Scientific_BT)
+
+# Generate the correlation matrix (takes a long time)
+removal_corr_matrix <- generate_phylo_corr(phylo_tree = t <- phylo_tree, drops = dropped)
+removal_tree_consensus <- ape::consensus(phylo_tree) %>%
+  drop.tip(tip = dropped)
+
+# Re-order the species so that they match the correlation matrix
+bin_removal <- bin_removal[match(colnames(removal_corr_matrix), bin_removal$Scientific_BT),]
+species <- bin_removal$Code
 
 # List of input counts
 Y <- vector(mode = "list", length = length(species))
@@ -114,33 +126,17 @@ n_samples <- nrow(Y)
 n_species <- length(unique(sp_list[,1]))
 max_intervals <- ncol(Y)
 
-stan_data <- list(n_samples = n_samples,
-                  n_species = n_species,
-                  max_intervals = max_intervals,
-                  species = sp_list_numeric,
-                  abund_per_band = abundance_per_band,
-                  abund_per_sample = total_abund_per_sample,
-                  bands_per_sample = time_bands_per_sample,
-                  max_time = max_time,
-                  phylo_corr = corr_matrix)
-
-####### Stan Modelling ############################
-
-model <- stan_model(file = "models/removal.stan")
-
-stan_job <- sampling(model,
-                          data = stan_data,
-                          verbose = TRUE,
-                          chains = 4,
-                          iter = 1000,
-                          warmup = 500,
-                          cores = 4,
-                          pars = c("log_phi", "tau", "mu"),
-                          control = list(adapt_delta = 0.8,
-                                         max_treedepth = 15))
+removal_stan_data <- list(n_samples = n_samples,
+                          n_species = n_species,
+                          max_intervals = max_intervals,
+                          species = sp_list_numeric,
+                          abund_per_band = abundance_per_band,
+                          abund_per_sample = total_abund_per_sample,
+                          bands_per_sample = time_bands_per_sample,
+                          max_time = max_time,
+                          phylo_corr = removal_corr_matrix)
 
 ####### Output ####################################
-
-save(stan_job, file = "data/generated/removal_turdidae_model.rda")
-save(stan_data, file = "data/generated/removal_turdidae_data.rda")
+save(removal_tree_consensus, file = "data/generated/removal_tree_consensus.rda")
+save(removal_stan_data, file = "data/generated/removal_stan_data.rda")
 
