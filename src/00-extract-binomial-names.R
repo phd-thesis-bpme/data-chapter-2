@@ -8,8 +8,6 @@
 ####### Import Libraries and External Files #######
 
 library(magrittr)
-library(fedmatch)
-library(data.table)
 
 ####### Read Data #################################
 
@@ -79,34 +77,81 @@ if (nrow(binomial_matched_sci_ioc > 0))
 }
 dropped <- setdiff(binomial$English, binomial_matched$English)
 
-#' Now the remaining dropped species will be a bit trickier. For the most part, 
-#' it will likely be the case that the names are just spelled slightly different,
-#' AND the scientific name differs (aren't those NOT suppose to change? Ugh...).
-#' So let's try fuzzy matching by Common name first
-#' SPECIES THAT WILL NOT/SHOULD NOT WORK:
-#' * Sagebrush Sparrow/Sage Sparrow (SBSP used to be SAGS with BESP)
-#' * Eastern Yellow Wagtail (Just yellow wagtail)
-#' * Pacific Wren (may have to drop)
-#' * Woodhouse's Scrub Jay (investigate)
-#' * Eastern Whip-poor-will (just Whip-poor-will)
-#' * Thick-billed Longspur (used to be Smith's Longspur)
-#' * Northern Shrike (????)
-#' * Bell's sparrow (same explanation as first on this list)
+#' We will now just have to do the remaining species by hand. Previous tests of
+#' fuzzy matching was okay for some, but then missed some others, so just best to
+#' do it manually unfortunately. This section here will likely have to be updated
+#' from time to time as more species get added to NA-POPS. I'll also put an explanation
+#' beside each species explaning why it must be done manually.
+binomial_remaining <- binomial[which(binomial$English %in% dropped), 
+                               c("English", "Code", "Scientific", "Family")]
+binomial_remaining$Scientific_BT <- NA
+binomial_remaining$Taxonomy <- NA
+print(binomial_remaining$English)
 
+#' LeConte's Sparrow couldn't fuzzily match well with "Le Conte's Sparrow, without
+#' including another wrong match
+binomial_remaining[which(binomial_remaining$English == "LeConte's Sparrow"),
+                   "Scientific_BT"] <- 
+  birdtree[which(birdtree$English_BT == "Le Conte's Sparrow"), "Scientific_BT"]
+binomial_remaining[which(binomial_remaining$English == "LeConte's Sparrow"),
+                   "Taxonomy"] <- 
+  birdtree[which(birdtree$English_BT == "Le Conte's Sparrow"), "Taxonomy"]
 
-# fuzzy_match <- merge_plus(data1 = binomial_dropped,
-#                           data2 = birdtree[, c("Scientific_BT", "English_BT")],
-#                           by.x = "English", by.y = "English_BT",
-#                           match_type = "fuzzy",
-#                           unique_key_1 = "Scientific",
-#                           unique_key_2 = "Scientific_BT",
-#                           fuzzy_settings = build_fuzzy_settings(maxDist = .08))
-#binomial[which(binomial$Scientific == "Ixoreus naevius"), "Scientific"] <- "Zoothera naevia"
+#' Eastern Whip-poor-will goes with BirdTree's Whip-poor-will. Fuzzy matching coulnd't
+#' handle
+binomial_remaining[which(binomial_remaining$English == "Eastern Whip-poor-will"),
+                   "Scientific_BT"] <- 
+  birdtree[which(birdtree$English_BT == "Whip-poor-will"), "Scientific_BT"]
+binomial_remaining[which(binomial_remaining$English == "Eastern Whip-poor-will"),
+                   "Taxonomy"] <- 
+  birdtree[which(birdtree$English_BT == "Whip-poor-will"), "Taxonomy"]
+
+#' Gray Hawk is "Grey Hawk" in BirdTree, and different scientific name, easy enough
+binomial_remaining[which(binomial_remaining$English == "Gray Hawk"),
+                   "Scientific_BT"] <- 
+  birdtree[which(birdtree$English_BT == "Grey Hawk"), "Scientific_BT"]
+binomial_remaining[which(binomial_remaining$English == "Gray Hawk"),
+                   "Taxonomy"] <- 
+  birdtree[which(birdtree$English_BT == "Grey Hawk"), "Taxonomy"]
+
+#' Eastern Yellow Wagtail should just be "Yellow Wagtail", and diff sci name
+binomial_remaining[which(binomial_remaining$English == "Eastern Yellow Wagtail"),
+                   "Scientific_BT"] <- 
+  birdtree[which(birdtree$English_BT == "Yellow Wagtail"), "Scientific_BT"]
+binomial_remaining[which(binomial_remaining$English == "Eastern Yellow Wagtail"),
+                   "Taxonomy"] <- 
+  birdtree[which(birdtree$English_BT == "Yellow Wagtail"), "Taxonomy"]
+
+#' Thick-billed Longspur got changed from Smith's Longspur
+binomial_remaining[which(binomial_remaining$English == "Thick-billed Longspur"),
+                   "Scientific_BT"] <- 
+  birdtree[which(birdtree$English_BT == "Smith's Longspur"), "Scientific_BT"]
+binomial_remaining[which(binomial_remaining$English == "Thick-billed Longspur"),
+                   "Taxonomy"] <- 
+  birdtree[which(birdtree$English_BT == "Smith's Longspur"), "Taxonomy"]
+
+#' Black-throated Gray Warbler is Black-throated Grey Warbler in BirdTree
+#' with a different sci name
+binomial_remaining[which(binomial_remaining$English == "Black-throated Gray Warbler"),
+                   "Scientific_BT"] <- 
+  birdtree[which(birdtree$English_BT == "Black-throated Grey Warbler"), "Scientific_BT"]
+binomial_remaining[which(binomial_remaining$English == "Black-throated Gray Warbler"),
+                   "Taxonomy"] <- 
+  birdtree[which(birdtree$English_BT == "Black-throated Grey Warbler"), "Taxonomy"]
+
+#' Woodhouse's Scrub-Jay, Bell's Sparrow, Sagebrush Sparrow, Pacific Wren 
+#' didn't exist at the time of Jetz et al. 2012 so just drop.
+#' Northern Shrike apparently was just lumped with "Great Gray Shrike" in birdtree?
+#' I don't quite understand this one, but I'm just going to drop it as well.
+binomial_remaining <- binomial_remaining[-which(is.na(binomial_remaining$Scientific_BT)), ]
+
+# Glue these on to the rest of the matches, and you've got your matched table
+binomial_matched <- rbind(binomial_matched, binomial_remaining)
 
 
 ####### Output ####################################
 
-write.table(binomial,
+write.table(binomial_matched,
             file = "data/generated/binomial_names.csv",
             sep = ",",
             row.names = FALSE)
