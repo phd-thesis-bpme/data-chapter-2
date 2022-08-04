@@ -12,17 +12,17 @@ data {
 
 parameters {
   row_vector[n_species] mu;
-  vector<lower = 0>[n_species] tau;
+  vector<lower = 0>[n_species] sigma;
   vector[n_species] log_phi;
 }
 
 model {
   matrix[n_samples, max_intervals] Pi;   // probabilities
   
-  tau ~ cauchy(0, 2.5);
+  sigma ~ cauchy(0, 2.5);
   mu ~ normal(0, 1);
   
-  log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr, tau));
+  log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr, sigma));
   
   Pi = rep_matrix(0, n_samples, max_intervals);
   
