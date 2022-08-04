@@ -1,4 +1,4 @@
-# README
+# multispecies-qpad-detectability
 This repository serves as the main project for the development of a multi-species model of QPAD detectability, incorporting species phylogeny and traits. Below is information regarding each directory.
 
 ## /article
