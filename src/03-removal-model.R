@@ -20,11 +20,14 @@ load("data/generated/removal_stan_data.rda")
 model <- cmdstan_model(stan_file = "models/removal.stan",
                        cpp_options = list(stan_threads = TRUE))#model <- stan_model(file = "models/removal.stan")
 
+removal_stan_data$grainsize <- 1
+
 removal_stan_fit <- model$sample(
   data = removal_stan_data,
   chains = 4,
   parallel_chains = 4,
-  refresh = 100
+  refresh = 100,
+  threads_per_chain = 2
 )
 
 # removal_stan_job <- sampling(model,
