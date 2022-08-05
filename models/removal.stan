@@ -22,7 +22,7 @@ functions {
       }
       Pi[Pi_index,1] = 1 - sum(Pi[Pi_index,]);
       
-      lp = lp + multinomial_lpmf(slice_abund_per_band[i,] | to_vector(Pi[Pi_index,]));
+      lp = lp + multinomial_lpmf(slice_abund_per_band[Pi_index,] | to_vector(Pi[Pi_index,]));
       Pi_index = Pi_index + 1;
     }
 

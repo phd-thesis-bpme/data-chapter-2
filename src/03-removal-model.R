@@ -27,7 +27,7 @@ removal_stan_fit <- model$sample(
   chains = 4,
   parallel_chains = 4,
   refresh = 100,
-  threads_per_chain = 2
+  threads_per_chain = 4
 )
 
 # removal_stan_job <- sampling(model,
@@ -43,6 +43,6 @@ removal_stan_fit <- model$sample(
 
 ####### Output ####################################
 
-fit$save_object(file = "data/generated/removal_model.RDS")
+removal_stan_fit$save_object(file = "data/generated/removal_model.RDS")
 #save(removal_stan_fit, file = "data/generated/removal_model.rda")
 
