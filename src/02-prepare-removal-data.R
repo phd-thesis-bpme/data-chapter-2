@@ -131,7 +131,6 @@ removal_stan_data <- list(n_samples = n_samples,
                           max_intervals = max_intervals,
                           species = sp_list_numeric,
                           abund_per_band = abundance_per_band,
-                          abund_per_sample = total_abund_per_sample,
                           bands_per_sample = time_bands_per_sample,
                           max_time = max_time,
                           phylo_corr = removal_corr_matrix)
