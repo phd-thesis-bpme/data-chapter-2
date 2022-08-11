@@ -1,16 +1,18 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 03-distance-model.R
-# Created April 2022
-# Last Updated April 2022
+# 03-prepare-distance-data.R
+# Created August 2022
+# Last Updated August 2022
 
 ####### Import Libraries and External Files #######
 
+library(ape)
+library(Matrix)
 library(plyr)
-library(rstan)
-options(mc.cores = parallel::detectCores())
-rstan_options(auto_write = TRUE)
+library(magrittr)
+
+source("src/functions/generate-phylo-corr.R")
 
 ####### Read Data #################################
 
