@@ -148,7 +148,14 @@ binomial_remaining <- binomial_remaining[-which(is.na(binomial_remaining$Scienti
 # Glue these on to the rest of the matches, and you've got your matched table
 binomial_matched <- rbind(binomial_matched, binomial_remaining)
 
-
+# Now add Bicknell's Thrush as "new data"
+binomial_matched <- rbind(binomial_matched,
+                          data.frame(English = "Bicknell's Thrush",
+                                     Code = "BITH",
+                                     Scientific = birdtree[which(birdtree$English_BT == "Bicknell's Thrush"), "Scientific_BT"],
+                                     Family = "Turdidae",
+                                     Scientific_BT = birdtree[which(birdtree$English_BT == "Bicknell's Thrush"), "Scientific_BT"],
+                                     Taxonomy = birdtree[which(birdtree$English_BT == "Bicknell's Thrush"), "Taxonomy"]))
 ####### Output ####################################
 
 write.table(binomial_matched,
