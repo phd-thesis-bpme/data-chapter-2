@@ -11,7 +11,7 @@ functions {
     int Pi_size = end - start + 1;
     int Pi_index = 1;
     matrix[Pi_size, max_intervals] Pi = rep_matrix(0, Pi_size, max_intervals);   // probabilities
-    //Pi = 
+
     for (i in start:end)
     {
       for (j in 2:bands_per_sample[i])
@@ -37,7 +37,6 @@ data {
   int<lower = 1> grainsize;           // grainsize for reduce_sum() function
   int species[n_samples];             // species being considered for each sample
   int abund_per_band[n_samples, max_intervals];// abundance in time band j for sample i
- // int<lower = 0> abund_per_sample[n_samples]; // total abundnace for sample i
   int bands_per_sample[n_samples]; // number of time bands for sample i
   int max_time[n_samples, max_intervals]; // max time duration for time band j
   corr_matrix[n_species] phylo_corr; // correlation matrix of phylogeny
@@ -50,28 +49,10 @@ parameters {
 }
 
 model {
- // matrix[n_samples, max_intervals] Pi;   // probabilities
-  
   sigma ~ cauchy(0, 2.5);
   mu ~ normal(0, 1);
   
   log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr, sigma));
-  
- // Pi = rep_matrix(0, n_samples, max_intervals);
-  // 
-  // for (i in 1:n_samples)
-  // {
-  //   for (j in 2:bands_per_sample[i])
-  //   {
-  //     Pi[i,j] = (exp(-max_time[i,j-1] * exp(log_phi[species[i]])) - 
-  //                exp(-max_time[i,j] * exp(log_phi[species[i]]))) / 
-  //               (1 - exp(-max_time[i,bands_per_sample[i]] * exp(log_phi[species[i]])));
-  //   }
-  //   Pi[i,1] = 1 - sum(Pi[i,]);
-  //   
-  //   target += multinomial_lpmf(abund_per_band[i,] | to_vector(Pi[i,]));
-  //  //  abund_per_band[i,] ~ multinomial(to_vector(Pi[i,]));
-  // }
   
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,
