@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 02-prepare-removal-data.R
 # Created August 2022
-# Last Updated August 2022
+# Last Updated October 2022
 
 ####### Import Libraries and External Files #######
 
@@ -12,16 +12,13 @@ library(Matrix)
 library(plyr)
 library(magrittr)
 
-source("src/functions/generate-phylo-corr.R")
-
 ####### Read Data #################################
 
 load("data/raw/time_count_matrix.rda")
 load("data/raw/time_design.rda")
-phylo_tree <- ape::read.nexus(file = "data/raw/all_species.nex")
+cv_tree <- load(file = "data/generated/corr_matrix_cv.rda")
+pred_tree <- load(file = "data/generated/corr_matrix_predict.rda")
 binomial <- read.csv("data/generated/binomial_names.csv")
-#load("data/generated/turdidae_corr_matrix.rda")
-#binomial <- read.csv("data/generated/binomial_names.csv")
 
 ####### Wrangle Data for Modelling ################
 
@@ -61,58 +58,89 @@ for (i in col_names)
   counts[indices, i] <- ifelse(is.na(design[indices, i]), NA, 0)
 }
 
-# Subset the NA-POPS phylogeny to only birds with removal data
-species <- sort(as.character(unique(counts$Species)))
-binomial$Scientific_BT <- gsub(" ", "_", binomial$Scientific_BT)
-bin_removal <- binomial[which(binomial$Code %in% species), ]
-dropped <- setdiff(binomial$Scientific_BT, bin_removal$Scientific_BT)
+# Get species codes and order of species codes for the Cross-validation matrix
+species_cv <- gsub(pattern = "_", 
+                   replacement = " ", 
+                   x = rownames(corr_matrix_cv))
+binomial_cv <- binomial[which(binomial$Scientific_BT %in% species_cv), ]
+binomial_cv <- binomial_cv[match(species_cv, binomial_cv$Scientific_BT), ]
+species_cv_code <- binomial_cv$Code
 
-# Generate the correlation matrix (takes a long time)
-removal_corr_matrix <- generate_phylo_corr(phylo_tree = t <- phylo_tree, drops = dropped)
-removal_tree_consensus <- ape::consensus(phylo_tree) %>%
-  drop.tip(tip = dropped)
+# Get species codes and order of species codes for the Prediction Matrix
+species_pred <- gsub(pattern = "_",
+                     replacement= " ",
+                     x = rownames(corr_matrix_predict))
+binomial_pred <- binomial[which(binomial$Scientific_BT %in% species_pred), ]
+binomial_pred <- binomial_pred[match(species_pred, binomial_pred$Scientific_BT), ]
+species_pred_code <- binomial_pred$Code
 
-# Re-order the species so that they match the correlation matrix
-bin_removal <- bin_removal[match(colnames(removal_corr_matrix), bin_removal$Scientific_BT),]
-species <- bin_removal$Code
+#' All of the following values will have values specific to cross validation list
+#' and the prediction list. So those will be noted e.g. Y_cv or Y_pred
 
 # List of input counts
-Y <- vector(mode = "list", length = length(species))
-names(Y) <- species
+Y_cv <- vector(mode = "list", length = length(species_cv_code))
+names(Y_cv) <- species_cv_code
+
+Y_pred <- vector(mode = "list", length = length(species_pred_code))
+names(Y_pred) <- species_pred_code
 
 # List of input design
-D <- vector(mode = "list", length = length(species))
-names(D) <- species
+D_cv <- vector(mode = "list", length = length(species_cv_code))
+names(D_cv) <- species_cv_code
+
+D_pred <- vector(mode = "list", length = length(species_pred_code))
+names(D_pred) <- species_pred_code
 
 # Species indicator list
-sp_list <- vector(mode = "list", length = length(species))
-names(sp_list) <- species
+sp_list_cv <- vector(mode = "list", length = length(species_cv_code))
+names(sp_list_cv) <- species_cv_code
 
-for (s in species)
+sp_list_pred <- vector(mode = "list", length = length(species_pred_code))
+names(sp_list_pred) <- species_pred_code
+
+for (s in species_cv_code)
 {
   n_counts <- nrow(counts[counts$Species == s, ])
-
-  Y[[s]] <- as.matrix(counts[counts$Species==s, col_names])
-  D[[s]] <- as.matrix(design[design$Species==s, col_names])
-  sp_list[[s]] <- data.frame(Species = rep(s, n_counts))
+  
+  Y_cv[[s]] <- as.matrix(counts[counts$Species==s, col_names])
+  D_cv[[s]] <- as.matrix(design[design$Species==s, col_names])
+  sp_list_cv[[s]] <- data.frame(Species = rep(s, n_counts))
 }
 
-Y <- Y[lengths(Y) != 0]; Y <- do.call(rbind, Y)
-D <- D[lengths(D) != 0]; D <- do.call(rbind, D)
-sp_list <- sp_list[lengths(sp_list) != 0]; sp_list <- do.call(rbind, sp_list)
+for (s in species_pred_code)
+{
+  n_counts <- nrow(counts[counts$Species == s, ])
+  
+  Y_pred[[s]] <- as.matrix(counts[counts$Species==s, col_names])
+  D_pred[[s]] <- as.matrix(design[design$Species==s, col_names])
+  sp_list_pred[[s]] <- data.frame(Species = rep(s, n_counts))
+}
+
+Y_cv <- Y_cv[lengths(Y_cv) != 0]; Y_cv <- do.call(rbind, Y_cv)
+Y_pred <- Y_pred[lengths(Y_pred) != 0]; Y_pred <- do.call(rbind, Y_pred)
+
+D_cv <- D_cv[lengths(D_cv) != 0]; D_cv <- do.call(rbind, D_cv)
+D_pred <- D_pred[lengths(D_pred) != 0]; D_pred <- do.call(rbind, D_pred)
+
+sp_list_cv <- do.call(rbind, sp_list_cv)
+sp_list_pred <- do.call(rbind, sp_list_pred)
 
 #' Corresponds with "bands_per_sample" in removal.stan
-time_bands_per_sample <- unname(apply(Y, 1, function(x) sum(!is.na(x))))
+time_bands_per_sample_cv <- unname(apply(Y_cv, 1, function(x) sum(!is.na(x))))
+time_bands_per_sample_pred <- unname(apply(Y_pred, 1, function(x) sum(!is.na(x))))
 
 #' Total species abundance per sampling event.
 #' I.e., this is the sum of Y_sij over j
 #' Corresponds with "abund_per_sample" in removal.stan
-total_abund_per_sample <- unname(apply(Y, 1, function(x) sum(x, na.rm = TRUE)))
+total_abund_per_sample_cv <- unname(apply(Y_cv, 1, function(x) sum(x, na.rm = TRUE)))
+total_abund_per_sample_pred <- unname(apply(Y_pred, 1, function(x) sum(x, na.rm = TRUE)))
 
 #' Factored list of species
 #' Corresponds with "species" in removal.stan
-sp_list_numeric <- as.numeric(factor(sp_list[,1],
-                                     levels = species))
+sp_cv_numeric <- data.frame(sp = species_cv_code,
+                            num = seq(1, length(species_cv_code))) %>%
+  merge(sp_list_cv, by.x = "sp", by.y = "Species")
+sp_list_cv_numeric <- sp_cv_numeric[which(sp_cv_numeric == sp_list_cv), "num"]
 
 #' Corresponds with "abund_per_band" in removal.stan
 abundance_per_band <- Y
