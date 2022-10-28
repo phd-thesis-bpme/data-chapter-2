@@ -17,15 +17,16 @@ load("data/generated/removal_stan_data_cv.rda")
 
 sp_list <- removal_stan_data_cv$sp_list
 removal_stan_data_cv$sp_list <- NULL
-models <- c("ou")
+models <- c("pagel")
 removal_stan_data_cv$grainsize <- 1
+removal_stan_data_cv$lambda <- 0.76
+
 
 for (m in models)
 {
   dir.create(paste0("output/cv/removal/", m), recursive = TRUE)
   model_file <- cmdstan_model(stan_file = paste0("models/removal_", m, ".stan"),
                          cpp_options = list(stan_threads = TRUE))
-
   
   # first, run the full model with no species removed
   removal_stan_fit_full <- model_file$sample(
