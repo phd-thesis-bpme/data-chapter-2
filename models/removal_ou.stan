@@ -28,6 +28,29 @@ functions {
 
     return lp;
   }
+ 
+ // Adapted from Statistical Rethinking Ed 2, Chapter 14 Page 484 
+  matrix ou_kernal(matrix x,
+                   real sq_alpha,
+                   real sq_rho,
+                   real delta)
+  {
+    int N = dims(x)[1];
+    matrix[N,N] K;
+    
+    for (i in 1:(N - 1))
+    {
+      K[i,i] = sq_alpha + delta;
+      for (j in (i + 1):N)
+      {
+        K[i,j] = sq_alpha * exp(-sq_rho * x[i,j]);
+        K[j,i] = K[i,j];
+      }
+    }
+    K[N,N] = sq_alpha + delta;
+    
+    return K;
+  }
 }
 
 data {
@@ -44,15 +67,17 @@ data {
 
 parameters {
   row_vector[n_species] mu;
-  vector<lower = 0>[n_species] sigma;
+  real<lower = 0> etasq;
+  real<lower = 0> rhosq;
   vector[n_species] log_phi;
 }
 
 model {
-  sigma ~ exponential(1);
+  etasq ~ normal(1, 0.25);
+  rhosq ~ normal(3, 0.25);
   mu ~ normal(0, 1);
   
-  log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr, sigma));
+  log_phi ~ multi_normal(mu, ou_kernal(phylo_corr, etasq, rhosq, 0.01));
   
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,

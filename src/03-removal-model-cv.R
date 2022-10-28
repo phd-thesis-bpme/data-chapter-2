@@ -17,7 +17,7 @@ load("data/generated/removal_stan_data_cv.rda")
 
 sp_list <- removal_stan_data_cv$sp_list
 removal_stan_data_cv$sp_list <- NULL
-models <- c("brownian")
+models <- c("ou")
 removal_stan_data_cv$grainsize <- 1
 
 for (m in models)
