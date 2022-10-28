@@ -29,6 +29,23 @@ functions {
     
     return lp;
   }
+  
+     // Adapted from Statistical Rethinking Ed 2, Chapter 14 Page 484 
+  matrix phylo_pl(matrix x,
+                  real lambda)
+  {
+    int N = dims(x)[1];
+    matrix[N,N] K;
+    
+    K = x * lambda;
+    
+    for (i in 1:N)
+    {
+      K[i,i] = 1;
+    }
+    
+    return K;
+  }
 }
 
 data {
@@ -41,6 +58,13 @@ data {
   int bands_per_sample[n_samples]; // number of distance bands for sample i
   int max_dist[n_samples, max_intervals]; // max distance for distance band k
   corr_matrix[n_species] phylo_corr; // correlation matrix of phylogeny
+  real<lower = 0> lambda;            //Pagel's lambda
+}
+
+transformed data {
+  corr_matrix[n_species] phylo_corr_pl;
+  phylo_corr_pl = phylo_pl(phylo_corr, lambda);
+  
 }
 
 parameters {
@@ -55,7 +79,7 @@ model {
 
  // mu_vector = rep_array(mu, n_species);
   
-  log_tau ~ multi_normal(mu, quad_form_diag(phylo_corr, rep_vector(sigma, n_species)));
+  log_tau ~ multi_normal(mu, quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
 
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,
