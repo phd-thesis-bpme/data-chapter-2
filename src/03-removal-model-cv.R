@@ -27,9 +27,8 @@ for (m in models)
   removal_stan_data_cv$grainsize <- 1
   
   # first, run the full model with no species removed
-  removal_stan_fit_full <- model_file$sample
-  (
-    data = removal_stan_data,
+  removal_stan_fit_full <- model_file$sample(
+    data = removal_stan_data_cv,
     iter_warmup = 10,
     iter_sampling = 50,
     chains = 4,
