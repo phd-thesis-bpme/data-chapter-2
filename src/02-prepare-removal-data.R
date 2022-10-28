@@ -137,33 +137,56 @@ total_abund_per_sample_pred <- unname(apply(Y_pred, 1, function(x) sum(x, na.rm 
 
 #' Factored list of species
 #' Corresponds with "species" in removal.stan
-sp_cv_numeric <- data.frame(sp = species_cv_code,
-                            num = seq(1, length(species_cv_code))) %>%
-  merge(sp_list_cv, by.x = "sp", by.y = "Species")
-sp_list_cv_numeric <- sp_cv_numeric[which(sp_cv_numeric == sp_list_cv), "num"]
+sp_cv_numeric <- data.frame(Species = species_cv_code,
+                            num = seq(1, length(species_cv_code)))
+sp_cv_numeric <- join(sp_list_cv, sp_cv_numeric, by= "Species")
+
+sp_pred_numeric <- data.frame(Species = species_pred_code,
+                            num = seq(1, length(species_pred_code)))
+sp_pred_numeric <- join(sp_list_pred, sp_pred_numeric, by= "Species")
 
 #' Corresponds with "abund_per_band" in removal.stan
-abundance_per_band <- Y
-abundance_per_band[is.na(abundance_per_band)] <- 0
+abundance_per_band_cv <- Y_cv
+abundance_per_band_cv[is.na(abundance_per_band_cv)] <- 0
+
+abundance_per_band_pred <- Y_pred
+abundance_per_band_pred[is.na(abundance_per_band_pred)] <- 0
 
 #' Corresponds with "max_time" in removal.stan
-max_time <- D
-max_time[is.na(max_time)] <- 0
+max_time_cv <- D_cv
+max_time_cv[is.na(max_time_cv)] <- 0
 
-n_samples <- nrow(Y)
-n_species <- length(unique(sp_list[,1]))
-max_intervals <- ncol(Y)
+max_time_pred <- D_pred
+max_time_pred[is.na(max_time_pred)] <- 0
 
-removal_stan_data <- list(n_samples = n_samples,
-                          n_species = n_species,
-                          max_intervals = max_intervals,
-                          species = sp_list_numeric,
-                          abund_per_band = abundance_per_band,
-                          bands_per_sample = time_bands_per_sample,
-                          max_time = max_time,
-                          phylo_corr = removal_corr_matrix)
+n_samples_cv <- nrow(Y_cv)
+n_samples_pred <- nrow(Y_pred)
+
+n_species_cv <- nrow(binomial_cv)
+n_species_pred <- nrow(binomial_pred)
+
+max_intervals_cv <- ncol(Y_cv)
+max_intervals_pred <- ncol(Y_pred)
+
+removal_stan_data_cv <- list(n_samples = n_samples_cv,
+                          n_species = n_species_cv,
+                          max_intervals = max_intervals_cv,
+                          species = sp_cv_numeric$num,
+                          abund_per_band = abundance_per_band_cv,
+                          bands_per_sample = time_bands_per_sample_cv,
+                          max_time = max_time_cv,
+                          phylo_corr = cv_tree)
+
+removal_stan_data_pred <- list(n_samples = n_samples_pred,
+                             n_species = n_species_pred,
+                             max_intervals = max_intervals_pred,
+                             species = sp_pred_numeric$num,
+                             abund_per_band = abundance_per_band_pred,
+                             bands_per_sample = time_bands_per_sample_pred,
+                             max_time = max_time_pred,
+                             phylo_corr = pred_tree)
 
 ####### Output ####################################
-save(removal_tree_consensus, file = "data/generated/removal_tree_consensus.rda")
-save(removal_stan_data, file = "data/generated/removal_stan_data.rda")
+save(removal_stan_data_cv, file = "data/generated/removal_stan_data_cv.rda")
+save(removal_stan_data_pred, file = "data/generated/removal_stan_data_pred.rda")
 
