@@ -15,8 +15,9 @@ load("data/generated/removal_stan_data_cv.rda")
 
 ####### Cross Validation ##########################
 
+sp_list <- removal_stan_data_cv$sp_list
+removal_stan_data_cv$sp_list <- NULL
 models <- c("brownian", "ou")
-
 
 for (m in models)
 {
@@ -36,8 +37,8 @@ for (m in models)
     refresh = 10,
     threads_per_chain = 4
   )
-  
   removal_stan_fit_full$save_object(file = paste0("output/cv/removal/", m,"/1full.RDS"))
+  
 }
 
 ####### Output ####################################

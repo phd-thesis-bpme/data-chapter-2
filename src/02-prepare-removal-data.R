@@ -16,8 +16,8 @@ library(magrittr)
 
 load("data/raw/time_count_matrix.rda")
 load("data/raw/time_design.rda")
-cv_tree <- load(file = "data/generated/corr_matrix_cv.rda")
-pred_tree <- load(file = "data/generated/corr_matrix_predict.rda")
+load(file = "data/generated/corr_matrix_cv.rda")
+load(file = "data/generated/corr_matrix_predict.rda")
 binomial <- read.csv("data/generated/binomial_names.csv")
 
 ####### Wrangle Data for Modelling ################
@@ -175,7 +175,8 @@ removal_stan_data_cv <- list(n_samples = n_samples_cv,
                           abund_per_band = abundance_per_band_cv,
                           bands_per_sample = time_bands_per_sample_cv,
                           max_time = max_time_cv,
-                          phylo_corr = cv_tree)
+                          phylo_corr = corr_matrix_cv,
+                          sp_list = sp_list_cv)
 
 removal_stan_data_pred <- list(n_samples = n_samples_pred,
                              n_species = n_species_pred,
@@ -184,7 +185,8 @@ removal_stan_data_pred <- list(n_samples = n_samples_pred,
                              abund_per_band = abundance_per_band_pred,
                              bands_per_sample = time_bands_per_sample_pred,
                              max_time = max_time_pred,
-                             phylo_corr = pred_tree)
+                             phylo_corr = corr_matrix_predict,
+                             sp_list = sp_list_pred)
 
 ####### Output ####################################
 save(removal_stan_data_cv, file = "data/generated/removal_stan_data_cv.rda")
