@@ -44,7 +44,7 @@ data {
 
 parameters {
   row_vector[n_species] mu;
-  vector<lower = 0>[n_species] sigma;
+  real<lower = 0> sigma;
   vector[n_species] log_phi;
 }
 
@@ -52,7 +52,7 @@ model {
   sigma ~ exponential(1);
   mu ~ normal(0, 1);
   
-  log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr, sigma));
+  log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr, rep_vector(sigma, n_species)));
   
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,
