@@ -38,8 +38,10 @@ corr_matrix_cv <- generate_phylo_corr(phylo_tree = phylo_tree, drops = dropped_s
 #' and prediction portion of the experiments. Here, we will add in 5 species to
 #' list of species to keep
 
-sp_new <- c("Abert's Towhee", "Bridled Titmouse", "Seaside Sparrow",
-            "Kirtland's Warbler", "Bicknell's Thrush")
+sp_new <- c("LeConte's Thrasher", "Bicknell's Thrush", 
+            "Lesser Prairie-Chicken", "Harris's Sparrow", 
+            "Kirtland's Warbler", "Tricolored Blackbird")
+
 
 sp_predict <- rbind(sp_cv,
                     binomial[which(binomial$English %in% sp_new), ])

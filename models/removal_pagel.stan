@@ -59,6 +59,8 @@ data {
   int max_time[n_samples, max_intervals]; // max time duration for time band j
   corr_matrix[n_species] phylo_corr; // correlation matrix of phylogeny
   real<lower = 0> lambda;            //Pagel's lambda
+  int<lower = 1> n_mig_strat;        //total number of migration strategies
+  int mig_strat[n_species];        //migration strategy for each species
 }
 
 transformed data {
@@ -69,15 +71,21 @@ transformed data {
 
 parameters {
   row_vector[n_species] mu;
+  row_vector[n_mig_strat] mu_mig_strat;
   real<lower = 0> sigma;
   vector[n_species] log_phi;
 }
 
 model {
-  sigma ~ exponential(1);
-  mu ~ normal(0, 1);
-  
   log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
+  
+  for (sp in 1:n_species)
+  {
+    mu[sp] ~ normal(mu_mig_strat[mig_strat[sp]], 1);
+  }
+  mu_mig_strat ~ normal(0,1);
+  
+  sigma ~ exponential(1);
   
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,
