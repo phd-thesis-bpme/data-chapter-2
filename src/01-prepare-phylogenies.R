@@ -40,7 +40,8 @@ corr_matrix_cv <- generate_phylo_corr(phylo_tree = phylo_tree, drops = dropped_s
 
 sp_new <- c("LeConte's Thrasher", "Bicknell's Thrush", 
             "Lesser Prairie-Chicken", "Harris's Sparrow", 
-            "Kirtland's Warbler", "Tricolored Blackbird")
+            "Kirtland's Warbler", "Tricolored Blackbird",
+            "Spotted Owl")
 
 
 sp_predict <- rbind(sp_cv,
