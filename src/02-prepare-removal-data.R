@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 02-prepare-removal-data.R
 # Created August 2022
-# Last Updated October 2022
+# Last Updated December 2022
 
 ####### Import Libraries and External Files #######
 
@@ -19,6 +19,7 @@ load("data/raw/time_design.rda")
 load(file = "data/generated/corr_matrix_cv.rda")
 load(file = "data/generated/corr_matrix_predict.rda")
 binomial <- read.csv("data/generated/binomial_names.csv")
+traits <- read.csv("data/raw/traits.csv")
 
 ####### Wrangle Data for Modelling ################
 
@@ -73,6 +74,14 @@ species_pred <- gsub(pattern = "_",
 binomial_pred <- binomial[which(binomial$Scientific_BT %in% species_pred), ]
 binomial_pred <- binomial_pred[match(species_pred, binomial_pred$Scientific_BT), ]
 species_pred_code <- binomial_pred$Code
+
+# Create subset of traits dataset for the Cross-validation matrix
+traits_cv <- traits[which(traits$Code %in% species_cv_code), ]
+traits_cv <- traits_cv[match(species_cv_code, traits_cv$Code), ]
+
+# Create subset of traits dataset for the prediction matrix
+traits_pred <- traits[which(traits$Code %in% species_pred_code), ]
+traits_pred <- traits_pred[match(species_pred_code, traits_pred$Code), ]
 
 #' All of the following values will have values specific to cross validation list
 #' and the prediction list. So those will be noted e.g. Y_cv or Y_pred
@@ -168,6 +177,10 @@ n_species_pred <- nrow(binomial_pred)
 max_intervals_cv <- ncol(Y_cv)
 max_intervals_pred <- ncol(Y_pred)
 
+# a 1 corresponds with resident, a 2 corresponds with a migrant
+mig_strat_cv <- traits_cv$Migrant + 1
+mig_strat_pred <- traits_pred$Migrant + 1
+
 removal_stan_data_cv <- list(n_samples = n_samples_cv,
                           n_species = n_species_cv,
                           max_intervals = max_intervals_cv,
@@ -176,7 +189,9 @@ removal_stan_data_cv <- list(n_samples = n_samples_cv,
                           bands_per_sample = time_bands_per_sample_cv,
                           max_time = max_time_cv,
                           phylo_corr = corr_matrix_cv,
-                          sp_list = sp_list_cv)
+                          sp_list = sp_list_cv,
+                          n_mig_strat <- max(mig_strat_cv),
+                          mig_strat <- mig_strat_cv)
 
 removal_stan_data_pred <- list(n_samples = n_samples_pred,
                              n_species = n_species_pred,
@@ -186,7 +201,9 @@ removal_stan_data_pred <- list(n_samples = n_samples_pred,
                              bands_per_sample = time_bands_per_sample_pred,
                              max_time = max_time_pred,
                              phylo_corr = corr_matrix_predict,
-                             sp_list = sp_list_pred)
+                             sp_list = sp_list_pred,
+                             n_mig_strat <- max(mig_strat_pred),
+                             mig_strat <- mig_strat_pred)
 
 ####### Output ####################################
 save(removal_stan_data_cv, file = "data/generated/removal_stan_data_cv.rda")
