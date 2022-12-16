@@ -190,8 +190,8 @@ removal_stan_data_cv <- list(n_samples = n_samples_cv,
                           max_time = max_time_cv,
                           phylo_corr = corr_matrix_cv,
                           sp_list = sp_list_cv,
-                          n_mig_strat <- max(mig_strat_cv),
-                          mig_strat <- mig_strat_cv)
+                          n_mig_strat = max(mig_strat_cv),
+                          mig_strat = mig_strat_cv)
 
 removal_stan_data_pred <- list(n_samples = n_samples_pred,
                              n_species = n_species_pred,
@@ -202,8 +202,8 @@ removal_stan_data_pred <- list(n_samples = n_samples_pred,
                              max_time = max_time_pred,
                              phylo_corr = corr_matrix_predict,
                              sp_list = sp_list_pred,
-                             n_mig_strat <- max(mig_strat_pred),
-                             mig_strat <- mig_strat_pred)
+                             n_mig_strat = max(mig_strat_pred),
+                             mig_strat = mig_strat_pred)
 
 ####### Output ####################################
 save(removal_stan_data_cv, file = "data/generated/removal_stan_data_cv.rda")

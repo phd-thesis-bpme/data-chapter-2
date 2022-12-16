@@ -40,3 +40,4 @@ stan_run <- model_file$sample(
   threads_per_chain = threads_per_chain
 )
 stan_run$save_object(file = paste0("output/model_runs/distance_predictions.RDS"))
+
