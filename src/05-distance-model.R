@@ -1,8 +1,8 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 03-removal-model.R
-# Created December 2022
+# 05-distance-model.R
+# Created October 2022
 # Last Updated December 2022
 
 ####### Import Libraries and External Files #######
@@ -11,12 +11,12 @@ library(cmdstanr)
 
 ####### Load Data #################################
 
-load("data/generated/removal_stan_data_pred.rda")
+load("data/generated/distance_stan_data_pred.rda")
 
 ####### Set Constants #############################
 
-removal_stan_data_pred$grainsize <- 1
-removal_stan_data_pred$lambda <- 0.79
+distance_stan_data_pred$grainsize <- 1
+distance_stan_data_pred$lambda <- 0
 
 # Stan settings
 n_iter <- 2000
@@ -27,11 +27,11 @@ threads_per_chain <- 3
 
 ####### Run Model #################################
 
-model_file <- cmdstan_model(stan_file = "models/removal.stan",
+model_file <- cmdstan_model(stan_file = "models/distance.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
-  data = removal_stan_data_pred,
+  data = distance_stan_data_pred,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
@@ -39,5 +39,4 @@ stan_run <- model_file$sample(
   refresh = refresh,
   threads_per_chain = threads_per_chain
 )
-stan_run$save_object(file = paste0("output/model_runs/removal_predictions.RDS"))
-
+stan_run$save_object(file = paste0("output/model_runs/distance_predictions.RDS"))
