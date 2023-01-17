@@ -3,7 +3,7 @@ functions {
                         int start, int end,
                         int max_intervals,
                         int [] bands_per_sample,
-                        int [, ] max_dist,
+                        real [, ] max_dist,
                         int [] species,
                         vector log_tau)
   {
@@ -56,7 +56,7 @@ data {
   int species[n_samples];             // species being considered for each sample
   int abund_per_band[n_samples, max_intervals];// abundance in distance band k for sample i
   int bands_per_sample[n_samples]; // number of distance bands for sample i
-  int max_dist[n_samples, max_intervals]; // max distance for distance band k
+  real max_dist[n_samples, max_intervals]; // max distance for distance band k
   corr_matrix[n_species] phylo_corr; // correlation matrix of phylogeny
   real<lower = 0> lambda;            //Pagel's lambda
   int<lower = 1> n_mig_strat;        //total number of migration strategies
@@ -74,13 +74,13 @@ transformed data {
 }
 
 parameters {
-  row_vector<lower = 3>[n_species] mu;
+  row_vector[n_species] mu;
   row_vector[n_mig_strat] mu_mig_strat;
   row_vector[n_habitat] mu_habitat;
   real beta_mass;
   real beta_pitch;
   real<lower = 0> sigma;
-  vector<lower = 0>[n_species] log_tau;
+  vector[n_species] log_tau;
 }
 
 model {
@@ -88,11 +88,11 @@ model {
   
   for (sp in 1:n_species)
   {
-    mu[sp] ~ lognormal(mu_mig_strat[mig_strat[sp]] +
+    mu[sp] ~ normal(mu_mig_strat[mig_strat[sp]] +
                        mu_habitat[habitat[sp]] +
                        beta_mass * mass[sp] +
                        beta_pitch * pitch[sp], 
-                       0.5);
+                       1);
   }
   mu_mig_strat ~ normal(0,1);
   mu_habitat ~ normal(0,1);
@@ -110,3 +110,4 @@ model {
                        species,
                        log_tau);
 }
+

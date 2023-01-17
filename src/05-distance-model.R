@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 05-distance-model.R
 # Created October 2022
-# Last Updated December 2022
+# Last Updated January 2023
 
 ####### Import Libraries and External Files #######
 
@@ -17,6 +17,9 @@ load("data/generated/distance_stan_data_pred.rda")
 
 distance_stan_data_pred$grainsize <- 1
 distance_stan_data_pred$lambda <- 0
+
+# Scale the maximum distances to units of KM for computational ease
+distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist / 1000
 
 # Stan settings
 n_iter <- 2000
