@@ -67,7 +67,24 @@ single_vs_multi_plot <- ggplot(data = to_plot, mapping = aes(x = exp(Single), y 
 
 ####### SD Comparison Plot ########################
 
-# need the napops R package to allow user to retrieve variation
+to_plot <- rem_summary[which(rem_summary$Code %in% napops_summary$Species), 
+                       c("Code", "N", "sd")]
+names(to_plot) <- c("Code", "N", "SD_Multi")
+to_plot$SD_Single <- NA
+# Get original NA-POPS SDs
+for (i in 1:nrow(to_plot))
+{
+  to_plot$SD_Single[i] <- sqrt(napops::get_vcv(species = to_plot$Code[i],
+                                          model_type = "rem",
+                                          model_num = 1))
+}
+to_plot_long <- reshape2::melt(to_plot, id = c("Code", "N"), variable_name = "Model")
+
+sd_comp_plot <- ggplot(data = to_plot_long, 
+                       aes(x = log(N), y = log(value),
+                           group = variable, color = variable)) + 
+  geom_smooth() +
+  NULL
 
 ####### Species-specific Plots ####################
 
@@ -84,18 +101,19 @@ species_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean),
   geom_text(aes(y = exp(q95) + 0.25, label = N)) +
   NULL
 
-sp_plot_list <- vector(mode = "list", length = length(sp))
-names(sp_plot_list) <- sp
-
-for (s in sp)
-{
-  to_plot <- rem_summary[which(rem_summary$Code == s), ]
-  sp_plot_list[[sp]] <- ggplot(to_plot, aes())
-}
-
 ####### Output ####################################
 
-png("plots/removal_comparison.png",
+png("output/plots/removal_1vs1.png",
     width = 6, height = 4, res = 600, units = "in")
-print(comparison_plot)
+print(single_vs_multi_plot)
+dev.off()
+
+png("output/plots/removal_sd_plot.png",
+    width = 6, height = 4, res = 600, units = "in")
+print(sd_comp_plot)
+dev.off()
+
+png("output/plots/removal_predictions_plot.png",
+    width = 6, height = 4, res = 600, units = "in")
+print(species_plot)
 dev.off()
