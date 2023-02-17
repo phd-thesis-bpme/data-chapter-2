@@ -77,7 +77,7 @@ parameters {
 }
 
 model {
-  log_phi ~ multi_normal(mu, quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
+  log_phi ~ multi_normal(mu, phylo_corr_pl * sigma);// quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
   
   for (sp in 1:n_species)
   {
