@@ -22,7 +22,7 @@ removal_stan_data_pred$lambda <- 0.79
 n_iter <- 2000
 n_warmup <- 1000
 n_chains <- 4
-refresh <- 100
+refresh <- 10
 threads_per_chain <- 3
 
 ####### Run Model #################################
