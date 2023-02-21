@@ -66,14 +66,18 @@ data {
 transformed data {
   corr_matrix[n_species] phylo_corr_pl;
   phylo_corr_pl = phylo_pl(phylo_corr, lambda);
-  
 }
 
 parameters {
   row_vector[n_species] mu;
-  row_vector[n_mig_strat] mu_mig_strat;
+  row_vector[n_mig_strat] mu_mig_strat_raw;
   real<lower = 0> sigma;
   vector[n_species] log_phi;
+}
+
+transformed parameters {
+  row_vector[n_mig_strat] mu_mig_strat;
+  mu_mig_strat = -1 + 0.1*mu_mig_strat_raw; //we expect log_phi to be negative
 }
 
 model {
@@ -83,7 +87,7 @@ model {
   {
     mu[sp] ~ normal(mu_mig_strat[mig_strat[sp]], 1);
   }
-  mu_mig_strat ~ normal(0,1);
+  mu_mig_strat_raw ~ std_normal();
   
   sigma ~ exponential(1);
   
