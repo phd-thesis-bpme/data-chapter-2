@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 05-distance-model.R
 # Created October 2022
-# Last Updated January 2023
+# Last Updated February 2023
 
 ####### Import Libraries and External Files #######
 
@@ -25,7 +25,7 @@ distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist / 1000
 n_iter <- 2000
 n_warmup <- 1000
 n_chains <- 4
-refresh <- 100
+refresh <- 10
 threads_per_chain <- 3
 
 ####### Run Model #################################
