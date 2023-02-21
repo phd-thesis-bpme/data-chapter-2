@@ -81,6 +81,43 @@ for (i in unique(to_plot$Mig_Strat))
 }
 dev.off()
 
+pdf(file = "output/prior_predictive_check/removal/mu.pdf")
+for (s in 1:removal_stan_data_pred$n_species)
+{
+  to_plot <- data.frame(Value = mu[,s])
+  print(ggplot(data = to_plot, aes(x = Value)) +
+          geom_histogram() +
+          xlab(dimnames(phylo_corr_pl)[[1]][s]) +
+          xlim(floor(min(mu) - 1), ceiling(max(mu) + 1)) +
+          NULL)
+}
+dev.off()
+
+pdf(file = "output/prior_predictive_check/removal/log_phi.pdf")
+for (s in 1:removal_stan_data_pred$n_species)
+{
+  to_plot <- data.frame(Value = (log_phi[,s]))
+  print(ggplot(data = to_plot, aes(x = Value)) +
+          geom_histogram() +
+          xlab(dimnames(phylo_corr_pl)[[1]][s]) +
+          xlim(floor(min(log_phi) - 1), ceiling(max(log_phi) + 1)) +
+          NULL)
+}
+dev.off()
+
+pdf(file = "output/prior_predictive_check/removal/phi.pdf")
+phi <- exp(log_phi)
+for (s in 1:removal_stan_data_pred$n_species)
+{
+  to_plot <- data.frame(Value = (phi[,s]))
+  print(ggplot(data = to_plot, aes(x = Value)) +
+          geom_histogram() +
+          xlab(dimnames(phylo_corr_pl)[[1]][s]) +
+          xlim(floor(min(phi) - 1), ceiling(max(phi) + 1)) +
+          NULL)
+}
+dev.off()
+
 
 ####### Run Model #################################
 
