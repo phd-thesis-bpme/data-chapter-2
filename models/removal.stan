@@ -77,7 +77,7 @@ parameters {
 
 transformed parameters {
   row_vector[n_mig_strat] mu_mig_strat;
-  mu_mig_strat = -1 + 0.1*mu_mig_strat_raw; //we expect log_phi to be negative
+  mu_mig_strat = -1 + 0.5*mu_mig_strat_raw; //we expect log_phi to be negative
 }
 
 model {
