@@ -8,6 +8,10 @@
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
+library(MASS)
+library(ggplot2)
+library(ggpubr)
+theme_set(theme_pubclean())
 
 ####### Load Data #################################
 
@@ -24,6 +28,59 @@ n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
 threads_per_chain <- 3
+
+# Prior predictive check settings
+n_sims <- 100
+
+####### Prior Predictive Check ####################
+
+phylo_corr_pl <- removal_stan_data_pred$phylo_corr * removal_stan_data_pred$lambda
+for (i in 1:dim(phylo_corr_pl)[1])
+{
+  phylo_corr_pl[i,i] <- 1
+}
+
+sigma <- rexp(n = n_sims, rate = 1)
+mu_mig_strat <- matrix(data = c(rnorm(n_sims, mean = 0, sd = 1),
+                                rnorm(n_sims, mean = 0, sd = 1)),
+                       ncol = removal_stan_data_pred$n_mig_strat,
+                       nrow = n_sims)
+mu <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data_pred$n_species)
+log_phi <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data_pred$n_species)
+for (s in 1:removal_stan_data_pred$n_species)
+{
+  mu[,s] <- rnorm(n = n_sims,
+                  mean = mu_mig_strat[, removal_stan_data_pred$mig_strat[s]])
+}
+
+for (i in 1:n_sims)
+{
+  log_phi[i,] <- MASS::mvrnorm(n = 1, mu = mu[i,],
+                               Sigma = phylo_corr_pl * sigma[i])
+}
+
+pdf(file = "output/prior_predictive_check/removal/sigma.pdf")
+print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
+        geom_histogram() +
+        NULL)
+dev.off()
+
+pdf(file = "output/prior_predictive_check/removal/mu_mig_strat.pdf")
+to_plot <- data.frame(Value = c(mu_mig_strat[,1],
+                                   mu_mig_strat[,2]),
+                      Mig_Strat = c(rep("Resident", 100),
+                                    rep("Migrant", 100)))
+for (i in unique(to_plot$Mig_Strat))
+{
+  print(ggplot(data = to_plot[which(to_plot$Mig_Strat == i), ],
+               aes(x = Value)) +
+          geom_histogram() +
+          xlab(i) +
+          xlim(floor(min(to_plot$Value) - 1), ceiling(max(to_plot$Value) + 1)) +
+          NULL)
+}
+dev.off()
+
 
 ####### Run Model #################################
 
