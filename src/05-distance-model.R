@@ -55,7 +55,7 @@ dev.off()
 mu_mig_strat <- matrix(data = NA,
                        ncol = distance_stan_data_pred$n_mig_strat,
                        nrow = n_sims)
-for (i in 1:removal_stan_data_pred$n_mig_strat)
+for (i in 1:distance_stan_data_pred$n_mig_strat)
 {
   mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.5)
 }
@@ -100,19 +100,49 @@ for (i in unique(to_plot$Habitat))
 dev.off()
 
 # beta mass
-beta_mass <- rnorm(n = n_sims, mean = 0, sd = 1)
+beta_mass <- rnorm(n = n_sims, mean = 0.01, sd = 0.01)
 pdf(file = "output/prior_predictive_check/distance/beta_mass.pdf")
-print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
-        geom_histogram(bins = 20) +
-        NULL)
+mass_plot <- ggplot() 
+predictors <- seq(min(distance_stan_data_pred$mass),
+                  max(distance_stan_data_pred$mass),
+                  by = 0.01)
+for (i in 1:n_sims)
+{
+  line_to_plot <- data.frame(Log_Mass = predictors,
+                             Prediction = predictors * beta_mass[i])
+  mass_plot <- mass_plot + 
+    geom_line(data = line_to_plot, aes(x = Log_Mass, y = Prediction))
+}
+print(mass_plot)
 dev.off()
 
-mu <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data_pred$n_species)
-pdf(file = "output/prior_predictive_check/removal/mu.pdf")
-for (s in 1:removal_stan_data_pred$n_species)
+# beta pitch
+beta_pitch <- rnorm(n = n_sims, mean = -0.01, sd = 0.01)
+pdf(file = "output/prior_predictive_check/distance/beta_pitch.pdf")
+pitch_plot <- ggplot() 
+predictors <- seq(min(distance_stan_data_pred$pitch),
+                  max(distance_stan_data_pred$pitch),
+                  by = 0.01)
+for (i in 1:n_sims)
+{
+  line_to_plot <- data.frame(Log_Pitch = predictors,
+                             Prediction = predictors * beta_pitch[i])
+  pitch_plot <- pitch_plot + 
+    geom_line(data = line_to_plot, aes(x = Log_Pitch, y = Prediction))
+}
+print(pitch_plot)
+dev.off()
+
+mu <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data_pred$n_species)
+pdf(file = "output/prior_predictive_check/distance/mu.pdf")
+for (s in 1:distance_stan_data_pred$n_species)
 {
   mu[,s] <- rnorm(n = n_sims,
-                  mean = mu_mig_strat[, removal_stan_data_pred$mig_strat[s]])
+                  mean = (mu_mig_strat[, distance_stan_data_pred$mig_strat[s]]) +
+                         (mu_habitat[, distance_stan_data_pred$habitat[s]]) +
+                         (beta_mass * distance_stan_data_pred$mass[s]) +
+                         (beta_pitch * distance_stan_data_pred$pitch[s]),
+                  1)
   to_plot <- data.frame(Value = mu[,s])
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
@@ -123,34 +153,34 @@ for (s in 1:removal_stan_data_pred$n_species)
 
 dev.off()
 
-log_phi <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data_pred$n_species)
+log_tau <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data_pred$n_species)
 for (i in 1:n_sims)
 {
-  log_phi[i,] <- MASS::mvrnorm(n = 1, mu = mu[i,],
+  log_tau[i,] <- MASS::mvrnorm(n = 1, mu = mu[i,],
                                Sigma = phylo_corr_pl * sigma[i])
 }
 
-pdf(file = "output/prior_predictive_check/removal/log_phi.pdf")
-for (s in 1:removal_stan_data_pred$n_species)
+pdf(file = "output/prior_predictive_check/distance/log_tau.pdf")
+for (s in 1:distance_stan_data_pred$n_species)
 {
-  to_plot <- data.frame(Value = (log_phi[,s]))
+  to_plot <- data.frame(Value = (log_tau[,s]))
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
           xlab(dimnames(phylo_corr_pl)[[1]][s]) +
-          xlim(floor(min(log_phi) - 1), ceiling(max(log_phi) + 1)) +
+          xlim(floor(min(log_tau) - 1), ceiling(max(log_tau) + 1)) +
           NULL)
 }
 dev.off()
 
-pdf(file = "output/prior_predictive_check/removal/phi.pdf")
-phi <- exp(log_phi)
-for (s in 1:removal_stan_data_pred$n_species)
+pdf(file = "output/prior_predictive_check/distance/tau.pdf")
+tau <- exp(log_tau) * 1000
+for (s in 1:distance_stan_data_pred$n_species)
 {
-  to_plot <- data.frame(Value = (phi[,s]))
+  to_plot <- data.frame(Value = (tau[,s]))
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
           xlab(dimnames(phylo_corr_pl)[[1]][s]) +
-          xlim(0, 10) +
+          xlim(0, 500) +
           NULL)
 }
 dev.off()
