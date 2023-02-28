@@ -74,30 +74,44 @@ transformed data {
 }
 
 parameters {
+  row_vector[n_species] mu_raw;
+  row_vector[n_mig_strat] mu_mig_strat_raw;
+  row_vector[n_habitat] mu_habitat_raw;
+  real beta_mass_raw;
+  real beta_pitch_raw;
+  real<lower = 0> sigma;
+  vector[n_species] log_tau;
+}
+
+transformed parameters {
   row_vector[n_species] mu;
   row_vector[n_mig_strat] mu_mig_strat;
   row_vector[n_habitat] mu_habitat;
   real beta_mass;
   real beta_pitch;
-  real<lower = 0> sigma;
-  vector[n_species] log_tau;
+  
+  mu_mig_strat = mu_mig_strat_raw * 0.5;
+  mu_habitat = mu_habitat_raw * 0.5;
+  beta_mass = 0.01 + (0.01 * beta_mass_raw);
+  beta_pitch = -0.01 + (0.01 * beta_pitch_raw);
+  
+  for (sp in 1:n_species)
+  {
+    mu[sp] = mu_raw[sp] + mu_mig_strat[mig_strat[sp]] +
+                       mu_habitat[habitat[sp]] +
+                       beta_mass * mass[sp] +
+                       beta_pitch * pitch[sp];
+  }
 }
 
 model {
   log_tau ~ multi_normal(mu, phylo_corr_pl * sigma);//quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
   
-  for (sp in 1:n_species)
-  {
-    mu[sp] ~ normal(mu_mig_strat[mig_strat[sp]] +
-                       mu_habitat[habitat[sp]] +
-                       beta_mass * mass[sp] +
-                       beta_pitch * pitch[sp], 
-                       1);
-  }
-  mu_mig_strat ~ normal(0,1);
-  mu_habitat ~ normal(0,1);
-  beta_mass ~ normal(0,1);
-  beta_pitch ~ normal(0,1);
+  mu_raw ~ std_normal();
+  mu_mig_strat_raw ~ std_normal();
+  mu_habitat_raw ~ std_normal();
+  beta_mass_raw ~ std_normal();
+  beta_pitch_raw ~ std_normal();
   
   sigma ~ exponential(1);
 
