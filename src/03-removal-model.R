@@ -40,7 +40,7 @@ for (i in 1:dim(phylo_corr_pl)[1])
   phylo_corr_pl[i,i] <- 1
 }
 
-sigma <- rexp(n = n_sims, rate = 1)
+sigma <- rexp(n = n_sims, rate = 5)
 pdf(file = "output/prior_predictive_check/removal/sigma.pdf")
 print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         geom_histogram(bins = 20) +
@@ -74,8 +74,7 @@ mu <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data_pred$n_species)
 pdf(file = "output/prior_predictive_check/removal/mu.pdf")
 for (s in 1:removal_stan_data_pred$n_species)
 {
-  mu[,s] <- rnorm(n = n_sims,
-                  mean = mu_mig_strat[, removal_stan_data_pred$mig_strat[s]])
+  mu[,s] <- mu_mig_strat[, removal_stan_data_pred$mig_strat[s]]
   to_plot <- data.frame(Value = mu[,s])
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +

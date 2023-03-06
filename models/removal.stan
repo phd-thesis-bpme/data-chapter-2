@@ -69,24 +69,27 @@ transformed data {
 }
 
 parameters {
-  row_vector[n_species] mu;
   row_vector[n_mig_strat] mu_mig_strat_raw;
   real<lower = 0> sigma;
   vector[n_species] log_phi;
 }
 
 transformed parameters {
+  row_vector[n_species] mu;
   row_vector[n_mig_strat] mu_mig_strat;
+  
   mu_mig_strat = -1 + 0.5*mu_mig_strat_raw; //we expect log_phi to be negative
+  
+  for (sp in 1:n_species)
+  {
+    mu[sp] = mu_mig_strat[mig_strat[sp]];
+  }
 }
 
 model {
   log_phi ~ multi_normal(mu, phylo_corr_pl * sigma);// quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
   
-  for (sp in 1:n_species)
-  {
-    mu[sp] ~ normal(mu_mig_strat[mig_strat[sp]], 1);
-  }
+
   mu_mig_strat_raw ~ std_normal();
   
   sigma ~ exponential(1);
