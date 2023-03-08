@@ -8,6 +8,7 @@
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
+library(bayesplot)
 library(napops)
 library(plyr)
 library(ggplot2)
@@ -23,6 +24,15 @@ load("data/generated/removal_stan_data_pred.rda")
 
 # Extract log_phi summary statistics from full Stan model runs
 rem_summary <- rem_model$summary(variables = "log_phi")
+
+# Model diagnostics
+
+diag <- rem_model$sampler_diagnostics(format = "df")
+sigma_draws <- rem_model$draws(variables = "mu_mig_strat[1]", format = "df")
+sigma_draws$.chain <- factor(sigma_draws$.chain, levels = c("1", "2", "3", "4"))
+ggplot(data = sigma_draws, aes(x = .iteration, y = mu, group = (.chain), color = .chain)) +
+  geom_line()
+mcmc_hist(rem_model$draws("sigma")) 
 
 # Add species names to these summaries
 rem_summary$Scientific_BT <- gsub("_", " ", rownames(corr_matrix_predict))

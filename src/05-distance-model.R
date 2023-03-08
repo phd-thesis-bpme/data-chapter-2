@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 05-distance-model.R
 # Created October 2022
-# Last Updated February 2023
+# Last Updated March 2023
 
 ####### Import Libraries and External Files #######
 
@@ -44,7 +44,7 @@ for (i in 1:dim(phylo_corr_pl)[1])
 }
 
 # Sigma
-sigma <- rexp(n = n_sims, rate = 1)
+sigma <- rexp(n = n_sims, rate = 5)
 pdf(file = "output/prior_predictive_check/distance/sigma.pdf")
 print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         geom_histogram(bins = 20) +
@@ -57,7 +57,7 @@ mu_mig_strat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_mig_strat)
 {
-  mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.5)
+  mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.01)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_mig_strat.pdf")
 to_plot <- data.frame(Value = c(mu_mig_strat[,1],
@@ -81,7 +81,7 @@ mu_habitat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_habitat)
 {
-  mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.5)
+  mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.01)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_habitat.pdf")
 to_plot <- data.frame(Value = c(mu_habitat[,1],
@@ -137,12 +137,10 @@ mu <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data_pred$n_species)
 pdf(file = "output/prior_predictive_check/distance/mu.pdf")
 for (s in 1:distance_stan_data_pred$n_species)
 {
-  mu[,s] <- rnorm(n = n_sims,
-                  mean = (mu_mig_strat[, distance_stan_data_pred$mig_strat[s]]) +
+  mu[,s] <- (mu_mig_strat[, distance_stan_data_pred$mig_strat[s]]) +
                          (mu_habitat[, distance_stan_data_pred$habitat[s]]) +
                          (beta_mass * distance_stan_data_pred$mass[s]) +
-                         (beta_pitch * distance_stan_data_pred$pitch[s]),
-                  1)
+                         (beta_pitch * distance_stan_data_pred$pitch[s])
   to_plot <- data.frame(Value = mu[,s])
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
@@ -167,7 +165,7 @@ for (s in 1:distance_stan_data_pred$n_species)
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
           xlab(dimnames(phylo_corr_pl)[[1]][s]) +
-          xlim(floor(min(log_tau) - 1), ceiling(max(log_tau) + 1)) +
+          #xlim(floor(min(log_tau) - 1), ceiling(max(log_tau) + 1)) +
           NULL)
 }
 dev.off()
@@ -180,7 +178,7 @@ for (s in 1:distance_stan_data_pred$n_species)
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
           xlab(dimnames(phylo_corr_pl)[[1]][s]) +
-          xlim(0, 500) +
+          #xlim(0, 500) +
           NULL)
 }
 dev.off()
