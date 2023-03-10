@@ -52,7 +52,7 @@ mu_mig_strat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:removal_stan_data_pred$n_mig_strat)
 {
-  mu_mig_strat[,i] <- rnorm(n_sims, mean = -1, sd = 0.5)
+  mu_mig_strat[,i] <- rnorm(n_sims, mean = -1, sd = 0.01)
 }
 pdf(file = "output/prior_predictive_check/removal/mu_mig_strat.pdf")
 to_plot <- data.frame(Value = c(mu_mig_strat[,1],
@@ -65,7 +65,7 @@ for (i in unique(to_plot$Mig_Strat))
                aes(x = Value)) +
           geom_histogram(bins = 20) +
           xlab(i) +
-          xlim(floor(min(to_plot$Value) - 1), ceiling(max(to_plot$Value) + 1)) +
+          #xlim(floor(min(to_plot$Value) - 1), ceiling(max(to_plot$Value) + 1)) +
           NULL)
 }
 dev.off()
@@ -112,7 +112,7 @@ for (s in 1:removal_stan_data_pred$n_species)
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
           xlab(dimnames(phylo_corr_pl)[[1]][s]) +
-          xlim(0, 10) +
+          #xlim(0, 10) +
           NULL)
 }
 dev.off()

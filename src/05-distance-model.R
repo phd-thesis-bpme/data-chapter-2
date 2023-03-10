@@ -100,8 +100,14 @@ for (i in unique(to_plot$Habitat))
 dev.off()
 
 # beta mass
-beta_mass <- rnorm(n = n_sims, mean = 0.01, sd = 0.01)
+beta_mass <- rnorm(n = n_sims, mean = 0.01, sd = 0.005)
 pdf(file = "output/prior_predictive_check/distance/beta_mass.pdf")
+
+mass_hist <- ggplot(data = data.frame(Mass_Slope = beta_mass), aes(x = Mass_Slope)) +
+  geom_histogram(bins = 20) +
+  NULL
+print(mass_hist)
+
 mass_plot <- ggplot() 
 predictors <- seq(min(distance_stan_data_pred$mass),
                   max(distance_stan_data_pred$mass),
@@ -117,8 +123,14 @@ print(mass_plot)
 dev.off()
 
 # beta pitch
-beta_pitch <- rnorm(n = n_sims, mean = -0.01, sd = 0.01)
+beta_pitch <- rnorm(n = n_sims, mean = -0.01, sd = 0.005)
 pdf(file = "output/prior_predictive_check/distance/beta_pitch.pdf")
+
+pitch_hist <- ggplot(data = data.frame(Pitch_Slope = beta_pitch), aes(x = Pitch_Slope)) +
+  geom_histogram(bins = 20) +
+  NULL
+print(pitch_hist)
+
 pitch_plot <- ggplot() 
 predictors <- seq(min(distance_stan_data_pred$pitch),
                   max(distance_stan_data_pred$pitch),

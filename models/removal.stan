@@ -78,7 +78,7 @@ transformed parameters {
   row_vector[n_species] mu;
   row_vector[n_mig_strat] mu_mig_strat;
   
-  mu_mig_strat = -1 + 0.5*mu_mig_strat_raw; //we expect log_phi to be negative
+  mu_mig_strat = -1 + 0.01*mu_mig_strat_raw; //we expect log_phi to be negative
   
   for (sp in 1:n_species)
   {
@@ -92,7 +92,7 @@ model {
 
   mu_mig_strat_raw ~ std_normal();
   
-  sigma ~ exponential(1);
+  sigma ~ exponential(5);
   
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,
