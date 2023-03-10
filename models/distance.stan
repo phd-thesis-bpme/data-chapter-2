@@ -74,7 +74,6 @@ transformed data {
 }
 
 parameters {
-  row_vector[n_species] mu_raw;
   row_vector[n_mig_strat] mu_mig_strat_raw;
   row_vector[n_habitat] mu_habitat_raw;
   real beta_mass_raw;
@@ -90,14 +89,14 @@ transformed parameters {
   real beta_mass;
   real beta_pitch;
   
-  mu_mig_strat = mu_mig_strat_raw * 0.5;
-  mu_habitat = mu_habitat_raw * 0.5;
-  beta_mass = 0.01 + (0.01 * beta_mass_raw);
-  beta_pitch = -0.01 + (0.01 * beta_pitch_raw);
+  mu_mig_strat = mu_mig_strat_raw * 0.01;
+  mu_habitat = mu_habitat_raw * 0.01;
+  beta_mass = 0.01 + (0.005 * beta_mass_raw);
+  beta_pitch = -0.01 + (0.005 * beta_pitch_raw);
   
   for (sp in 1:n_species)
   {
-    mu[sp] = mu_raw[sp] + mu_mig_strat[mig_strat[sp]] +
+    mu[sp] = mu_mig_strat[mig_strat[sp]] +
                        mu_habitat[habitat[sp]] +
                        beta_mass * mass[sp] +
                        beta_pitch * pitch[sp];
@@ -107,13 +106,12 @@ transformed parameters {
 model {
   log_tau ~ multi_normal(mu, phylo_corr_pl * sigma);//quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
   
-  mu_raw ~ std_normal();
   mu_mig_strat_raw ~ std_normal();
   mu_habitat_raw ~ std_normal();
   beta_mass_raw ~ std_normal();
   beta_pitch_raw ~ std_normal();
   
-  sigma ~ exponential(1);
+  sigma ~ exponential(5);
 
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,
