@@ -89,10 +89,10 @@ transformed parameters {
   real beta_mass;
   real beta_pitch;
   
-  mu_mig_strat = mu_mig_strat_raw * 0.01;
-  mu_habitat = mu_habitat_raw * 0.01;
-  beta_mass = 0.01 + (0.005 * beta_mass_raw);
-  beta_pitch = -0.01 + (0.005 * beta_pitch_raw);
+  mu_mig_strat = -1 + (mu_mig_strat_raw * 0.01); # start log taus in negative
+  mu_habitat = -1 + (mu_habitat_raw * 0.01);
+  beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
+  beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
   
   for (sp in 1:n_species)
   {

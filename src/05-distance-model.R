@@ -57,7 +57,7 @@ mu_mig_strat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_mig_strat)
 {
-  mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.01)
+  mu_mig_strat[,i] <- rnorm(n_sims, mean = -1, sd = 0.01)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_mig_strat.pdf")
 to_plot <- data.frame(Value = c(mu_mig_strat[,1],
@@ -70,7 +70,7 @@ for (i in unique(to_plot$Mig_Strat))
                aes(x = Value)) +
           geom_histogram(bins = 20) +
           xlab(i) +
-          xlim(floor(min(to_plot$Value) - 1), ceiling(max(to_plot$Value) + 1)) +
+          #xlim(floor(min(to_plot$Value) - 1), ceiling(max(to_plot$Value) + 1)) +
           NULL)
 }
 dev.off()
@@ -81,7 +81,7 @@ mu_habitat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_habitat)
 {
-  mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.01)
+  mu_habitat[,i] <- rnorm(n_sims, mean = -1, sd = 0.01)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_habitat.pdf")
 to_plot <- data.frame(Value = c(mu_habitat[,1],
@@ -94,7 +94,7 @@ for (i in unique(to_plot$Habitat))
                aes(x = Value)) +
           geom_histogram(bins = 20) +
           xlab(i) +
-          xlim(floor(min(to_plot$Value) - 1), ceiling(max(to_plot$Value) + 1)) +
+          #xlim(floor(min(to_plot$Value) - 1), ceiling(max(to_plot$Value) + 1)) +
           NULL)
 }
 dev.off()
