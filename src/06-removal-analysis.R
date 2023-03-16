@@ -12,6 +12,8 @@ library(bayesplot)
 library(napops)
 library(plyr)
 library(ggplot2)
+library(ggpubr)
+theme_set(theme_pubclean())
 
 ####### Read Data #################################
 
@@ -23,16 +25,16 @@ load("data/generated/removal_stan_data_pred.rda")
 ####### Data Wrangling ############################
 
 # Extract log_phi summary statistics from full Stan model runs
-rem_summary <- rem_model$summary(variables = "log_phi")
+rem_summary <- rem_model$summary("log_phi")
 
 # Model diagnostics
 
-diag <- rem_model$sampler_diagnostics(format = "df")
-sigma_draws <- rem_model$draws(variables = "mu_mig_strat[1]", format = "df")
-sigma_draws$.chain <- factor(sigma_draws$.chain, levels = c("1", "2", "3", "4"))
-ggplot(data = sigma_draws, aes(x = .iteration, y = mu, group = (.chain), color = .chain)) +
-  geom_line()
-mcmc_hist(rem_model$draws("sigma")) 
+# diag <- rem_model$sampler_diagnostics(format = "df")
+# sigma_draws <- rem_model$draws(variables = "mu_mig_strat[1]", format = "df")
+# sigma_draws$.chain <- factor(sigma_draws$.chain, levels = c("1", "2", "3", "4"))
+# ggplot(data = sigma_draws, aes(x = .iteration, y = mu, group = (.chain), color = .chain)) +
+#   geom_line()
+# mcmc_hist(rem_model$draws("sigma")) 
 
 # Add species names to these summaries
 rem_summary$Scientific_BT <- gsub("_", " ", rownames(corr_matrix_predict))
@@ -91,9 +93,11 @@ for (i in 1:nrow(to_plot))
 to_plot_long <- reshape2::melt(to_plot, id = c("Code", "N"), variable_name = "Model")
 
 sd_comp_plot <- ggplot(data = to_plot_long, 
-                       aes(x = log(N), y = log(value),
+                       aes(x = log(N), y = (value),
                            group = variable, color = variable)) + 
   geom_smooth() +
+  xlab("log(Sample Size)") +
+  ylab("Standard Deviation") +
   NULL
 
 ####### Species-specific Plots ####################
@@ -109,6 +113,7 @@ species_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean),
   xlab("Species") +
   ylab("Cue Rate") +
   geom_text(aes(y = exp(q95) + 0.25, label = N)) +
+ # ylim(0,2.0) +
   NULL
 
 ####### Output ####################################
