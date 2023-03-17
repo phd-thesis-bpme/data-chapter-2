@@ -92,6 +92,23 @@ for (i in 1:nrow(to_plot))
 }
 to_plot_long <- reshape2::melt(to_plot, id = c("Code", "N"), variable_name = "Model")
 
+sd_model_data <- list(n_samples = nrow(to_plot_long),
+                      stdev = to_plot_long$value,
+                      N = to_plot_long$N,
+                      model_type = factor(to_plot_long$variable,
+                                     levels = c("SD_Single", "SD_Multi")))
+
+sd_model <- cmdstan_model(stan_file = "models/sd_model.stan")
+
+sd_model_run <- sd_model$sample(
+  data = sd_model_data,
+  iter_warmup = 1000,
+  iter_sampling = 2000,
+  chains = 4,
+  parallel_chains = 4,
+  refresh = 10
+)
+
 sd_comp_plot <- ggplot(data = to_plot_long, 
                        aes(x = log(N), y = (value),
                            group = variable, color = variable)) + 
