@@ -79,7 +79,7 @@ parameters {
   real beta_mass_raw;
   real beta_pitch_raw;
   real<lower = 0> sigma;
-  vector[n_species] log_tau;
+  vector[n_species] log_tau_raw;
 }
 
 transformed parameters {
@@ -88,6 +88,7 @@ transformed parameters {
   row_vector[n_habitat] mu_habitat;
   real beta_mass;
   real beta_pitch;
+  vector[n_species] log_tau;
   
   mu_mig_strat = -1 + (mu_mig_strat_raw * 0.01); # start log taus in negative
   mu_habitat = -1 + (mu_habitat_raw * 0.01);
@@ -100,12 +101,14 @@ transformed parameters {
                        mu_habitat[habitat[sp]] +
                        beta_mass * mass[sp] +
                        beta_pitch * pitch[sp];
+                       
+    log_tau[sp] = mu[sp] + (log_tau_raw[sp] * sigma);
   }
 }
 
 model {
-  log_tau ~ multi_normal(mu, phylo_corr_pl * sigma);//quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
   
+  log_tau_raw ~ std_normal();
   mu_mig_strat_raw ~ std_normal();
   mu_habitat_raw ~ std_normal();
   beta_mass_raw ~ std_normal();
