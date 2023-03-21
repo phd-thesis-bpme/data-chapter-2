@@ -1,24 +1,26 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 05-distance-analysis.R
+# 07-distance-analysis.R
 # Created May 2022
-# Last Updated May 2022
-
+# Last Updated March 2023
 ####### Import Libraries and External Files #######
 
-library(rstan)
+library(cmdstanr)
+library(bayesplot)
 library(napops)
+library(plyr)
 library(ggplot2)
 library(ggpubr)
 theme_set(theme_pubclean())
 
 ####### Read Data #################################
 
-load("data/generated/turdidae_corr_matrix.rda")
-load("data/generated/distance_turdidae_model.rda")
-load("data/generated/distance_turdidae_data.rda")
+dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
+load("data/generated/corr_matrix_predict.rda")
 binomial <- read.csv("data/generated/binomial_names.csv")
+load("data/generated/distance_stan_data_pred.rda")
+
 
 ####### Main Code #################################
 
