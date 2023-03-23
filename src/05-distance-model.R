@@ -26,11 +26,11 @@ distance_stan_data_pred$lambda <- 0
 distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist / 1000
 
 # Stan settings
-n_iter <- 2000
-n_warmup <- 1000
+n_iter <- 500
+n_warmup <- 250
 n_chains <- 4
 refresh <- 10
-threads_per_chain <- 3
+threads_per_chain <- 5
 
 # Prior predictive check settings
 n_sims <- 100
