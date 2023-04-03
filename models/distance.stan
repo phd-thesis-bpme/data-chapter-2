@@ -74,34 +74,36 @@ transformed data {
 }
 
 parameters {
- // row_vector[n_mig_strat] mu_mig_strat_raw;
-  //row_vector[n_habitat] mu_habitat_raw;
-  //real beta_mass_raw;
-  //real beta_pitch_raw;
+  real intercept_raw;
+  row_vector[n_mig_strat] mu_mig_strat_raw;
+  row_vector[n_habitat] mu_habitat_raw;
+  real beta_mass_raw;
+  real beta_pitch_raw;
   real<lower = 0> sigma;
   vector[n_species] log_tau_raw;
 }
 
 transformed parameters {
+  real intercept;
   row_vector[n_species] mu;
-  //row_vector[n_mig_strat] mu_mig_strat;
-  //row_vector[n_habitat] mu_habitat;
-  //real beta_mass;
-  //real beta_pitch;
+  row_vector[n_mig_strat] mu_mig_strat;
+  row_vector[n_habitat] mu_habitat;
+  real beta_mass;
+  real beta_pitch;
   vector[n_species] log_tau;
   
- // mu_mig_strat = -1 + (mu_mig_strat_raw * 0.01); # start log taus in negative
-//  mu_habitat = -1 + (mu_habitat_raw * 0.01);
-//  beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
-//  beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
+  intercept = 4.5 + (intercept_raw * 0.5);
+  mu_mig_strat = (mu_mig_strat_raw * 0.01); # start log taus in negative
+  mu_habitat = (mu_habitat_raw * 0.01);
+  beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
+  beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
   
   for (sp in 1:n_species)
   {
-    mu[sp] = 4.5;
-    // mu[sp] = mu_mig_strat[mig_strat[sp]] +
-    //                    mu_habitat[habitat[sp]] +
-    //                    beta_mass * mass[sp] +
-    //                    beta_pitch * pitch[sp];
+    mu[sp] = intercept + mu_mig_strat[mig_strat[sp]] +
+                       mu_habitat[habitat[sp]] +
+                       beta_mass * mass[sp] +
+                       beta_pitch * pitch[sp];
                        
     log_tau[sp] = mu[sp] + (log_tau_raw[sp] * sigma);
   }
@@ -110,10 +112,11 @@ transformed parameters {
 model {
   
   log_tau_raw ~ std_normal();
- // mu_mig_strat_raw ~ std_normal();
- // mu_habitat_raw ~ std_normal();
-  //beta_mass_raw ~ std_normal();
- // beta_pitch_raw ~ std_normal();
+  intercept_raw ~ std_normal();
+  mu_mig_strat_raw ~ std_normal();
+  mu_habitat_raw ~ std_normal();
+  beta_mass_raw ~ std_normal();
+  beta_pitch_raw ~ std_normal();
   
   sigma ~ exponential(5);
 

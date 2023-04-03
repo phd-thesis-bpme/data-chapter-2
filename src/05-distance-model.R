@@ -51,6 +51,12 @@ print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         NULL)
 dev.off()
 
+intercept <- rnorm(n = n_sims, mean = 4.5, sd = 0.5)
+pdf(file = "output/prior_predictive_check/distance/intercept.pdf")
+print(ggplot(data = data.frame(intercept), aes(x = intercept)) +
+        geom_histogram(bins = 20) +
+        NULL)
+
 # mu mig strat
 mu_mig_strat <- matrix(data = NA,
                        ncol = distance_stan_data_pred$n_mig_strat,
@@ -149,7 +155,7 @@ mu <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data_pred$n_species)
 pdf(file = "output/prior_predictive_check/distance/mu.pdf")
 for (s in 1:distance_stan_data_pred$n_species)
 {
-  mu[,s] <- (mu_mig_strat[, distance_stan_data_pred$mig_strat[s]]) +
+  mu[,s] <- intercept + (mu_mig_strat[, distance_stan_data_pred$mig_strat[s]]) +
                          (mu_habitat[, distance_stan_data_pred$habitat[s]]) +
                          (beta_mass * distance_stan_data_pred$mass[s]) +
                          (beta_pitch * distance_stan_data_pred$pitch[s])
@@ -183,7 +189,7 @@ for (s in 1:distance_stan_data_pred$n_species)
 dev.off()
 
 pdf(file = "output/prior_predictive_check/distance/tau.pdf")
-tau <- exp(log_tau) * 1000
+tau <- exp(log_tau) #* 1000
 for (s in 1:distance_stan_data_pred$n_species)
 {
   to_plot <- data.frame(Value = (tau[,s]))
