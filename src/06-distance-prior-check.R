@@ -1,13 +1,12 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 05-distance-model.R
-# Created October 2022
+# 06-distance-prior-check.R
+# Created March 2023
 # Last Updated March 2023
 
 ####### Import Libraries and External Files #######
 
-library(cmdstanr)
 library(MASS)
 library(ggplot2)
 library(ggpubr)
@@ -19,18 +18,10 @@ load("data/generated/distance_stan_data_pred.rda")
 
 ####### Set Constants #############################
 
-distance_stan_data_pred$grainsize <- 1
 distance_stan_data_pred$lambda <- 0
 
 # Scale the maximum distances to units of KM for computational ease
 #distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist / 1000
-
-# Stan settings
-n_iter <- 500
-n_warmup <- 250
-n_chains <- 4
-refresh <- 10
-threads_per_chain <- 5
 
 # Prior predictive check settings
 n_sims <- 100
@@ -51,11 +42,12 @@ print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         NULL)
 dev.off()
 
-intercept <- rnorm(n = n_sims, mean = 4.5, sd = 0.5)
+intercept <- rnorm(n = n_sims, mean = 4, sd = 0.1)
 pdf(file = "output/prior_predictive_check/distance/intercept.pdf")
 print(ggplot(data = data.frame(intercept), aes(x = intercept)) +
         geom_histogram(bins = 20) +
         NULL)
+dev.off()
 
 # mu mig strat
 mu_mig_strat <- matrix(data = NA,
@@ -63,7 +55,7 @@ mu_mig_strat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_mig_strat)
 {
-  mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.01)
+  mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.05)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_mig_strat.pdf")
 to_plot <- data.frame(Value = c(mu_mig_strat[,1],
@@ -83,17 +75,17 @@ dev.off()
 
 # mu habitat
 mu_habitat <- matrix(data = NA,
-                       ncol = distance_stan_data_pred$n_habitat,
-                       nrow = n_sims)
+                     ncol = distance_stan_data_pred$n_habitat,
+                     nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_habitat)
 {
-  mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.01)
+  mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.05)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_habitat.pdf")
 to_plot <- data.frame(Value = c(mu_habitat[,1],
                                 mu_habitat[,2]),
                       Habitat = c(rep("Open", 100),
-                                    rep("Closed", 100)))
+                                  rep("Closed", 100)))
 for (i in unique(to_plot$Habitat))
 {
   print(ggplot(data = to_plot[which(to_plot$Habitat == i), ],
@@ -156,9 +148,9 @@ pdf(file = "output/prior_predictive_check/distance/mu.pdf")
 for (s in 1:distance_stan_data_pred$n_species)
 {
   mu[,s] <- intercept + (mu_mig_strat[, distance_stan_data_pred$mig_strat[s]]) +
-                         (mu_habitat[, distance_stan_data_pred$habitat[s]]) +
-                         (beta_mass * distance_stan_data_pred$mass[s]) +
-                         (beta_pitch * distance_stan_data_pred$pitch[s])
+    (mu_habitat[, distance_stan_data_pred$habitat[s]]) +
+    (beta_mass * distance_stan_data_pred$mass[s]) +
+    (beta_pitch * distance_stan_data_pred$pitch[s])
   to_plot <- data.frame(Value = mu[,s])
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
@@ -200,20 +192,3 @@ for (s in 1:distance_stan_data_pred$n_species)
           NULL)
 }
 dev.off()
-
-####### Run Model #################################
-
-model_file <- cmdstan_model(stan_file = "models/distance.stan",
-                            cpp_options = list(stan_threads = TRUE))
-
-stan_run <- model_file$sample(
-  data = distance_stan_data_pred,
-  iter_warmup = n_warmup,
-  iter_sampling = n_iter,
-  chains = n_chains,
-  parallel_chains = n_chains,
-  refresh = refresh,
-  threads_per_chain = threads_per_chain
-)
-stan_run$save_object(file = paste0("output/model_runs/distance_predictions.RDS"))
-
