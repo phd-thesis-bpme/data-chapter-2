@@ -97,7 +97,7 @@ transformed parameters {
   
   for (sp in 1:n_species)
   {
-    mu[sp] = -2;
+    mu[sp] = 4.5;
     // mu[sp] = mu_mig_strat[mig_strat[sp]] +
     //                    mu_habitat[habitat[sp]] +
     //                    beta_mass * mass[sp] +

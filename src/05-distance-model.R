@@ -23,7 +23,7 @@ distance_stan_data_pred$grainsize <- 1
 distance_stan_data_pred$lambda <- 0
 
 # Scale the maximum distances to units of KM for computational ease
-distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist / 1000
+#distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist / 1000
 
 # Stan settings
 n_iter <- 500
@@ -57,7 +57,7 @@ mu_mig_strat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_mig_strat)
 {
-  mu_mig_strat[,i] <- rnorm(n_sims, mean = -1, sd = 0.01)
+  mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.01)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_mig_strat.pdf")
 to_plot <- data.frame(Value = c(mu_mig_strat[,1],
@@ -81,7 +81,7 @@ mu_habitat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_habitat)
 {
-  mu_habitat[,i] <- rnorm(n_sims, mean = -1, sd = 0.01)
+  mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.01)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_habitat.pdf")
 to_plot <- data.frame(Value = c(mu_habitat[,1],
