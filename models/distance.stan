@@ -93,7 +93,7 @@ transformed parameters {
   vector[n_species] log_tau;
   
   intercept = 4 + (intercept_raw * 0.1);
-  mu_mig_strat = (mu_mig_strat_raw * 0.05); # start log taus in negative
+  mu_mig_strat = (mu_mig_strat_raw * 0.05); 
   mu_habitat = (mu_habitat_raw * 0.05);
   beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
   beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
