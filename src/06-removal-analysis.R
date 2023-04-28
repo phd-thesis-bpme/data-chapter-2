@@ -149,3 +149,4 @@ png("output/plots/removal_predictions_plot.png",
     width = 6, height = 4, res = 600, units = "in")
 print(species_plot)
 dev.off()
+
