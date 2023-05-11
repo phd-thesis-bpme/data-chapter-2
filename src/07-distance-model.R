@@ -26,7 +26,7 @@ n_iter <- 500
 n_warmup <- 250
 n_chains <- 4
 refresh <- 10
-threads_per_chain <- 5
+threads_per_chain <- 3
 
 ####### Run Model #################################
 
