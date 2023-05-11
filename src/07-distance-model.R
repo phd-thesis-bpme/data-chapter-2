@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 07-distance-model.R
 # Created October 2022
-# Last Updated March 2023
+# Last Updated May 2023
 
 ####### Import Libraries and External Files #######
 
@@ -29,6 +29,11 @@ refresh <- 10
 threads_per_chain <- 3
 
 ####### Run Model #################################
+
+# get rid of centre/scale attributes for modelling
+distance_stan_data_pred$pitch <- distance_stan_data_pred$pitch[,1]
+distance_stan_data_pred$mass <- distance_stan_data_pred$mass[,1]
+
 
 model_file <- cmdstan_model(stan_file = "models/distance.stan",
                             cpp_options = list(stan_threads = TRUE))
