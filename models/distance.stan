@@ -73,7 +73,7 @@ transformed parameters {
   real beta_pitch;
   vector[n_species] log_tau;
   
-  intercept = intercept_raw * 0.001// intercept_raw; //rescaling shouldn't be necessary now that all values are scaled and centered
+  intercept = intercept_raw * 0.001;// intercept_raw; //rescaling shouldn't be necessary now that all values are scaled and centered
   
   mu_mig_strat[1] = 0; //fixing one of the intercepts at 0
   mu_habitat[1] = 0; //fixing one of the intercepts at 0
