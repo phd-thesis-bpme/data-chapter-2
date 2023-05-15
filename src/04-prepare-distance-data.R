@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 04-prepare-distance-data.R
 # Created August 2022
-# Last Updated December 2022
+# Last Updated May 2023
 
 ####### Import Libraries and External Files #######
 
@@ -170,9 +170,11 @@ abundance_per_band_pred[is.na(abundance_per_band_pred)] <- 0
 #' Corresponds with "max_dist" in distance.stan
 max_dist_cv <- D_cv
 max_dist_cv[is.na(max_dist_cv)] <- 0
+max_dist_cv <- max_dist_cv / 100 # scale to be on scale of 100m
 
 max_dist_pred <- D_pred
 max_dist_pred[is.na(max_dist_pred)] <- 0
+max_dist_pred <- max_dist_pred / 100 #scale to be on scale of 100m
 
 n_samples_cv <- nrow(Y_cv)
 n_samples_pred <- nrow(Y_pred)
@@ -191,11 +193,13 @@ mig_strat_pred <- traits_pred$Migrant + 1
 habitat_cv <- traits_cv$Habitat + 1
 habitat_pred <- traits_pred$Habitat + 1
 
-mass_cv <- log(traits_cv$Mass)
-mass_pred <- log(traits_pred$Mass)
+# centre and scale mass
+mass_cv <- scale(log(traits_cv$Mass))
+mass_pred <- scale(log(traits_pred$Mass))
 
-pitch_cv <- traits_cv$Pitch
-pitch_pred <- traits_pred$Pitch
+# centre and scale pitch
+pitch_cv <- scale(traits_cv$Pitch)
+pitch_pred <- scale(traits_pred$Pitch)
 
 distance_stan_data_cv <- list(n_samples = n_samples_cv,
                               n_species = n_species_cv,
