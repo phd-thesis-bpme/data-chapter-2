@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 05-distance-prior-check.R
 # Created March 2023
-# Last Updated March 2023
+# Last Updated May 2023
 
 ####### Import Libraries and External Files #######
 
@@ -42,7 +42,7 @@ print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         NULL)
 dev.off()
 
-intercept <- rnorm(n = n_sims, mean = 4, sd = 0.1)
+intercept <- rnorm(n = n_sims, mean = 0, sd = 0.001)
 pdf(file = "output/prior_predictive_check/distance/intercept.pdf")
 print(ggplot(data = data.frame(intercept), aes(x = intercept)) +
         geom_histogram(bins = 20) +
@@ -55,7 +55,7 @@ mu_mig_strat <- matrix(data = NA,
                        nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_mig_strat)
 {
-  mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.05)
+  mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.001)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_mig_strat.pdf")
 to_plot <- data.frame(Value = c(mu_mig_strat[,1],
@@ -79,7 +79,7 @@ mu_habitat <- matrix(data = NA,
                      nrow = n_sims)
 for (i in 1:distance_stan_data_pred$n_habitat)
 {
-  mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.05)
+  mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.001)
 }
 pdf(file = "output/prior_predictive_check/distance/mu_habitat.pdf")
 to_plot <- data.frame(Value = c(mu_habitat[,1],
@@ -98,7 +98,7 @@ for (i in unique(to_plot$Habitat))
 dev.off()
 
 # beta mass
-beta_mass <- rnorm(n = n_sims, mean = 0.01, sd = 0.005)
+beta_mass <- rnorm(n = n_sims, mean = 0, sd = 0.001)
 pdf(file = "output/prior_predictive_check/distance/beta_mass.pdf")
 
 mass_hist <- ggplot(data = data.frame(Mass_Slope = beta_mass), aes(x = Mass_Slope)) +
@@ -121,7 +121,7 @@ print(mass_plot)
 dev.off()
 
 # beta pitch
-beta_pitch <- rnorm(n = n_sims, mean = -0.01, sd = 0.005)
+beta_pitch <- rnorm(n = n_sims, mean = 0, sd = 0.001)
 pdf(file = "output/prior_predictive_check/distance/beta_pitch.pdf")
 
 pitch_hist <- ggplot(data = data.frame(Pitch_Slope = beta_pitch), aes(x = Pitch_Slope)) +
@@ -181,7 +181,7 @@ for (s in 1:distance_stan_data_pred$n_species)
 dev.off()
 
 pdf(file = "output/prior_predictive_check/distance/tau.pdf")
-tau <- exp(log_tau) #* 1000
+tau <- exp(log_tau) * 100
 for (s in 1:distance_stan_data_pred$n_species)
 {
   to_plot <- data.frame(Value = (tau[,s]))
