@@ -55,11 +55,11 @@ data {
 }
 
 parameters {
-  real intercept_raw;
-  real mu_mig_strat_raw;
-  real mu_habitat_raw;
-  real beta_mass_raw;
-  real beta_pitch_raw;
+  real<lower = -2, upper = 2> intercept_raw;
+  real<lower = -2, upper = 2> mu_mig_strat_raw;
+  real<lower = -2, upper = 2> mu_habitat_raw;
+  real<lower = -2, upper = 2> beta_mass_raw;
+  real<lower = -2, upper = 2> beta_pitch_raw;
   real<lower = 0> sigma;
   vector[n_species] log_tau_raw;
 }
