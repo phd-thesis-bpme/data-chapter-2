@@ -73,14 +73,14 @@ transformed parameters {
   real beta_pitch;
   vector[n_species] log_tau;
   
-  intercept = intercept_raw * 0.001;// intercept_raw; //rescaling shouldn't be necessary now that all values are scaled and centered
+  intercept = intercept_raw// * 0.001;// intercept_raw; //rescaling shouldn't be necessary now that all values are scaled and centered
   
   mu_mig_strat[1] = 0; //fixing one of the intercepts at 0
   mu_habitat[1] = 0; //fixing one of the intercepts at 0
-  mu_mig_strat[2] = mu_mig_strat_raw * 0.001; 
-  mu_habitat[2] = mu_habitat_raw * 0.001;
-  beta_mass = beta_mass_raw * 0.001; // small positive slope probably not necessary?
-  beta_pitch = beta_pitch_raw * 0.001; // small negative slope probably not necessary?
+  mu_mig_strat[2] = mu_mig_strat_raw// * 0.001; 
+  mu_habitat[2] = mu_habitat_raw// * 0.001;
+  beta_mass = beta_mass_raw// * 0.001; // small positive slope probably not necessary?
+  beta_pitch = beta_pitch_raw// * 0.001; // small negative slope probably not necessary?
   
   for (sp in 1:n_species)
   {
