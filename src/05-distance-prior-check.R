@@ -36,14 +36,14 @@ for (i in 1:dim(phylo_corr_pl)[1])
 
 # Sigma
 sigma <- rexp(n = n_sims, rate = 5)
-pdf(file = "output/prior_predictive_check/distance/sigma.pdf")
+pdf(file = "output/prior_predictive_check/distance/01-sigma.pdf")
 print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         geom_histogram(bins = 20) +
         NULL)
 dev.off()
 
 intercept <- rnorm(n = n_sims, mean = 0, sd = 0.001)
-pdf(file = "output/prior_predictive_check/distance/intercept.pdf")
+pdf(file = "output/prior_predictive_check/distance/02-intercept.pdf")
 print(ggplot(data = data.frame(intercept), aes(x = intercept)) +
         geom_histogram(bins = 20) +
         NULL)
@@ -57,7 +57,7 @@ for (i in 1:distance_stan_data_pred$n_mig_strat)
 {
   mu_mig_strat[,i] <- rnorm(n_sims, mean = 0, sd = 0.001)
 }
-pdf(file = "output/prior_predictive_check/distance/mu_mig_strat.pdf")
+pdf(file = "output/prior_predictive_check/distance/03-mu_mig_strat.pdf")
 to_plot <- data.frame(Value = c(mu_mig_strat[,1],
                                 mu_mig_strat[,2]),
                       Mig_Strat = c(rep("Resident", 100),
@@ -81,7 +81,7 @@ for (i in 1:distance_stan_data_pred$n_habitat)
 {
   mu_habitat[,i] <- rnorm(n_sims, mean = 0, sd = 0.001)
 }
-pdf(file = "output/prior_predictive_check/distance/mu_habitat.pdf")
+pdf(file = "output/prior_predictive_check/distance/04-mu_habitat.pdf")
 to_plot <- data.frame(Value = c(mu_habitat[,1],
                                 mu_habitat[,2]),
                       Habitat = c(rep("Open", 100),
@@ -99,7 +99,7 @@ dev.off()
 
 # beta mass
 beta_mass <- rnorm(n = n_sims, mean = 0, sd = 0.001)
-pdf(file = "output/prior_predictive_check/distance/beta_mass.pdf")
+pdf(file = "output/prior_predictive_check/distance/05-beta_mass.pdf")
 
 mass_hist <- ggplot(data = data.frame(Mass_Slope = beta_mass), aes(x = Mass_Slope)) +
   geom_histogram(bins = 20) +
@@ -122,7 +122,7 @@ dev.off()
 
 # beta pitch
 beta_pitch <- rnorm(n = n_sims, mean = 0, sd = 0.001)
-pdf(file = "output/prior_predictive_check/distance/beta_pitch.pdf")
+pdf(file = "output/prior_predictive_check/distance/06-beta_pitch.pdf")
 
 pitch_hist <- ggplot(data = data.frame(Pitch_Slope = beta_pitch), aes(x = Pitch_Slope)) +
   geom_histogram(bins = 20) +
@@ -144,7 +144,7 @@ print(pitch_plot)
 dev.off()
 
 mu <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data_pred$n_species)
-pdf(file = "output/prior_predictive_check/distance/mu.pdf")
+pdf(file = "output/prior_predictive_check/distance/07-mu.pdf")
 for (s in 1:distance_stan_data_pred$n_species)
 {
   mu[,s] <- intercept + (mu_mig_strat[, distance_stan_data_pred$mig_strat[s]]) +
@@ -168,7 +168,7 @@ for (i in 1:n_sims)
                                Sigma = phylo_corr_pl * sigma[i])
 }
 
-pdf(file = "output/prior_predictive_check/distance/log_tau.pdf")
+pdf(file = "output/prior_predictive_check/distance/08-log_tau.pdf")
 for (s in 1:distance_stan_data_pred$n_species)
 {
   to_plot <- data.frame(Value = (log_tau[,s]))
@@ -180,7 +180,7 @@ for (s in 1:distance_stan_data_pred$n_species)
 }
 dev.off()
 
-pdf(file = "output/prior_predictive_check/distance/tau.pdf")
+pdf(file = "output/prior_predictive_check/distance/09-tau.pdf")
 tau <- exp(log_tau) * 100
 for (s in 1:distance_stan_data_pred$n_species)
 {
