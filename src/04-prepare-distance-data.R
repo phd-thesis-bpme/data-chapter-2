@@ -26,7 +26,7 @@ traits <- read.csv("data/raw/traits.csv")
 ####### Wrangle Data for Modelling ################
 
 # Change infinite values to some other very large number to avoid Stan issues
-dist_design <- do.call(data.frame,lapply(dist_design, function(x) replace(x, is.infinite(x),1000)))
+dist_design <- do.call(data.frame,lapply(dist_design, function(x) replace(x, is.infinite(x),450)))
 
 # Most of this code adopted from Edwards et al. 2022
 
