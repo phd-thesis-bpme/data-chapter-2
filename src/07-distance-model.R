@@ -34,8 +34,6 @@ threads_per_chain <- 3
 distance_stan_data_pred$pitch <- distance_stan_data_pred$pitch[,1]
 distance_stan_data_pred$mass <- distance_stan_data_pred$mass[,1]
 
-# temporarily unscale the max_dists to be in metres, for diagnostic purposes
-distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist * 100
 model_file <- cmdstan_model(stan_file = "models/distance.stan",
                             cpp_options = list(stan_threads = TRUE))
 

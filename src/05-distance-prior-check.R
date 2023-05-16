@@ -181,7 +181,7 @@ for (s in 1:distance_stan_data_pred$n_species)
 dev.off()
 
 pdf(file = "output/prior_predictive_check/distance/09-tau.pdf")
-tau <- exp(log_tau) #* 100
+tau <- exp(log_tau) * 100
 for (s in 1:distance_stan_data_pred$n_species)
 {
   to_plot <- data.frame(Value = (tau[,s]))
