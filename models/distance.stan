@@ -17,12 +17,12 @@ functions {
       for (k in 1:(bands_per_sample[i]-1)) // what if the final band was usedas the constraint? more effecient?
       {
         if(k > 1){
-        Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) - 
-        (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]])^2)))) / 
-        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
+        Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / log_tau[species[i]]^2))) - 
+        (1 - exp(-(max_dist[i,k - 1]^2 / log_tau[species[i]]^2)))) / 
+        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / log_tau[species[i]]^2)));
         }else{
-        Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) /
-        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
+        Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / log_tau[species[i]]^2))) /
+        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / log_tau[species[i]]^2)));
         }
       }
       Pi[Pi_index,bands_per_sample[i]] = 1 - sum(Pi[Pi_index,]); // what if the final band was used as the constraint?
@@ -55,11 +55,11 @@ data {
 }
 
 parameters {
-  real<lower = -2, upper = 2> intercept_raw;
-  real<lower = -2, upper = 2> mu_mig_strat_raw;
-  real<lower = -2, upper = 2> mu_habitat_raw;
-  real<lower = -2, upper = 2> beta_mass_raw;
-  real<lower = -2, upper = 2> beta_pitch_raw;
+  real<lower = -1, upper = 1> intercept_raw;
+  real<lower = -1, upper = 1> mu_mig_strat_raw;
+  real<lower = -1, upper = 1> mu_habitat_raw;
+  real<lower = -1, upper = 1> beta_mass_raw;
+  real<lower = -1, upper = 1> beta_pitch_raw;
   real<lower = 0> sigma;
   vector[n_species] log_tau_raw;
 }
