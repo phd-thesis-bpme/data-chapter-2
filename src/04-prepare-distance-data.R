@@ -170,11 +170,9 @@ abundance_per_band_pred[is.na(abundance_per_band_pred)] <- 0
 #' Corresponds with "max_dist" in distance.stan
 max_dist_cv <- D_cv
 max_dist_cv[is.na(max_dist_cv)] <- 0
-max_dist_cv <- max_dist_cv / 100 # scale to be on scale of 100m
 
 max_dist_pred <- D_pred
 max_dist_pred[is.na(max_dist_pred)] <- 0
-max_dist_pred <- max_dist_pred / 100 #scale to be on scale of 100m
 
 n_samples_cv <- nrow(Y_cv)
 n_samples_pred <- nrow(Y_pred)
