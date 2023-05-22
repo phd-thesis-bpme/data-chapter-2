@@ -34,7 +34,6 @@ threads_per_chain <- 3
 distance_stan_data_pred$pitch <- distance_stan_data_pred$pitch[,1]
 distance_stan_data_pred$mass <- distance_stan_data_pred$mass[,1]
 
-
 model_file <- cmdstan_model(stan_file = "models/distance.stan",
                             cpp_options = list(stan_threads = TRUE))
 

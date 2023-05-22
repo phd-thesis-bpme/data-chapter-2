@@ -17,12 +17,12 @@ functions {
       for (k in 1:(bands_per_sample[i]-1)) // what if the final band was usedas the constraint? more effecient?
       {
         if(k > 1){
-        Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) - 
-        (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]])^2)))) / 
-        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
+        Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]]^2)))) - 
+        (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]]^2))))) / 
+        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]]^2))));
         }else{
-        Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) /
-        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
+        Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]]^2)))) /
+        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]]^2))));
         }
       }
       Pi[Pi_index,bands_per_sample[i]] = 1 - sum(Pi[Pi_index,]); // what if the final band was used as the constraint?
@@ -73,14 +73,14 @@ transformed parameters {
   real beta_pitch;
   vector[n_species] log_tau;
   
-  intercept = intercept_raw * 0.001;// intercept_raw; //rescaling shouldn't be necessary now that all values are scaled and centered
+  intercept = 4 + (intercept_raw * 0.1);
   
   mu_mig_strat[1] = 0; //fixing one of the intercepts at 0
   mu_habitat[1] = 0; //fixing one of the intercepts at 0
-  mu_mig_strat[2] = mu_mig_strat_raw * 0.001; 
-  mu_habitat[2] = mu_habitat_raw * 0.001;
-  beta_mass = beta_mass_raw * 0.001; // small positive slope probably not necessary?
-  beta_pitch = beta_pitch_raw * 0.001; // small negative slope probably not necessary?
+  mu_mig_strat[2] = mu_mig_strat_raw * 0.05; 
+  mu_habitat[2] = mu_habitat_raw * 0.05;
+  beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
+  beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
   
   for (sp in 1:n_species)
   {
