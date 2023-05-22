@@ -14,16 +14,16 @@ theme_set(theme_pubclean())
 
 ####### Load Data #################################
 
-load("data/generated/removal_stan_data_pred.rda")
+load("data/generated/removal_stan_data.rda")
 
 ####### Set Constants #############################
 
-removal_stan_data_pred$lambda <- 0.79
+removal_stan_data$lambda <- 0.79
 n_sims <- 100
 
 ####### Prior Predictive Check ####################
 
-phylo_corr_pl <- removal_stan_data_pred$phylo_corr * removal_stan_data_pred$lambda
+phylo_corr_pl <- removal_stan_data$phylo_corr * removal_stan_data$lambda
 for (i in 1:dim(phylo_corr_pl)[1])
 {
   phylo_corr_pl[i,i] <- 1
@@ -37,9 +37,9 @@ print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
 dev.off()
 
 mu_mig_strat <- matrix(data = NA,
-                       ncol = removal_stan_data_pred$n_mig_strat,
+                       ncol = removal_stan_data$n_mig_strat,
                        nrow = n_sims)
-for (i in 1:removal_stan_data_pred$n_mig_strat)
+for (i in 1:removal_stan_data$n_mig_strat)
 {
   mu_mig_strat[,i] <- rnorm(n_sims, mean = -1, sd = 0.01)
 }
@@ -59,11 +59,11 @@ for (i in unique(to_plot$Mig_Strat))
 }
 dev.off()
 
-mu <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data_pred$n_species)
+mu <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data$n_species)
 pdf(file = "output/prior_predictive_check/removal/mu.pdf")
-for (s in 1:removal_stan_data_pred$n_species)
+for (s in 1:removal_stan_data$n_species)
 {
-  mu[,s] <- mu_mig_strat[, removal_stan_data_pred$mig_strat[s]]
+  mu[,s] <- mu_mig_strat[, removal_stan_data$mig_strat[s]]
   to_plot <- data.frame(Value = mu[,s])
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
@@ -74,7 +74,7 @@ for (s in 1:removal_stan_data_pred$n_species)
 
 dev.off()
 
-log_phi <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data_pred$n_species)
+log_phi <- matrix(data = NA, nrow = n_sims, ncol = removal_stan_data$n_species)
 for (i in 1:n_sims)
 {
   log_phi[i,] <- MASS::mvrnorm(n = 1, mu = mu[i,],
@@ -82,7 +82,7 @@ for (i in 1:n_sims)
 }
 
 pdf(file = "output/prior_predictive_check/removal/log_phi.pdf")
-for (s in 1:removal_stan_data_pred$n_species)
+for (s in 1:removal_stan_data$n_species)
 {
   to_plot <- data.frame(Value = (log_phi[,s]))
   print(ggplot(data = to_plot, aes(x = Value)) +
@@ -95,7 +95,7 @@ dev.off()
 
 pdf(file = "output/prior_predictive_check/removal/phi.pdf")
 phi <- exp(log_phi)
-for (s in 1:removal_stan_data_pred$n_species)
+for (s in 1:removal_stan_data$n_species)
 {
   to_plot <- data.frame(Value = (phi[,s]))
   print(ggplot(data = to_plot, aes(x = Value)) +

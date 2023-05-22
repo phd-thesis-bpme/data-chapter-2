@@ -11,12 +11,12 @@ library(cmdstanr)
 
 ####### Load Data #################################
 
-load("data/generated/removal_stan_data_pred.rda")
+load("data/generated/removal_stan_data.rda")
 
 ####### Set Constants #############################
 
-removal_stan_data_pred$grainsize <- 1
-removal_stan_data_pred$lambda <- 0.79
+removal_stan_data$grainsize <- 1
+removal_stan_data$lambda <- 0.79
 
 # Stan settings
 n_iter <- 2000
@@ -31,7 +31,7 @@ model_file <- cmdstan_model(stan_file = "models/removal.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
-  data = removal_stan_data_pred,
+  data = removal_stan_data,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
