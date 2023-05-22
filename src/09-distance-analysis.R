@@ -19,7 +19,7 @@ theme_set(theme_pubclean())
 dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
 load("data/generated/corr_matrix_predict.rda")
 binomial <- read.csv("data/generated/binomial_names.csv")
-load("data/generated/distance_stan_data_pred.rda")
+load("data/generated/distance_stan_data.rda")
 
 
 ####### Main Code #################################
@@ -41,7 +41,7 @@ dis_summary$Scientific_BT <- gsub("_", " ", rownames(corr_matrix_predict))
 dis_summary <- join(dis_summary, binomial[, c("Scientific_BT", "Code")], by = "Scientific_BT")
 
 # Get data sample size for all species and add to summary
-species_n <- data.frame(table(distance_stan_data_pred$species))
+species_n <- data.frame(table(distance_stan_data$species))
 names(species_n) <- c("index", "N")
 dis_summary$index <- seq(1, nrow(dis_summary))
 dis_summary$N <- 0

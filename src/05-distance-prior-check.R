@@ -14,21 +14,21 @@ theme_set(theme_pubclean())
 
 ####### Load Data #################################
 
-load("data/generated/distance_stan_data_pred.rda")
+load("data/generated/distance_stan_data.rda")
 
 ####### Set Constants #############################
 
-distance_stan_data_pred$lambda <- 0
+distance_stan_data$lambda <- 0
 
 # Scale the maximum distances to units of KM for computational ease
-#distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist / 1000
+#distance_stan_data$max_dist <- distance_stan_data$max_dist / 1000
 
 # Prior predictive check settings
 n_sims <- 100
 
 ####### Prior Predictive Check ####################
 
-phylo_corr_pl <- distance_stan_data_pred$phylo_corr * distance_stan_data_pred$lambda
+phylo_corr_pl <- distance_stan_data$phylo_corr * distance_stan_data$lambda
 for (i in 1:dim(phylo_corr_pl)[1])
 {
   phylo_corr_pl[i,i] <- 1
@@ -51,12 +51,12 @@ dev.off()
 
 # mu mig strat
 mu_mig_strat <- matrix(data = NA,
-                       ncol = distance_stan_data_pred$n_mig_strat,
+                       ncol = distance_stan_data$n_mig_strat,
                        nrow = n_sims)
 
 mu_mig_strat[,1] <- 0
 mu_mig_strat[,2] <- rnorm(n_sims, sd = 0.05)
-# for (i in 1:distance_stan_data_pred$n_mig_strat)
+# for (i in 1:distance_stan_data$n_mig_strat)
 # {
 #   mu_mig_strat[,i] <- rnorm(n_sims)
 # }
@@ -78,12 +78,12 @@ dev.off()
 
 # mu habitat
 mu_habitat <- matrix(data = NA,
-                     ncol = distance_stan_data_pred$n_habitat,
+                     ncol = distance_stan_data$n_habitat,
                      nrow = n_sims)
 
 mu_habitat[,1] <- 0
 mu_habitat[,2] <- rnorm(n_sims, sd = 0.05)
-# for (i in 1:distance_stan_data_pred$n_habitat)
+# for (i in 1:distance_stan_data$n_habitat)
 # {
 #   mu_habitat[,i] <- rnorm(n_sims)
 # }
@@ -113,8 +113,8 @@ mass_hist <- ggplot(data = data.frame(Mass_Slope = beta_mass), aes(x = Mass_Slop
 print(mass_hist)
 
 mass_plot <- ggplot() 
-predictors <- seq(min(distance_stan_data_pred$mass),
-                  max(distance_stan_data_pred$mass),
+predictors <- seq(min(distance_stan_data$mass),
+                  max(distance_stan_data$mass),
                   by = 0.01)
 for (i in 1:n_sims)
 {
@@ -136,8 +136,8 @@ pitch_hist <- ggplot(data = data.frame(Pitch_Slope = beta_pitch), aes(x = Pitch_
 print(pitch_hist)
 
 pitch_plot <- ggplot() 
-predictors <- seq(min(distance_stan_data_pred$pitch),
-                  max(distance_stan_data_pred$pitch),
+predictors <- seq(min(distance_stan_data$pitch),
+                  max(distance_stan_data$pitch),
                   by = 0.01)
 for (i in 1:n_sims)
 {
@@ -149,14 +149,14 @@ for (i in 1:n_sims)
 print(pitch_plot)
 dev.off()
 
-mu <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data_pred$n_species)
+mu <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data$n_species)
 pdf(file = "output/prior_predictive_check/distance/07-mu.pdf")
-for (s in 1:distance_stan_data_pred$n_species)
+for (s in 1:distance_stan_data$n_species)
 {
-  mu[,s] <- intercept + (mu_mig_strat[, distance_stan_data_pred$mig_strat[s]]) +
-    (mu_habitat[, distance_stan_data_pred$habitat[s]]) +
-    (beta_mass * distance_stan_data_pred$mass[s]) +
-    (beta_pitch * distance_stan_data_pred$pitch[s])
+  mu[,s] <- intercept + (mu_mig_strat[, distance_stan_data$mig_strat[s]]) +
+    (mu_habitat[, distance_stan_data$habitat[s]]) +
+    (beta_mass * distance_stan_data$mass[s]) +
+    (beta_pitch * distance_stan_data$pitch[s])
   to_plot <- data.frame(Value = mu[,s])
   print(ggplot(data = to_plot, aes(x = Value)) +
           geom_histogram(bins = 20) +
@@ -167,7 +167,7 @@ for (s in 1:distance_stan_data_pred$n_species)
 
 dev.off()
 
-log_tau <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data_pred$n_species)
+log_tau <- matrix(data = NA, nrow = n_sims, ncol = distance_stan_data$n_species)
 for (i in 1:n_sims)
 {
   log_tau[i,] <- MASS::mvrnorm(n = 1, mu = mu[i,],
@@ -175,7 +175,7 @@ for (i in 1:n_sims)
 }
 
 pdf(file = "output/prior_predictive_check/distance/08-log_tau.pdf")
-for (s in 1:distance_stan_data_pred$n_species)
+for (s in 1:distance_stan_data$n_species)
 {
   to_plot <- data.frame(Value = (log_tau[,s]))
   print(ggplot(data = to_plot, aes(x = Value)) +
@@ -188,7 +188,7 @@ dev.off()
 
 pdf(file = "output/prior_predictive_check/distance/09-tau.pdf")
 tau <- exp(log_tau)
-for (s in 1:distance_stan_data_pred$n_species)
+for (s in 1:distance_stan_data$n_species)
 {
   to_plot <- data.frame(Value = (tau[,s]))
   print(ggplot(data = to_plot, aes(x = Value)) +

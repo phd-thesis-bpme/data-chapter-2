@@ -11,15 +11,15 @@ library(cmdstanr)
 
 ####### Load Data #################################
 
-load("data/generated/distance_stan_data_pred.rda")
+load("data/generated/distance_stan_data.rda")
 
 ####### Set Constants #############################
 
-distance_stan_data_pred$grainsize <- 1
-distance_stan_data_pred$lambda <- 0
+distance_stan_data$grainsize <- 1
+distance_stan_data$lambda <- 0
 
 # Scale the maximum distances to units of KM for computational ease
-#distance_stan_data_pred$max_dist <- distance_stan_data_pred$max_dist / 1000
+#distance_stan_data$max_dist <- distance_stan_data$max_dist / 1000
 
 # Stan settings
 n_iter <- 500
@@ -31,14 +31,14 @@ threads_per_chain <- 3
 ####### Run Model #################################
 
 # get rid of centre/scale attributes for modelling
-distance_stan_data_pred$pitch <- distance_stan_data_pred$pitch[,1]
-distance_stan_data_pred$mass <- distance_stan_data_pred$mass[,1]
+distance_stan_data$pitch <- distance_stan_data$pitch[,1]
+distance_stan_data$mass <- distance_stan_data$mass[,1]
 
 model_file <- cmdstan_model(stan_file = "models/distance.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
-  data = distance_stan_data_pred,
+  data = distance_stan_data,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
