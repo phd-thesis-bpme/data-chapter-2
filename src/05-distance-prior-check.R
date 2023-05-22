@@ -42,7 +42,7 @@ print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         NULL)
 dev.off()
 
-intercept <- rnorm(n = n_sims)
+intercept <- rnorm(n = n_sims, mean = 4, sd = 0.1)
 pdf(file = "output/prior_predictive_check/distance/02-intercept.pdf")
 print(ggplot(data = data.frame(intercept), aes(x = intercept)) +
         geom_histogram(bins = 20) +
@@ -53,10 +53,13 @@ dev.off()
 mu_mig_strat <- matrix(data = NA,
                        ncol = distance_stan_data_pred$n_mig_strat,
                        nrow = n_sims)
-for (i in 1:distance_stan_data_pred$n_mig_strat)
-{
-  mu_mig_strat[,i] <- rnorm(n_sims)
-}
+
+mu_mig_strat[,1] <- 0
+mu_mig_strat[,2] <- rnorm(n_sims, sd = 0.05)
+# for (i in 1:distance_stan_data_pred$n_mig_strat)
+# {
+#   mu_mig_strat[,i] <- rnorm(n_sims)
+# }
 pdf(file = "output/prior_predictive_check/distance/03-mu_mig_strat.pdf")
 to_plot <- data.frame(Value = c(mu_mig_strat[,1],
                                 mu_mig_strat[,2]),
@@ -77,10 +80,13 @@ dev.off()
 mu_habitat <- matrix(data = NA,
                      ncol = distance_stan_data_pred$n_habitat,
                      nrow = n_sims)
-for (i in 1:distance_stan_data_pred$n_habitat)
-{
-  mu_habitat[,i] <- rnorm(n_sims)
-}
+
+mu_habitat[,1] <- 0
+mu_habitat[,2] <- rnorm(n_sims, sd = 0.05)
+# for (i in 1:distance_stan_data_pred$n_habitat)
+# {
+#   mu_habitat[,i] <- rnorm(n_sims)
+# }
 pdf(file = "output/prior_predictive_check/distance/04-mu_habitat.pdf")
 to_plot <- data.frame(Value = c(mu_habitat[,1],
                                 mu_habitat[,2]),
@@ -98,7 +104,7 @@ for (i in unique(to_plot$Habitat))
 dev.off()
 
 # beta mass
-beta_mass <- rnorm(n = n_sims)
+beta_mass <- rnorm(n = n_sims, mean = 0.01, sd = 0.005)
 pdf(file = "output/prior_predictive_check/distance/05-beta_mass.pdf")
 
 mass_hist <- ggplot(data = data.frame(Mass_Slope = beta_mass), aes(x = Mass_Slope)) +
@@ -121,7 +127,7 @@ print(mass_plot)
 dev.off()
 
 # beta pitch
-beta_pitch <- rnorm(n = n_sims)
+beta_pitch <- rnorm(n = n_sims, mean = -0.01, sd = 0.005)
 pdf(file = "output/prior_predictive_check/distance/06-beta_pitch.pdf")
 
 pitch_hist <- ggplot(data = data.frame(Pitch_Slope = beta_pitch), aes(x = Pitch_Slope)) +
@@ -181,7 +187,7 @@ for (s in 1:distance_stan_data_pred$n_species)
 dev.off()
 
 pdf(file = "output/prior_predictive_check/distance/09-tau.pdf")
-tau <- exp(log_tau) * 100
+tau <- exp(log_tau)
 for (s in 1:distance_stan_data_pred$n_species)
 {
   to_plot <- data.frame(Value = (tau[,s]))
