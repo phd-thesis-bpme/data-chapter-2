@@ -23,11 +23,11 @@ distance_stan_data$lambda <- 0
 #distance_stan_data$max_dist <- distance_stan_data$max_dist / 1000
 
 # Stan settings
-n_iter <- 500
-n_warmup <- 250
-n_chains <- 4
+n_iter <- 1000
+n_warmup <- 500
+n_chains <- 1
 refresh <- 10
-threads_per_chain <- 3
+threads_per_chain <- 12
 
 ####### Subset Data for Testing ###################
 
@@ -46,7 +46,16 @@ sub_data <- data.frame(mig_strat = distance_stan_data$mig_strat,
                        sp_n = 1:length(distance_stan_data$mig_strat))
 sp_df <- left_join(sp_df,sub_data)
 
-sps <- c("GRSP","WOTH","BCCH","WTSP","BAOR","EAME","HAWO","GCFL","BOBO")
+sps <- c(#"GRSP",
+        # "WOTH",
+        # "BCCH",
+         "WTSP"
+        # "BAOR",
+        # "EAME",
+        # "HAWO",
+        # "GCFL",
+         #"BOBO"
+        )
 sp_sel <- sp_df[which(sp_df$species %in% sps),]
 sp_sel[,"new_sp_n"] <- 1:length(sps) # new species indicators
 
@@ -56,7 +65,7 @@ sp_data_repl <- orig_data_df %>%
   left_join(.,sp_sel,
             by = "sp_n")
 
-distance_stan_data2 <- distance_stan_data
+distance_stan_data2 <- distance_stan_data; rm(distance_stan_data); gc();
 distance_stan_data2$bands_per_sample <- distance_stan_data2$bands_per_sample[data_sel]
 distance_stan_data2$abund_per_band <- distance_stan_data2$abund_per_band[data_sel,]
 distance_stan_data2$max_dist <- distance_stan_data2$max_dist[data_sel,]
