@@ -23,11 +23,11 @@ distance_stan_data$lambda <- 0
 #distance_stan_data$max_dist <- distance_stan_data$max_dist / 1000
 
 # Stan settings
-n_iter <- 1000
-n_warmup <- 500
+n_iter <- 2000
+n_warmup <- 1000
 n_chains <- 1
 refresh <- 10
-threads_per_chain <- 12
+threads_per_chain <- 16
 
 ####### Subset Data for Testing ###################
 
