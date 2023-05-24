@@ -105,7 +105,8 @@ stan_run <- model_file$sample(
   chains = n_chains,
   parallel_chains = n_chains,
   refresh = refresh,
-  threads_per_chain = threads_per_chain
+  threads_per_chain = threads_per_chain,
+  adapt_delta = 0.95
 )
 stan_run$save_object(file = paste0("output/model_runs/distance_predictions.RDS"))
 
