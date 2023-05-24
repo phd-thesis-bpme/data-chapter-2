@@ -46,10 +46,11 @@ sub_data <- data.frame(mig_strat = distance_stan_data$mig_strat,
                        sp_n = 1:length(distance_stan_data$mig_strat))
 sp_df <- left_join(sp_df,sub_data)
 
-sps <- c(#"GRSP",
+sps <- c("GRSP",
         # "WOTH",
         # "BCCH",
-         "WTSP"
+         "WTSP",
+         "WCSP"
         # "BAOR",
         # "EAME",
         # "HAWO",
