@@ -46,48 +46,48 @@ data {
   array[n_samples, max_intervals] int abund_per_band;// abundance in distance band k for sample i
   array[n_samples] int bands_per_sample; // number of distance bands for sample i
   array[n_samples, max_intervals] real max_dist; // max distance for distance band k
-  #int<lower = 1> n_mig_strat;        //total number of migration strategies
-  #array[n_species] int mig_strat;        //migration strategy for each species
-  #int<lower = 1> n_habitat;        //total number of habitat preferences
-  #array[n_species] int habitat;        //habitat preference for each species
-  #array[n_species] real mass;  //log mass of species
-  #array[n_species] real pitch; //song pitch of species
+  int<lower = 1> n_mig_strat;        //total number of migration strategies
+  array[n_species] int mig_strat;        //migration strategy for each species
+  int<lower = 1> n_habitat;        //total number of habitat preferences
+  array[n_species] int habitat;        //habitat preference for each species
+  array[n_species] real mass;  //log mass of species
+  array[n_species] real pitch; //song pitch of species
 }
 
 parameters {
-  #real intercept_raw;
-  #real mu_mig_strat_raw;
-  #real mu_habitat_raw;
-  #real beta_mass_raw;
-  #real beta_pitch_raw;
+  real intercept_raw;
+  real mu_mig_strat_raw;
+  real mu_habitat_raw;
+  real beta_mass_raw;
+  real beta_pitch_raw;
   real<lower = 0> sigma;
   vector[n_species] log_tau_raw;
 }
 
 transformed parameters {
-  #real intercept;
-  #row_vector[n_species] mu;
-  #row_vector[n_mig_strat] mu_mig_strat;
-  #row_vector[n_habitat] mu_habitat;
-  #real beta_mass;
-  #real beta_pitch;
+  real intercept;
+  row_vector[n_species] mu;
+  row_vector[n_mig_strat] mu_mig_strat;
+  row_vector[n_habitat] mu_habitat;
+  real beta_mass;
+  real beta_pitch;
   vector[n_species] log_tau;
   
-  #intercept = 4 + (intercept_raw * 0.1);
+  intercept = 4 + (intercept_raw * 0.1);
   
-  #mu_mig_strat[1] = 0; //fixing one of the intercepts at 0
-  #mu_habitat[1] = 0; //fixing one of the intercepts at 0
-  #mu_mig_strat[2] = mu_mig_strat_raw * 0.05; 
-  #mu_habitat[2] = mu_habitat_raw * 0.05;
-  #beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
-  #beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
+  mu_mig_strat[1] = 0; //fixing one of the intercepts at 0
+  mu_habitat[1] = 0; //fixing one of the intercepts at 0
+  mu_mig_strat[2] = mu_mig_strat_raw * 0.05; 
+  mu_habitat[2] = mu_habitat_raw * 0.05;
+  beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
+  beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
   
   for (sp in 1:n_species)
   {
-   # mu[sp] = intercept + mu_mig_strat[mig_strat[sp]] +
-  #                     mu_habitat[habitat[sp]] + //should this be the habitat at the survey?
-  #                     beta_mass * mass[sp] +
-  #                     beta_pitch * pitch[sp];
+    mu[sp] = intercept + mu_mig_strat[mig_strat[sp]] +
+                       mu_habitat[habitat[sp]] + //should this be the habitat at the survey?
+                       beta_mass * mass[sp] +
+                       beta_pitch * pitch[sp];
                        
     log_tau[sp] = (log_tau_raw[sp] * sigma);
   }
@@ -96,11 +96,11 @@ transformed parameters {
 model {
   
   log_tau_raw ~ std_normal();
-  #intercept_raw ~ std_normal();
-  #mu_mig_strat_raw ~ std_normal();
-  #mu_habitat_raw ~ std_normal();
-  #beta_mass_raw ~ std_normal();
-  #beta_pitch_raw ~ std_normal();
+  intercept_raw ~ std_normal();
+  mu_mig_strat_raw ~ std_normal();
+  mu_habitat_raw ~ std_normal();
+  beta_mass_raw ~ std_normal();
+  beta_pitch_raw ~ std_normal();
   
   sigma ~ exponential(5);
 

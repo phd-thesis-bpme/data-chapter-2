@@ -46,11 +46,22 @@ sub_data <- data.frame(mig_strat = distance_stan_data$mig_strat,
                        sp_n = 1:length(distance_stan_data$mig_strat))
 sp_df <- left_join(sp_df,sub_data)
 
-sps <- c("GRSP",
+sps <- c(#"GRSP",
         # "WOTH",
         # "BCCH",
-         "WTSP",
-         "WCSP"
+         #"WTSP",
+         "FLSJ",
+         "KIWA",
+         "HASP",
+         "SPOW",
+         "LEPC",
+         "GRSG",
+         "WTPT",
+         "EASO",
+         "BCRF",
+         "MEJA",
+         "BOSP",
+         "RFWA"
         # "BAOR",
         # "EAME",
         # "HAWO",
@@ -87,13 +98,13 @@ distance_stan_data2$max_dist <- distance_stan_data2$max_dist / 100
 
 ####### Run Model #################################
 
-# get rid of centre/scale attributes for modelling
-distance_stan_data2$pitch <- NULL#distance_stan_data$pitch[,1]
-distance_stan_data2$mass <- NULL#distance_stan_data$mass[,1]
-distance_stan_data2$n_mig_strat <- NULL
-distance_stan_data2$mig_strat <- NULL
-distance_stan_data2$n_habitat <- NULL
-distance_stan_data2$habitat <- NULL
+# # get rid of centre/scale attributes for modelling
+# distance_stan_data2$pitch <- NULL#distance_stan_data$pitch[,1]
+# distance_stan_data2$mass <- NULL#distance_stan_data$mass[,1]
+# distance_stan_data2$n_mig_strat <- NULL
+# distance_stan_data2$mig_strat <- NULL
+# distance_stan_data2$n_habitat <- NULL
+# distance_stan_data2$habitat <- NULL
 
 model_file <- cmdstan_model(stan_file = "models/distance.stan",
                             cpp_options = list(stan_threads = TRUE))
