@@ -46,26 +46,20 @@ sub_data <- data.frame(mig_strat = distance_stan_data$mig_strat,
                        sp_n = 1:length(distance_stan_data$mig_strat))
 sp_df <- left_join(sp_df,sub_data)
 
- sps <- c("GRSP",
+ sps <- c(
 #          "WOTH",
 #         # "BCCH",
-#          "WCSP",
+          "WCSP",
         "FLSJ",
          "KIWA",
          "HASP",
 "SPOW",
-"LEPC",
-"GRSG",
-"WTPT",
-"EASO",
-"BCRF",
 "MEJA",
 "BOSP",
-"RFWA"
         # "BAOR",
         # "EAME",
         # "HAWO",
-        # "GCFL",
+         "GCFL"
          #"BOBO"
         )
 sp_sel <- sp_df[which(sp_df$species %in% sps),]
@@ -95,8 +89,8 @@ distance_stan_data2$sp_list <- NULL
 distance_stan_data2$phylo_corr <- NULL
 distance_stan_data2$max_dist <- distance_stan_data2$max_dist / 100
 
-# test area for mixture of centred and non-centred parameters
-distance_stan_data2$n_noncentred_sp <- 12
+# # test area for mixture of centred and non-centred parameters
+distance_stan_data2$n_species_ncp <- 12
 distance_stan_data2$n_centred_sp <- 1
 distance_stan_data2$noncentred_sp <- c(1:5,7:13)
 distance_stan_data2$centred_sp <- c(6)
@@ -111,7 +105,7 @@ distance_stan_data2$centred_sp <- c(6)
 # distance_stan_data2$n_habitat <- NULL
 # distance_stan_data2$habitat <- NULL
 
-model_file <- cmdstan_model(stan_file = "models/distance.stan",
+model_file <- cmdstan_model(stan_file = "models/distance_mixed.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
