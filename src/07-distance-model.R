@@ -23,6 +23,10 @@ distance_stan_data$sp_list <- NULL
 distance_stan_data$phylo_corr <- NULL
 distance_stan_data$max_dist <- distance_stan_data$max_dist / 100
 
+# get rid of centre/scale attributes for modelling
+distance_stan_data$pitch <- distance_stan_data$pitch[,1]
+distance_stan_data$mass <- distance_stan_data$mass[,1]
+
 # Scale the maximum distances to units of KM for computational ease
 #distance_stan_data$max_dist <- distance_stan_data$max_dist / 1000
 
@@ -96,14 +100,6 @@ threads_per_chain <- 16
 # distance_stan_data2$species_cp <- c(1,3,6,8)
 
 ####### Run Model #################################
-
-# # get rid of centre/scale attributes for modelling
-# distance_stan_data2$pitch <- NULL#distance_stan_data$pitch[,1]
-# distance_stan_data2$mass <- NULL#distance_stan_data$mass[,1]
-# distance_stan_data2$n_mig_strat <- NULL
-# distance_stan_data2$mig_strat <- NULL
-# distance_stan_data2$n_habitat <- NULL
-# distance_stan_data2$habitat <- NULL
 
 model_file <- cmdstan_model(stan_file = "models/distance_mixed.stan",
                             cpp_options = list(stan_threads = TRUE))
