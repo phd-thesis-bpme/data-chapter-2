@@ -63,28 +63,46 @@ data {
 }
 
 parameters {
-  real intercept;
-  row_vector[n_mig_strat] mu_mig_strat;
-  row_vector[n_habitat] mu_habitat;
-  real beta_mass;
-  real beta_pitch;
+  real intercept_raw;
+  real mu_mig_strat_raw;
+  real mu_habitat_raw;
+  real beta_mass_raw;
+  real beta_pitch_raw;
   real<lower = 0> sigma;
   vector[n_species] log_tau;
   vector[n_noncentred_sp] log_tau_noncentred_raw;
 }
 
 transformed parameters {
+  real intercept;
+  row_vector[n_species] mu;
+  row_vector[n_mig_strat] mu_mig_strat;
+  row_vector[n_habitat] mu_habitat;
+  real beta_mass;
+  real beta_pitch;
   vector[n_noncentred_sp] log_tau_noncentred;
+  
+  intercept = 0.05 + (intercept_raw * 0.1);
+  mu_mig_strat[1] = 0; //fixing one of the intercepts at 0
+  mu_habitat[1] = 0; //fixing one of the intercepts at 0
+  mu_mig_strat[2] = mu_mig_strat_raw * 0.05; 
+  mu_habitat[2] = mu_habitat_raw * 0.05;
+  beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
+  beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
+  
+  for (sp in 1:n_species)
+  {
+    mu[sp] = intercept + mu_mig_strat[mig_strat[sp]] +
+                       mu_habitat[habitat[sp]] +
+                       beta_mass * mass[sp] +
+                       beta_pitch * pitch[sp];
+  }
   
   for (sp_index in 1:n_noncentred_sp)
   {
     int sp = noncentred_sp[sp_index];
-    real mu = intercept + mu_mig_strat[mig_strat[sp]] +
-                       mu_habitat[habitat[sp]] +
-                       beta_mass * mass[sp] +
-                       beta_pitch * pitch[sp];
                        
-    log_tau_noncentred[sp_index] = mu + sigma * log_tau_noncentred_raw[sp_index];
+    log_tau_noncentred[sp_index] = mu[sp] + sigma * log_tau_noncentred_raw[sp_index];
     
   }
 }
@@ -94,12 +112,8 @@ model {
   for (sp_index in 1:n_centred_sp)
   {
     int sp = centred_sp[sp_index];
-    real mu = intercept + mu_mig_strat[mig_strat[sp]] +
-                       mu_habitat[habitat[sp]] +
-                       beta_mass * mass[sp] +
-                       beta_pitch * pitch[sp];
                        
-    log_tau[sp] ~ normal(mu, sigma);
+    log_tau[sp] ~ normal(mu[sp], sigma);
   }
   log_tau_all = log_tau;
   
@@ -110,11 +124,11 @@ model {
   }
 
   log_tau_noncentred_raw ~ std_normal();
-  intercept ~ normal(0.05, 0.1);
-  mu_mig_strat ~ normal(0, 0.05);
-  mu_habitat ~ normal(0, 0.05);
-  beta_mass ~ normal(0.01, 0.005);
-  beta_pitch ~ normal(0.01, 0.005);
+  intercept_raw ~ std_normal();
+  mu_mig_strat_raw ~ std_normal();
+  mu_habitat_raw ~ std_normal();
+  beta_mass_raw ~ std_normal();
+  beta_pitch_raw ~ std_normal();
   
   sigma ~ exponential(5);
 
