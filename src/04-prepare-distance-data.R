@@ -117,6 +117,15 @@ sp_pred_numeric <- data.frame(Species = species_pred_code,
                               num = seq(1, length(species_pred_code)))
 sp_pred_numeric <- join(sp_list_pred, sp_pred_numeric, by= "Species")
 
+#' Create vector of indices corresponding to species modelled by centred and non-
+#' centred parameterizations
+count_per_sp <- data.frame(table(sp_pred_numeric$num))
+species_ncp <- as.numeric(count_per_sp[which(count_per_sp$Freq <= 1000), "Var1"])
+species_cp <- as.numeric(setdiff(count_per_sp$Var1, species_ncp))
+# Account for any species with zero counts, add them into non-centred species
+species_ncp <- sort(c(species_ncp,
+                 setdiff(as.numeric(count_per_sp$Var1), c(species_ncp, species_cp))))
+
 #' Corresponds with "abund_per_band" in distance.stan
 abundance_per_band_pred <- Y_pred
 abundance_per_band_pred[is.na(abundance_per_band_pred)] <- 0
@@ -144,20 +153,24 @@ mass_pred <- scale(log(traits_pred$Mass))
 pitch_pred <- scale(traits_pred$Pitch)
 
 distance_stan_data <- list(n_samples = n_samples_pred,
-                              n_species = n_species_pred,
-                              max_intervals = max_intervals_pred,
-                              species = sp_pred_numeric$num,
-                              abund_per_band = abundance_per_band_pred,
-                              bands_per_sample = dist_bands_per_sample_pred,
-                              max_dist = max_dist_pred,
-                              phylo_corr = corr_matrix_predict,
-                              sp_list = sp_list_pred,
-                              n_mig_strat = max(mig_strat_pred),
-                              mig_strat = mig_strat_pred,
-                              n_habitat = max(habitat_pred),
-                              habitat = habitat_pred,
-                              mass = mass_pred,
-                              pitch = pitch_pred)
+                           n_species = n_species_pred,
+                           species_cp = species_cp,
+                           n_species_cp = length(species_cp),
+                           species_ncp = species_ncp,
+                           n_species_ncp = length(species_ncp),
+                           max_intervals = max_intervals_pred,
+                           species = sp_pred_numeric$num,
+                           abund_per_band = abundance_per_band_pred,
+                           bands_per_sample = dist_bands_per_sample_pred,
+                           max_dist = max_dist_pred,
+                           phylo_corr = corr_matrix_predict,
+                           sp_list = sp_list_pred,
+                           n_mig_strat = max(mig_strat_pred),
+                           mig_strat = mig_strat_pred,
+                           n_habitat = max(habitat_pred),
+                           habitat = habitat_pred,
+                           mass = mass_pred,
+                           pitch = pitch_pred)
 
 ####### Output ####################################
 save(distance_stan_data, file = "data/generated/distance_stan_data.rda")
