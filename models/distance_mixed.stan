@@ -121,7 +121,7 @@ model {
   sigma ~ exponential(5);
   
   log_tau_ncp ~ std_normal();
-  log_tau_cp[species_cp] ~ normal(mu[species_cp], sigma);
+  log_tau_cp ~ normal(mu[species_cp], sigma);
   // for (sp_index in 1:n_species_cp)
   // {
   //   int sp = species_cp[sp_index];
