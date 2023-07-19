@@ -92,23 +92,6 @@ transformed parameters {
   
   log_tau[species_ncp] = mu[species_ncp] + sigma * log_tau_ncp;
   log_tau[species_cp] = log_tau_cp;
-  
-  // for (sp_index in 1:n_species_ncp)
-  // {
-  //   int sp = species_ncp[sp_index];
-  //   real mu = intercept + mu_mig_strat[mig_strat[sp]] +
-  //                      mu_habitat[habitat[sp]] + 
-  //                      beta_mass * mass[sp] +
-  //                      beta_pitch * pitch[sp];
-  //   log_tau[sp] = mu + sigma * log_tau_ncp[sp_index];
-  // }
-  // 
-  // for (sp_index in 1:n_species_cp)
-  // {
-  //   int sp = species_cp[sp_index];
-  //   log_tau[sp] = log_tau_cp[sp_index];
-  // }
-  
 }
 
 model {
@@ -122,15 +105,6 @@ model {
   
   log_tau_ncp ~ std_normal();
   log_tau_cp ~ normal(mu[species_cp], sigma);
-  // for (sp_index in 1:n_species_cp)
-  // {
-  //   int sp = species_cp[sp_index];
-  //   real mu = intercept + mu_mig_strat[mig_strat[sp]] +
-  //                      mu_habitat[habitat[sp]] + 
-  //                      beta_mass * mass[sp] +
-  //                      beta_pitch * pitch[sp];
-  //   log_tau_cp[sp_index] ~ normal(mu, sigma);
-  // }
 
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,
