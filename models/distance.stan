@@ -5,7 +5,7 @@ functions {
                         array[] int bands_per_sample,
                         array[, ] real max_dist,
                         array[] int species,
-                        vector log_tau)
+                        vector log_tau_all)
   {
     real lp = 0;
     int Pi_size = end - start + 1;
@@ -17,12 +17,12 @@ functions {
       for (k in 1:(bands_per_sample[i]-1)) // what if the final band was usedas the constraint? more effecient?
       {
         if(k > 1){
-        Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]]^2)))) - 
-        (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]]^2))))) / 
-        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]]^2))));
+        Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / exp(log_tau_all[species[i]]^2)))) - 
+        (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau_all[species[i]]^2))))) / 
+        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau_all[species[i]]^2))));
         }else{
-        Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]]^2)))) /
-        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]]^2))));
+        Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / exp(log_tau_all[species[i]]^2)))) /
+        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau_all[species[i]]^2))));
         }
       }
       Pi[Pi_index,bands_per_sample[i]] = 1 - sum(Pi[Pi_index,]); // what if the final band was used as the constraint?
@@ -42,65 +42,79 @@ data {
   int<lower = 1> n_species;           // total number of specise
   int<lower = 2> max_intervals;       // maximum number of intervals being considered
   int<lower = 1> grainsize;           // grainsize for reduce_sum() function
+  int<lower = 1> n_noncentred_sp;     // how many non-centred species to model
+  int<lower = 1> n_centred_sp;        // how many centred species to model
+  
   array[n_samples] int species;             // species being considered for each sample
+  array[n_noncentred_sp] int noncentred_sp;  // vector of indices corresponding to non-centred species
+  array[n_centred_sp] int centred_sp;       // vector of indices correspondnig to centred species
   array[n_samples, max_intervals] int abund_per_band;// abundance in distance band k for sample i
   array[n_samples] int bands_per_sample; // number of distance bands for sample i
   array[n_samples, max_intervals] real max_dist; // max distance for distance band k
+  
   int<lower = 1> n_mig_strat;        //total number of migration strategies
   array[n_species] int mig_strat;        //migration strategy for each species
+  
   int<lower = 1> n_habitat;        //total number of habitat preferences
   array[n_species] int habitat;        //habitat preference for each species
+  
   array[n_species] real mass;  //log mass of species
   array[n_species] real pitch; //song pitch of species
 }
 
 parameters {
-  real intercept_raw;
-  real mu_mig_strat_raw;
-  real mu_habitat_raw;
-  real beta_mass_raw;
-  real beta_pitch_raw;
-  real<lower = 0> sigma;
-  vector[n_species] log_tau_raw;
-}
-
-transformed parameters {
   real intercept;
-  row_vector[n_species] mu;
   row_vector[n_mig_strat] mu_mig_strat;
   row_vector[n_habitat] mu_habitat;
   real beta_mass;
   real beta_pitch;
+  real<lower = 0> sigma;
   vector[n_species] log_tau;
+  vector[n_noncentred_sp] log_tau_noncentred_raw;
+}
+
+transformed parameters {
+  vector[n_noncentred_sp] log_tau_noncentred;
   
-  intercept = 4 + (intercept_raw * 0.1);
-  
-  mu_mig_strat[1] = 0; //fixing one of the intercepts at 0
-  mu_habitat[1] = 0; //fixing one of the intercepts at 0
-  mu_mig_strat[2] = mu_mig_strat_raw * 0.05; 
-  mu_habitat[2] = mu_habitat_raw * 0.05;
-  beta_mass = 0.01 + (0.005 * beta_mass_raw); # small positive slope
-  beta_pitch = -0.01 + (0.005 * beta_pitch_raw); # small negative slope
-  
-  for (sp in 1:n_species)
+  for (sp_index in 1:n_noncentred_sp)
   {
-    mu[sp] = intercept + mu_mig_strat[mig_strat[sp]] +
-                       mu_habitat[habitat[sp]] + //should this be the habitat at the survey?
+    int sp = noncentred_sp[sp_index];
+    real mu = intercept + mu_mig_strat[mig_strat[sp]] +
+                       mu_habitat[habitat[sp]] +
                        beta_mass * mass[sp] +
                        beta_pitch * pitch[sp];
                        
-    log_tau[sp] = (log_tau_raw[sp] * sigma);
+    log_tau_noncentred[sp_index] = mu + sigma * log_tau_noncentred_raw[sp_index];
+    
   }
 }
 
 model {
+  vector[n_species] log_tau_all;
+  for (sp_index in 1:n_centred_sp)
+  {
+    int sp = centred_sp[sp_index];
+    real mu = intercept + mu_mig_strat[mig_strat[sp]] +
+                       mu_habitat[habitat[sp]] +
+                       beta_mass * mass[sp] +
+                       beta_pitch * pitch[sp];
+                       
+    log_tau[sp] ~ normal(mu, sigma);
+  }
+  log_tau_all = log_tau;
   
-  log_tau_raw ~ std_normal();
-  intercept_raw ~ std_normal();
-  mu_mig_strat_raw ~ std_normal();
-  mu_habitat_raw ~ std_normal();
-  beta_mass_raw ~ std_normal();
-  beta_pitch_raw ~ std_normal();
+  for (sp_index in 1:n_noncentred_sp)
+  {
+    int sp = noncentred_sp[sp_index];
+    log_tau_all[sp] = log_tau_noncentred[sp_index];
+  }
+
+  log_tau_noncentred_raw ~ std_normal();
+  intercept ~ normal(0.05, 0.1);
+  mu_mig_strat ~ normal(0, 0.05);
+  mu_habitat ~ normal(0, 0.05);
+  beta_mass ~ normal(0.01, 0.005);
+  beta_pitch ~ normal(0.01, 0.005);
   
   sigma ~ exponential(5);
 
@@ -111,5 +125,5 @@ model {
                        bands_per_sample,
                        max_dist,
                        species,
-                       log_tau);
+                       log_tau_all);
 }

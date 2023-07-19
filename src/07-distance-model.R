@@ -23,8 +23,8 @@ distance_stan_data$lambda <- 0
 #distance_stan_data$max_dist <- distance_stan_data$max_dist / 1000
 
 # Stan settings
-n_iter <- 2000
-n_warmup <- 1000
+n_iter <- 100
+n_warmup <- 250
 n_chains <- 1
 refresh <- 10
 threads_per_chain <- 16
@@ -46,22 +46,22 @@ sub_data <- data.frame(mig_strat = distance_stan_data$mig_strat,
                        sp_n = 1:length(distance_stan_data$mig_strat))
 sp_df <- left_join(sp_df,sub_data)
 
-sps <- c(#"GRSP",
-        # "WOTH",
-        # "BCCH",
-         #"WTSP",
-         "FLSJ",
+ sps <- c("GRSP",
+#          "WOTH",
+#         # "BCCH",
+#          "WCSP",
+        "FLSJ",
          "KIWA",
          "HASP",
-         "SPOW",
-         "LEPC",
-         "GRSG",
-         "WTPT",
-         "EASO",
-         "BCRF",
-         "MEJA",
-         "BOSP",
-         "RFWA"
+"SPOW",
+"LEPC",
+"GRSG",
+"WTPT",
+"EASO",
+"BCRF",
+"MEJA",
+"BOSP",
+"RFWA"
         # "BAOR",
         # "EAME",
         # "HAWO",
@@ -95,6 +95,11 @@ distance_stan_data2$sp_list <- NULL
 distance_stan_data2$phylo_corr <- NULL
 distance_stan_data2$max_dist <- distance_stan_data2$max_dist / 100
 
+# test area for mixture of centred and non-centred parameters
+distance_stan_data2$n_noncentred_sp <- 12
+distance_stan_data2$n_centred_sp <- 1
+distance_stan_data2$noncentred_sp <- c(1:5,7:13)
+distance_stan_data2$centred_sp <- c(6)
 
 ####### Run Model #################################
 
