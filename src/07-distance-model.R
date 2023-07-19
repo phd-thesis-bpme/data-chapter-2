@@ -90,10 +90,10 @@ distance_stan_data2$phylo_corr <- NULL
 distance_stan_data2$max_dist <- distance_stan_data2$max_dist / 100
 
 # # test area for mixture of centred and non-centred parameters
-distance_stan_data2$n_species_ncp <- 12
-distance_stan_data2$n_centred_sp <- 1
-distance_stan_data2$noncentred_sp <- c(1:5,7:13)
-distance_stan_data2$centred_sp <- c(6)
+distance_stan_data2$n_species_ncp <- 6
+distance_stan_data2$n_species_cp <- 2
+distance_stan_data2$species_ncp <- c(1,2,4:7)
+distance_stan_data2$species_cp <- c(3,8)
 
 ####### Run Model #################################
 
