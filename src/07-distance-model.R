@@ -31,11 +31,11 @@ distance_stan_data$mass <- distance_stan_data$mass[,1]
 #distance_stan_data$max_dist <- distance_stan_data$max_dist / 1000
 
 # Stan settings
-n_iter <- 20
-n_warmup <- 20
-n_chains <- 1
+n_iter <- 2000
+n_warmup <- 1000
+n_chains <- 4
 refresh <- 10
-threads_per_chain <- 16
+threads_per_chain <- 4
 
 # ####### Subset Data for Testing ###################
 # 
@@ -111,8 +111,7 @@ stan_run <- model_file$sample(
   chains = n_chains,
   parallel_chains = n_chains,
   refresh = refresh,
-  threads_per_chain = threads_per_chain,
-  adapt_delta = 0.95
+  threads_per_chain = threads_per_chain
 )
 stan_run$save_object(file = paste0("output/model_runs/distance_predictions.RDS"))
 
