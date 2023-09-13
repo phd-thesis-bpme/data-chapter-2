@@ -17,9 +17,9 @@ load("data/generated/distance_stan_data.rda")
 ####### Set Constants #############################
 
 # Stan settings
-n_iter <- 2000
-n_warmup <- 1000
-n_chains <- 4
+n_iter <- 20
+n_warmup <- 10
+n_chains <- 1
 refresh <- 10
 threads_per_chain <- 4
 
@@ -37,7 +37,7 @@ distance_stan_data$mass <- distance_stan_data$mass[,1]
 
 ####### Run Model #################################
 
-model_file <- cmdstan_model(stan_file = "models/distance_ucp.stan",
+model_file <- cmdstan_model(stan_file = "models/distance_mixed.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
