@@ -18,7 +18,7 @@ functions {
       {
         if(k > 1){
         Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) - 
-        (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]]^2))))) / 
+        (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]])^2)))) / 
         (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
         }else{
         Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) /
