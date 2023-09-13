@@ -37,7 +37,7 @@ distance_stan_data$mass <- distance_stan_data$mass[,1]
 
 ####### Run Model #################################
 
-model_file <- cmdstan_model(stan_file = "models/distance_mixed.stan",
+model_file <- cmdstan_model(stan_file = "models/distance_ucp.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
@@ -47,7 +47,8 @@ stan_run <- model_file$sample(
   chains = n_chains,
   parallel_chains = n_chains,
   refresh = refresh,
-  threads_per_chain = threads_per_chain
+  threads_per_chain = threads_per_chain,
+  output_dir = "output/model_runs/stan_output/"
 )
 
 stan_run$save_object(file = paste0("output/model_runs/distance_predictions.RDS"))
