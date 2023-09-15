@@ -27,7 +27,7 @@ functions {
       }
       Pi[Pi_index,bands_per_sample[i]] = 1 - sum(Pi[Pi_index,]); // what if the final band was used as the constraint?
 
-      lp = lp + multinomial_lpmf(slice_abund_per_band[Pi_index, ] | to_vector(Pi[Pi_index, ]));
+      lp = lp + multinomial_lupmf(slice_abund_per_band[Pi_index, ] | to_vector(Pi[Pi_index, ]));
       Pi_index = Pi_index + 1;
 
     }
@@ -108,7 +108,7 @@ model {
   print("max raw log_tau = ", max(log_tau_raw));
   print("max log_tau = ", max((log_tau)));
 
-  target += reduce_sum(partial_sum_lpmf,
+  target += reduce_sum(partial_sum_lupmf,
                        abund_per_band,
                        grainsize,
                        max_intervals,
