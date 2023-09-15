@@ -42,7 +42,7 @@ print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         NULL)
 dev.off()
 
-intercept <- rnorm(n = n_sims, mean = 0.04, sd = 0.1)
+intercept <- rnorm(n = n_sims, mean = 0.05, sd = 0.1)
 pdf(file = "output/prior_predictive_check/distance/02-intercept.pdf")
 print(ggplot(data = data.frame(intercept), aes(x = intercept)) +
         geom_histogram(bins = 20) +

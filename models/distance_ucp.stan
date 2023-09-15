@@ -18,7 +18,7 @@ functions {
       {
         if(k > 1){
         Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) -
-        (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]])^2)))) /
+                      (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]])^2)))) /
         (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
         }else{
         Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) /
@@ -103,6 +103,10 @@ model {
   beta_pitch_raw ~ std_normal();
 
   sigma ~ exponential(5);
+  print("sigma = ", sigma);
+  print("max mu = ", max(mu));
+  print("max raw log_tau = ", max(log_tau_raw));
+  print("max log_tau = ", max((log_tau)));
 
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,

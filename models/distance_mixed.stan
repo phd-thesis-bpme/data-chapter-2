@@ -17,12 +17,12 @@ functions {
       for (k in 1:(bands_per_sample[i]-1)) // what if the final band was usedas the constraint? more effecient?
       {
         if(k > 1){
-        Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / (log_tau[species[i]])^2))) - 
-                      (1 - exp(-(max_dist[i,k - 1]^2 / (log_tau[species[i]])^2)))) / 
-        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / (log_tau[species[i]])^2)));
+        Pi[Pi_index,k] = ((1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) - 
+                      (1 - exp(-(max_dist[i,k - 1]^2 / exp(log_tau[species[i]])^2)))) / 
+        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
         }else{
-        Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / (log_tau[species[i]])^2))) /
-        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / (log_tau[species[i]])^2)));
+        Pi[Pi_index,k] = (1 - exp(-(max_dist[i,k]^2 / exp(log_tau[species[i]])^2))) /
+        (1 - exp(-(max_dist[i,bands_per_sample[i]]^2 / exp(log_tau[species[i]])^2)));
         }
       }
       Pi[Pi_index,bands_per_sample[i]] = 1 - sum(Pi[Pi_index,]); // what if the final band was used as the constraint?
@@ -67,15 +67,15 @@ data {
 }
 
 parameters {
-  real intercept;
-  row_vector[n_mig_strat] mu_mig_strat;
-  row_vector[n_habitat] mu_habitat;
-  real beta_mass;
-  real beta_pitch;
-  real<lower = 0> sigma;
+  real<lower = -0.5, upper = 0.5> intercept;
+  row_vector<lower = -0.5, upper = 0.5>[n_mig_strat] mu_mig_strat;
+  row_vector<lower = -0.5, upper = 0.5>[n_habitat] mu_habitat;
+  real<lower = -0.05, upper = 0.05> beta_mass;
+  real<lower = -0.05, upper = 0.05> beta_pitch;
+  real<lower = 0, upper = 0.25> sigma;
   
-  vector[n_species_ncp] log_tau_ncp; // non-centred species log tau
-  vector[n_species_cp] log_tau_cp; // centred species log tau
+  vector<upper = 1.5>[n_species_ncp] log_tau_ncp; // non-centred species log tau
+  vector<upper = 1>[n_species_cp] log_tau_cp; // centred species log tau
 }
 
 transformed parameters {
@@ -99,12 +99,25 @@ model {
   mu_mig_strat ~ normal(0,0.05);
   mu_habitat ~ normal(0,0.05);
   beta_mass ~ normal(0.01,0.005);
-  beta_pitch ~ normal(0.01,0.005);
+  beta_pitch ~ normal(-0.01,0.005);
   
-  sigma ~ exponential(5);
+  sigma ~ exponential(6);
   
+  // print("intercept = ", intercept);
+  // print("mu_mig_strat = ", mu_mig_strat);
+  // print("mu_habitat = ", mu_habitat);
+  // print("beta_mass = ", beta_mass);
+  // print("beta_pitch = ", beta_pitch);
+   print("sigma = ", sigma);
+  // 
   log_tau_ncp ~ std_normal();
   log_tau_cp ~ normal(mu[species_cp], sigma);
+  
+  print("max mu_cp = ", max(mu[species_cp]));
+  print("max log_tau_cp = ", max((log_tau[species_cp])));
+  print("max mu_ncp = ", max(mu[species_ncp]));
+  print("max raw log_tau_ncp = ", max(log_tau_ncp));
+  print("max log_tau_ncp = ", max((log_tau[species_ncp])));
 
   target += reduce_sum(partial_sum_lpmf,
                        abund_per_band,
