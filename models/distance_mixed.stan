@@ -27,7 +27,7 @@ functions {
       }
       Pi[Pi_index,bands_per_sample[i]] = 1 - sum(Pi[Pi_index,]); // what if the final band was used as the constraint?
       
-      lp = lp + multinomial_lpmf(slice_abund_per_band[Pi_index, ] | to_vector(Pi[Pi_index, ]));
+      lp = lp + multinomial_lupmf(slice_abund_per_band[Pi_index, ] | to_vector(Pi[Pi_index, ]));
       Pi_index = Pi_index + 1;
      
     }
@@ -67,15 +67,15 @@ data {
 }
 
 parameters {
-  real<lower = -0.5, upper = 0.5> intercept;
-  row_vector<lower = -0.5, upper = 0.5>[n_mig_strat] mu_mig_strat;
-  row_vector<lower = -0.5, upper = 0.5>[n_habitat] mu_habitat;
-  real<lower = -0.05, upper = 0.05> beta_mass;
-  real<lower = -0.05, upper = 0.05> beta_pitch;
-  real<lower = 0, upper = 0.25> sigma;
+  real intercept;
+  row_vector[n_mig_strat] mu_mig_strat;
+  row_vector[n_habitat] mu_habitat;
+  real beta_mass;
+  real beta_pitch;
+  real<lower = 0> sigma;
   
-  vector<upper = 1.5>[n_species_ncp] log_tau_ncp; // non-centred species log tau
-  vector<upper = 1>[n_species_cp] log_tau_cp; // centred species log tau
+  vector[n_species_ncp] log_tau_ncp; // non-centred species log tau
+  vector[n_species_cp] log_tau_cp; // centred species log tau
 }
 
 transformed parameters {
@@ -103,23 +103,10 @@ model {
   
   sigma ~ exponential(6);
   
-  // print("intercept = ", intercept);
-  // print("mu_mig_strat = ", mu_mig_strat);
-  // print("mu_habitat = ", mu_habitat);
-  // print("beta_mass = ", beta_mass);
-  // print("beta_pitch = ", beta_pitch);
-   print("sigma = ", sigma);
-  // 
   log_tau_ncp ~ std_normal();
   log_tau_cp ~ normal(mu[species_cp], sigma);
-  
-  print("max mu_cp = ", max(mu[species_cp]));
-  print("max log_tau_cp = ", max((log_tau[species_cp])));
-  print("max mu_ncp = ", max(mu[species_ncp]));
-  print("max raw log_tau_ncp = ", max(log_tau_ncp));
-  print("max log_tau_ncp = ", max((log_tau[species_ncp])));
 
-  target += reduce_sum(partial_sum_lpmf,
+  target += reduce_sum(partial_sum_lupmf,
                        abund_per_band,
                        grainsize,
                        max_intervals,

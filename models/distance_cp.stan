@@ -27,7 +27,7 @@ functions {
       }
       Pi[Pi_index,bands_per_sample[i]] = 1 - sum(Pi[Pi_index,]); // what if the final band was used as the constraint?
       
-      lp = lp + multinomial_lpmf(slice_abund_per_band[Pi_index, ] | to_vector(Pi[Pi_index, ]));
+      lp = lp + multinomial_lupmf(slice_abund_per_band[Pi_index, ] | to_vector(Pi[Pi_index, ]));
       Pi_index = Pi_index + 1;
      
     }
@@ -55,13 +55,13 @@ data {
 }
 
 parameters {
-  real<lower = -0.5, upper = 0.5> intercept;
-  row_vector<lower = -0.5, upper = 0.5>[n_mig_strat] mu_mig_strat;
-  row_vector<lower = -0.5, upper = 0.5>[n_habitat] mu_habitat;
-  real<lower = -0.05, upper = 0.05> beta_mass;
-  real<lower = -0.05, upper = 0.05> beta_pitch;
-  real<lower = 0, upper = 0.5> sigma;
+  real intercept;
+  row_vector[n_mig_strat] mu_mig_strat;
+  row_vector[n_habitat] mu_habitat;
+  real beta_mass;
+  real beta_pitch;
   vector[n_species] log_tau;
+  real<lower = 0> sigma;
 }
 
 model {
@@ -81,10 +81,8 @@ model {
   beta_pitch ~ normal(-0.01,0.005);
   
   sigma ~ exponential(5);
-      print("min log_tau = ", min(exp(log_tau) * 100));
-    print("max log_tau = ", max(exp(log_tau) * 100));
 
-  target += reduce_sum(partial_sum_lpmf,
+  target += reduce_sum(partial_sum_lupmf,
                        abund_per_band,
                        grainsize,
                        max_intervals,
