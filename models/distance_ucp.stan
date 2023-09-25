@@ -103,10 +103,10 @@ model {
   beta_pitch_raw ~ std_normal();
 
   sigma ~ exponential(5);
-  print("sigma = ", sigma);
-  print("max mu = ", max(mu));
-  print("max raw log_tau = ", max(log_tau_raw));
-  print("max log_tau = ", max((log_tau)));
+//  print("sigma = ", sigma);
+ // print("max mu = ", max(mu));
+ // print("max raw log_tau = ", max(log_tau_raw));
+  //print("max log_tau = ", max((log_tau)));
 
   target += reduce_sum(partial_sum_lupmf,
                        abund_per_band,
