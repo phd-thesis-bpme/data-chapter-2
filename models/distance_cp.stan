@@ -60,7 +60,7 @@ parameters {
   row_vector[n_habitat] mu_habitat;
   real beta_mass;
   real beta_pitch;
-  vector[n_species] log_tau;
+  vector<lower = -2, upper = 1.5>[n_species] log_tau;
   real<lower = 0> sigma;
 }
 

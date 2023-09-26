@@ -36,6 +36,8 @@ generate_distance_inits <- function(n_chains = NULL,
     
     log_tau_mean <- log(sp$edr / 100)
     log_tau <- MASS::mvrnorm(n = 1, mu = log_tau_mean, Sigma = diag(0.1, length(log_tau_mean)))
+    log_tau[which(log_tau >= 1.5)] <- 1.4999
+    log_tau[which(log_tau <= -2)] <- -1.9999
     
     inits[[i]] <- list(intercept = intercept,
                        mu_mig_strat = mu_mig_strat,
