@@ -112,7 +112,7 @@ model_file <- cmdstan_model(stan_file = "models/distance_cp.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
-  data = distance_stan_data2,
+  data = distance_stan_data,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
