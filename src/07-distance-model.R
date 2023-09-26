@@ -10,6 +10,8 @@
 library(cmdstanr)
 library(dplyr)
 
+source("src/functions/generate-distance-inits.R")
+
 ####### Load Data #################################
 
 load("data/generated/distance_stan_data.rda")
@@ -97,6 +99,10 @@ threads_per_chain <- 7
 distance_stan_data$grainsize <- 1
 distance_stan_data$lambda <- 0
 
+inits <- generate_distance_inits(n_chains = n_chains,
+                                 napops_skip = c("BITH", "HASP", "KIWA", "LCTH", "LEPC", "SPOW"),
+                                 dis_data = distance_stan_data)
+
 distance_stan_data$sp_list <- NULL
 distance_stan_data$phylo_corr <- NULL
 # Scale the maximum distances for computational ease
@@ -119,7 +125,8 @@ stan_run <- model_file$sample(
   parallel_chains = n_chains,
   refresh = refresh,
   threads_per_chain = threads_per_chain,
-  output_dir = "output/model_runs/stan_output/"
+  output_dir = "output/model_runs/stan_output/",
+  init = inits
 )
 
 stan_run$save_object(file = paste0("output/model_runs/distance_predictions.RDS"))
