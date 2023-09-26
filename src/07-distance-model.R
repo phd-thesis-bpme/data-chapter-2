@@ -23,7 +23,7 @@ n_iter <- 500#2000
 n_warmup <- 250#1000
 n_chains <- 1
 refresh <- 10
-threads_per_chain <- 7
+threads_per_chain <- 6
 
 # ####### Subset Data for Testing ###################
 # 
