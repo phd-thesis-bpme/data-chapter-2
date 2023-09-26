@@ -60,7 +60,7 @@ parameters {
   row_vector[n_habitat] mu_habitat;
   real beta_mass;
   real beta_pitch;
-  vector[n_species] log_tau;
+  vector<lower = -2, upper = 1.5>[n_species] log_tau;
   real<lower = 0> sigma;
 }
 
@@ -81,6 +81,9 @@ model {
   beta_pitch ~ normal(-0.01,0.005);
   
   sigma ~ exponential(5);
+
+  print("max log_tau: ", max(log_tau));
+  print("min log_tau: ", min(log_tau));
 
   target += reduce_sum(partial_sum_lupmf,
                        abund_per_band,

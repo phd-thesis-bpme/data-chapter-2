@@ -19,9 +19,9 @@ load("data/generated/distance_stan_data.rda")
 # Stan settings
 n_iter <- 500#2000
 n_warmup <- 250#1000
-n_chains <- 4
+n_chains <- 1
 refresh <- 10
-threads_per_chain <- 4
+threads_per_chain <- 7
 
 # ####### Subset Data for Testing ###################
 # 
