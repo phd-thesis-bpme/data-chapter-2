@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 08-removal-analysis.R
 # Created April 2022
-# Last Updated May 2023
+# Last Updated September 2023
 
 ####### Import Libraries and External Files #######
 
@@ -60,22 +60,40 @@ to_plot <- merge(rem_summary[,c("Code", "mean")], napops_summary[, c("Species", 
                  by.x = "Code", by.y = "Species")
 names(to_plot) <- c("Species", "Multi", "Single")
 to_plot$Label <- ""
-to_plot$diff <- NA
+to_plot$Multi <- exp(to_plot$Multi)
+to_plot$Single <- exp(to_plot$Single)
+to_plot$diff <- to_plot$Multi - to_plot$Single
+
+# Check for a 5% relative difference in cue rates
 for (i in 1:nrow(to_plot))
 {
-  to_plot$diff[i] <- abs(to_plot$Multi[i] - to_plot$Single[i])
-  if (to_plot$diff[i] > 0.1)
+  if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.10)
   {
     to_plot$Label[i] <- to_plot$Species[i]
   }
 }
-single_vs_multi_plot <- ggplot(data = to_plot, mapping = aes(x = exp(Single), y = exp(Multi))) +
+
+(single_vs_multi_plot <- ggplot(data = to_plot, mapping = aes(x = Single, y = Multi)) +
   geom_point() +
   geom_abline(slope = 1) +
   xlim(0,1) +
   ylim(0,1) +
   geom_text(aes(label = Label)) +
-  NULL
+  xlab("Cue Rate (Single Species)") + 
+    ylab("Cue Rate (Multi Species)") +
+  NULL)
+
+(difference_plot <- ggplot(data = to_plot, mapping = aes(x = Species, y = sort(diff))) +
+    geom_point() + 
+    geom_text(aes(label = Label)) +
+    geom_hline(yintercept = 0) +
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank()) +
+    ylab("Difference in Cue Rate (Multi - Single Model)") +
+  NULL)
+
+
 
 ####### SD Comparison Plot ########################
 
@@ -109,13 +127,13 @@ sd_model_run <- sd_model$sample(
   refresh = 10
 )
 
-sd_comp_plot <- ggplot(data = to_plot_long, 
+(sd_comp_plot <- ggplot(data = to_plot_long, 
                        aes(x = log(N), y = (value),
                            group = variable, color = variable)) + 
   geom_smooth() +
   xlab("log(Sample Size)") +
   ylab("Standard Deviation") +
-  NULL
+  NULL)
 
 ####### Species-specific Plots ####################
 
@@ -136,8 +154,9 @@ species_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean),
 ####### Output ####################################
 
 png("output/plots/removal_1vs1.png",
-    width = 6, height = 4, res = 600, units = "in")
-print(single_vs_multi_plot)
+    width = 12, height = 8, res = 600, units = "in")
+ggarrange(single_vs_multi_plot, difference_plot, ncol = 2, labels = c("A", "B"))
+#print(single_vs_multi_plot)
 dev.off()
 
 png("output/plots/removal_sd_plot.png",
