@@ -19,8 +19,8 @@ load("data/generated/distance_stan_data.rda")
 ####### Set Constants #############################
 
 # Stan settings
-n_iter <- 500#2000
-n_warmup <- 250#1000
+n_iter <- 2000
+n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
 threads_per_chain <- 7
