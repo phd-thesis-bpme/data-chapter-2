@@ -101,7 +101,7 @@ model {
   beta_mass ~ normal(0.01,0.005);
   beta_pitch ~ normal(-0.01,0.005);
   
-  sigma ~ exponential(6);
+  sigma ~ exponential(5);
   
   log_tau_ncp ~ std_normal();
   log_tau_cp ~ normal(mu[species_cp], sigma);
