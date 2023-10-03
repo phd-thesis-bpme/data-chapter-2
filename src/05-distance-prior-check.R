@@ -42,7 +42,7 @@ print(ggplot(data = data.frame(sigma), aes(x = sigma)) +
         NULL)
 dev.off()
 
-intercept <- rnorm(n = n_sims, mean = 4, sd = 0.1)
+intercept <- rnorm(n = n_sims, mean = 0.05, sd = 0.1)
 pdf(file = "output/prior_predictive_check/distance/02-intercept.pdf")
 print(ggplot(data = data.frame(intercept), aes(x = intercept)) +
         geom_histogram(bins = 20) +
@@ -187,7 +187,7 @@ for (s in 1:distance_stan_data$n_species)
 dev.off()
 
 pdf(file = "output/prior_predictive_check/distance/09-tau.pdf")
-tau <- exp(log_tau)
+tau <- exp(log_tau) * 100
 for (s in 1:distance_stan_data$n_species)
 {
   to_plot <- data.frame(Value = (tau[,s]))
