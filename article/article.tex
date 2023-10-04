@@ -52,11 +52,31 @@
 \par The following subsections outline the modelling techniques used in this study as well as the data that were collected. 
 We start by introducing the Bayesian hierarchical QPAD removal and distance models, and then describe the input.
 
+\subsection{Data Collection}
+\subsubsection{Point Count Data}
+\par We used the same standardized database of point count data that was put together through the NA-POPS project \cite{edwards_point_2023}. 
+This consists of $712138$ point counts conducted across $292$ projects in Canada and the United States, $422514$ of which used removal sampling and $522820$ of which used distance sampling.
+
+\subsubsection{Phylogenetic Trees}
+\par We accessed 2000 pseudo-posterior trees from \citet{jetz_global_2012} that contains phylogeny for all species that contained sufficient data for removal modelling ($>75$ observations as per \cite{edwards_point_2023,solymos_evaluating_2018,buckland_introduction_2001}). 
+We also requested that the phylogenies include the following bird species with insufficient data from NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird, and Spotted Owl. 
+All seven of these bird species are listed on Partner's in Flight's watchlist for various threats (CITATION). 
+This resulted in 2000 pseudo-posterior trees that contained 323 species.
+
+\par We generated a phylogenetic correlation matrix using the same methods outlined in the Appendix of \citet{solymos_phylogeny_2018} that generate distances between species, and further processed using the R package "ape" \citet{paradis_ape_2019}.
+
+\subsubsection{Species Traits}
+\par Species traits (song pitch, migratory vs resident, open vs. closed habitat) were obtained from Birds of the World accounts of all the birds to model in this study (CITATION). 
+Body mass for each bird species was obtained form the Elton traits dataset (CITATION). 
+Where body mass was not available through the Elton traits dataset, the Birds of the World account was used instead.
+
+\subsection{Bayesian Hierarchical Models}
+
 \par For any point count that employs removal and/or distance sampling, let $Y_{sijk}$ be the observed count of species $s$ during sampling event $i$, occuring in time band $j \in [1,J]$ and/or distance band $k \in [1,K]$.
 That is, if we have a point count where removal sampling or distance sampling (but not both) is not used, then we have that either $J = 1$ or $K = 1$, respectively. 
 The following two subsections detail the Bayesian hierarchical QPAD Removal and Distance Models.
 
-\subsection{Bayesian Hierarchical QPAD Removal Model}
+\subsubsection{Bayesian Hierarchical QPAD Removal Model}
 
 \par For removal modelling, we are not interested in distance to the bird, and so we will sum counts from each sampling event $i$ over all distance bands. 
 Thus, we will be considering counts $Y_{sij.}$. 
@@ -96,7 +116,7 @@ We set priors on both migratory strategies to be $\alpha_M \sim N(-1, 0.01)$, be
 
 \par Results of simulated priors can be found in Appendix TO DO.
 
-\subsection{Bayesian Hierarchical QPAD Distance Model}
+\subsubsection{Bayesian Hierarchical QPAD Distance Model}
 
 \par For distance modelling, we are not interested in the time bin that the bird was recorded in, and so we will sum counts from each sampling event $i$ over all time bands. 
 Thus, we will be considering counts $Y_{si.k}$. 
@@ -141,6 +161,8 @@ $$ \beta_p \sim N(-0.01, 0.005) $$
 $$\sigma \sim exp(5)$$
 
 \par Results of simulated priors can be found in Appendix TO DO.
+
+\subsection{Model Assessment}
 
 \bibliography{refs}
 
