@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 09-distance-analysis.R
 # Created May 2022
-# Last Updated May 2023
+# Last Updated October 2023
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
@@ -21,20 +21,10 @@ load("data/generated/corr_matrix_predict.rda")
 binomial <- read.csv("data/generated/binomial_names.csv")
 load("data/generated/distance_stan_data.rda")
 
-
 ####### Main Code #################################
 
 # Extract log_phi summary statistics from full Stan model runs
 dis_summary <- dis_model$summary("log_tau")
-
-# Model diagnostics
-
-# diag <- dis_model$sampler_diagnostics(format = "df")
-# sigma_draws <- dis_model$draws(variables = "mu_mig_strat[1]", format = "df")
-# sigma_draws$.chain <- factor(sigma_draws$.chain, levels = c("1", "2", "3", "4"))
-# ggplot(data = sigma_draws, aes(x = .iteration, y = mu, group = (.chain), color = .chain)) +
-#   geom_line()
-# mcmc_hist(dis_model$draws("sigma")) 
 
 # Add species names to these summaries
 dis_summary$Scientific_BT <- gsub("_", " ", rownames(corr_matrix_predict))
@@ -60,22 +50,38 @@ to_plot <- merge(dis_summary[,c("Code", "mean")], napops_summary[, c("Species", 
                  by.x = "Code", by.y = "Species")
 names(to_plot) <- c("Species", "Multi", "Single")
 to_plot$Label <- ""
-to_plot$diff <- NA
+to_plot$Multi <- exp(to_plot$Multi) * 100
+to_plot$Single <- exp(to_plot$Single)
+to_plot$diff <- to_plot$Multi - to_plot$Single
+
+# Check for a 10% relative difference in EDR
 for (i in 1:nrow(to_plot))
 {
-  to_plot$diff[i] <- abs(to_plot$Multi[i] - to_plot$Single[i])
-  if (to_plot$diff[i] > 0.1)
+  if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.10)
   {
     to_plot$Label[i] <- to_plot$Species[i]
   }
 }
-single_vs_multi_plot <- ggplot(data = to_plot, mapping = aes(x = exp(Single), y = exp(Multi))) +
-  geom_point() +
-  geom_abline(slope = 1) +
-  # xlim(0,1) +
-  # ylim(0,1) +
-  geom_text(aes(label = Label)) +
-  NULL
+
+(single_vs_multi_plot <- ggplot(data = to_plot, mapping = aes(x = Single, y = Multi)) +
+    geom_point() +
+    geom_abline(slope = 1) +
+    xlim(0,500) +
+    ylim(0,500) +
+    geom_text(aes(label = Label)) +
+    xlab("EDR (Single Species)") + 
+    ylab("EDR (Multi Species)") +
+    NULL)
+
+(difference_plot <- ggplot(data = to_plot, mapping = aes(x = Species, y = sort(diff))) +
+    geom_point() + 
+    geom_text(aes(label = Label)) +
+    geom_hline(yintercept = 0) +
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank()) +
+    ylab("Difference in EDR (Multi - Single Model)") +
+    NULL)
 
 ####### SD Comparison Plot ########################
 
@@ -123,21 +129,21 @@ sp <- c("LCTH", "LEPC", "HASP", "TRBL", "SPOW", "KIWA", "BITH")
 
 to_plot <- dis_summary[which(dis_summary$Code %in% sp), ]
 
-species_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean),
-                                           ymin = exp(q5), ymax = exp(q95))) +
+(species_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean) * 100,
+                                           ymin = exp(q5) * 100, ymax = exp(q95) * 100)) +
   geom_point() + 
   geom_errorbar() +
   xlab("Species") +
   ylab("EDR") +
-  geom_text(aes(y = exp(q95) + 0.25, label = N)) +
+  geom_text(aes(y = exp(q95) * 100 + 25, label = N)) +
   # ylim(0,2.0) +
-  NULL
+  NULL)
 
 ####### Output ####################################
 
 png("output/plots/distance_1vs1.png",
-    width = 6, height = 4, res = 600, units = "in")
-print(single_vs_multi_plot)
+    width = 12, height = 8, res = 600, units = "in")
+ggarrange(single_vs_multi_plot, difference_plot, ncol = 2, labels = c("A", "B"))
 dev.off()
 
 png("output/plots/distance_sd_plot.png",
@@ -149,3 +155,4 @@ png("output/plots/distance_predictions_plot.png",
     width = 6, height = 4, res = 600, units = "in")
 print(species_plot)
 dev.off()
+

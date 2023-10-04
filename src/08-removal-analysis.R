@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 08-removal-analysis.R
 # Created April 2022
-# Last Updated September 2023
+# Last Updated October 2023
 
 ####### Import Libraries and External Files #######
 
@@ -156,7 +156,6 @@ species_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean),
 png("output/plots/removal_1vs1.png",
     width = 12, height = 8, res = 600, units = "in")
 ggarrange(single_vs_multi_plot, difference_plot, ncol = 2, labels = c("A", "B"))
-#print(single_vs_multi_plot)
 dev.off()
 
 png("output/plots/removal_sd_plot.png",
