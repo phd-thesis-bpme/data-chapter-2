@@ -1,8 +1,41 @@
-\documentclass[]{article}
+\documentclass[12pt]{article}
+
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{natbib}
+\bibliographystyle{apalike}
+
+\usepackage[margin=1.0in]{geometry}
+
+\usepackage{amsmath}
+
+\usepackage{lineno}
+\linenumbers
 
 %opening
-\title{}
-\author{}
+\title{Predicting detection probabilities for rare and undersampled North American landbirds}
+\author{
+	Edwards, Brandon P.M.\\
+	\and
+	Solymos, Peter\\
+	\and
+	Stralberg, Diana\\
+	\and
+	Michel, Nicole\\
+	\and
+	Robinson, Barry\\
+	\and
+	Gahbauer, Marcel\\
+	\and
+	Grinde, Alexis\\
+	\and
+	Hope, David\\
+	\and
+	Bennett, Joseph R.\\
+	\and
+	Smith, Adam C.\\
+}
 
 \begin{document}
 
@@ -12,6 +45,103 @@
 
 \end{abstract}
 
-\section{}
+\section{Introduction}
+
+\section{Methods}
+
+\par The following subsections outline the modelling techniques used in this study as well as the data that were collected. 
+We start by introducing the Bayesian hierarchical QPAD removal and distance models, and then describe the input.
+
+\par For any point count that employs removal and/or distance sampling, let $Y_{sijk}$ be the observed count of species $s$ during sampling event $i$, occuring in time band $j \in [1,J]$ and/or distance band $k \in [1,K]$.
+That is, if we have a point count where removal sampling or distance sampling (but not both) is not used, then we have that either $J = 1$ or $K = 1$, respectively. 
+The following two subsections detail the Bayesian hierarchical QPAD Removal and Distance Models.
+
+\subsection{Bayesian Hierarchical QPAD Removal Model}
+
+\par For removal modelling, we are not interested in distance to the bird, and so we will sum counts from each sampling event $i$ over all distance bands. 
+Thus, we will be considering counts $Y_{sij.}$. 
+From \citet{solymos_calibrating_2013}, we model $Y_{sij.}$ as
+$$Y_{sij.} \sim multinomial\left(Y_{si..}, \Pi_{si.}\right).$$
+
+\par For sample $i$, $\Pi_{si.}$ is the corresponding probability vector that determines how the total number of species $s$ observed at sample $i$ (i.e., $Y_{si..}$) are to be distributed across the $J$ time bands; in essense, it is the mixing parameter.
+Let $t_ij$ be the maximum time for time band $j$ during sampling event $i$, and let $phi_s$ be the unknown cue rate for species $s$.
+We then have the following calculation of each component $\pi_{sij}$ of the mixing parameter $\Pi_{si.}$:
+
+\begin{equation*}
+	\pi_{sij} = 
+	\begin{cases}
+		\dfrac{\exp\left\{ -t_{i,j-1}\phi_{s} \right\} - \exp\left\{ -t_{ij}\phi_{s} \right\}}{1 - \exp\left\{ -t_{iJ}\phi_{s} \right\}} & \text{for } j > 1 \\
+		1 - \sum_{n = 2}^{J} \pi_{sin} & \text{for } j = 1
+	\end{cases}
+\end{equation*}
+
+\par We are most interested in estimating $phi_s$, the cue rate for species $s$. 
+To allow for the partial pooling of estimates for each species to be based on a phylogenic relationship, we can use Gaussian processes, which are effectively allow for "continuous" factors. 
+Let $\Phi$ be the vector of cue rates (of length $s$). 
+We then have:
+
+$$\log \Phi \sim MVN\left( \mu_{[s]}, \Sigma_{[s \times s]} \right).$$
+
+\par The covariance function $\Sigma$ (denoted with subscript $[s \times s]$ to show dimensionality) determines the strength of the partial pooling, and can be any function that contains a measure of distance. 
+In this case, we created a function based on phylogenetic distance $D_{[s \times s]}$, i.e.,
+
+$$\Sigma_{[s \times s]} = D_{[s \times s]}\lambda\sigma.$$
+
+\par Here, $\lambda$ is Pagal's Lambda (CITATION), which determines the strength of the phylogenetic relationship. 
+We set $\lambda = 0.76$, consistent with previous results \cite{solymos_phylogeny_2018}. 
+We also have the extra variance term $\sigma \sim exp(5)$.
+
+\par Finally, the vector of mean cue rate $\mu_{[s]}$ is just a function of the species migratory strategy $\alpha_M$, where the migratory strategy $M$ could either be Resident or Migrant. 
+We set priors on both migratory strategies to be $\alpha_M \sim N(-1, 0.01)$, because on the log scale we would expect cue rate to be negative. 
+
+\par Results of simulated priors can be found in Appendix TO DO.
+
+\subsection{Bayesian Hierarchical QPAD Distance Model}
+
+\par For distance modelling, we are not interested in the time bin that the bird was recorded in, and so we will sum counts from each sampling event $i$ over all time bands. 
+Thus, we will be considering counts $Y_{si.k}$. 
+From \citet{solymos_calibrating_2013}, we model $Y_{si.k}$ as
+$$Y_{si.k} \sim multinomial\left(Y_{si..}, \Pi_{si.}\right).$$
+
+\par For sample $i$, $\Pi_{si.}$ is the corresponding probability vector that determines how the total number of species $s$ observed at sample $i$ (i.e., $Y_{si..}$) are to be distributed across the $K$ distance bins; in essense, it is the mixing parameter. 
+Let $r_ik$ be the maximum distance for distance bin $k$ during sampling event $i$, and let $tau_s$ be the unknown effective detection radius for species $s$. 
+We then have the following calculation of each component $\pi_{sik}$ of the mixing parameter $\Pi_{si.}$:
+
+%\begin{equation*}
+%	\pi_{sik} = 
+%	\begin{cases}
+%		\dfrac{\left( 1 - \exp\left\{ -\dfrac{r_{i,k}^2}{\exp\left\{\tau_s^2\right\}} \right\} \right) - \left( 1 - \exp\left\{ -\dfrac{r_{i,k-1}^2}{\exp\left\{\tau_s^2\right\}} \right\} \right)}
+%		{ 1 - \exp\left\{ -\dfrac{r_{i,K}^2}{\exp\left\{\tau_s^2\right\}} \right\} } & \text{for } k > 1 \\
+%		1 - \sum_{n = 2}^{J} \pi_{sin} & \text{for } k = 1
+%	\end{cases}
+%\end{equation*}
+
+\begin{equation*}
+	\pi_{sik} = 
+	\begin{cases}
+		\dfrac{f(r_{i,k}, \tau_s) - f(r_{i,k-1}, \tau_s)}{f(r_{i,K}, \tau_s)} & \text{for } k > 1 \\
+		1 - \sum_{n = 2}^{J} \pi_{sin} & \text{for } k = 1
+	\end{cases}
+\end{equation*}
+
+where 
+$$f(r,\tau) =  1 - \exp\left\{ -\dfrac{r^2}{\exp\left\{\tau^2\right\}} \right\} .$$
+
+\par We are most interested in estimating $\tau_s$, the effective detection radius for species $s$. 
+To allow for the partial pooling of estimates for each species to be based on traits, we set up a mixed effects model as follows:
+$$\log \tau_s \sim N(\mu_s, \sigma).$$
+
+\par In this model, mean effective detection radius for species $s$ (i.e., $\mu_s$) is a function of the following traits as described in \cite{solymos_phylogeny_2018}: an overall intercept term $\alpha_0$; migratory strategy $\alpha_M$, where $M$ can be Migratory or Resident; habitat preference $\alpha_H$, where $H$ can be Open or Closed habitat; log body size $\beta_b$; and log song pitch $\beta_p$. 
+That is, we have
+$$ \mu_s = \alpha_0 + \alpha_{M_s} + \alpha_{H_s} + \beta_b \times \log BodySize_s + \beta_p \times \log SongPitch_s$$
+$$\alpha_0 \sim N(0.05, 0.1)$$
+$$ \alpha_M, \alpha_H \sim N(0, 0.05)$$
+$$ \beta_b \sim N(0.01, 0.005)$$
+$$ \beta_p \sim N(-0.01, 0.005) $$
+$$\sigma \sim exp(5)$$
+
+\par Results of simulated priors can be found in Appendix TO DO.
+
+\bibliography{refs}
 
 \end{document}
