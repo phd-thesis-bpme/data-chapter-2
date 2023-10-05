@@ -13,6 +13,7 @@ library(plyr)
 library(ggplot2)
 library(ggpubr)
 theme_set(theme_pubclean())
+bayesplot::color_scheme_set("red")
 
 ####### Read Data #################################
 
@@ -54,10 +55,10 @@ to_plot$Multi <- exp(to_plot$Multi) * 100
 to_plot$Single <- exp(to_plot$Single)
 to_plot$diff <- to_plot$Multi - to_plot$Single
 
-# Check for a 10% relative difference in EDR
+# Check for a 20% relative difference in EDR
 for (i in 1:nrow(to_plot))
 {
-  if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.10)
+  if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.20)
   {
     to_plot$Label[i] <- to_plot$Species[i]
   }
@@ -82,6 +83,23 @@ for (i in 1:nrow(to_plot))
           axis.ticks.x=element_blank()) +
     ylab("Difference in EDR (Multi - Single Model)") +
     NULL)
+
+diff_model_data <- list(n_samples = nrow(to_plot),
+                        difference = to_plot$diff)
+diff_model <- cmdstan_model(stan_file = "models/difference.stan")
+
+diff_model_run <- diff_model$sample(
+  data = diff_model_data,
+  iter_warmup = 1000,
+  iter_sampling = 2000,
+  chains = 4,
+  parallel_chains = 4,
+  refresh = 10
+)
+
+(modelled_difference_plot <- bayesplot::mcmc_areas(diff_model_run$draws(c("mu")),
+                                                   prob = 0.95) +
+    xlab("Modelled Difference"))
 
 ####### SD Comparison Plot ########################
 
@@ -115,13 +133,11 @@ sd_model_run <- sd_model$sample(
   refresh = 10
 )
 
-sd_comp_plot <- ggplot(data = to_plot_long, 
-                       aes(x = log(N), y = (value),
-                           group = variable, color = variable)) + 
-  geom_smooth() +
-  xlab("log(Sample Size)") +
-  ylab("Standard Deviation") +
-  NULL
+(sd_intercept_plot <- bayesplot::mcmc_areas(sd_model_run$draws(c("alpha[1]", "alpha[2]")),
+                                           prob = 0.95))
+
+(sd_slope_plot <- bayesplot::mcmc_areas(sd_model_run$draws(c("beta[1]", "beta[2]")),
+                                       prob = 0.95))
 
 ####### Species-specific Plots ####################
 
@@ -129,30 +145,30 @@ sp <- c("LCTH", "LEPC", "HASP", "TRBL", "SPOW", "KIWA", "BITH")
 
 to_plot <- dis_summary[which(dis_summary$Code %in% sp), ]
 
-(species_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean) * 100,
-                                           ymin = exp(q5) * 100, ymax = exp(q95) * 100)) +
-  geom_point() + 
-  geom_errorbar() +
-  xlab("Species") +
-  ylab("EDR") +
-  geom_text(aes(y = exp(q95) * 100 + 25, label = N)) +
-  # ylim(0,2.0) +
-  NULL)
+species_vars <- to_plot$variable
+
+(species_prediction_plot <- bayesplot::mcmc_intervals(exp(dis_model$draws(species_vars)) * 100) + 
+    xlab("Predicted EDR") + 
+    ylab("Species") +
+    scale_y_discrete(labels = (to_plot$Code)) +
+    coord_flip())
 
 ####### Output ####################################
 
 png("output/plots/distance_1vs1.png",
-    width = 12, height = 8, res = 600, units = "in")
-ggarrange(single_vs_multi_plot, difference_plot, ncol = 2, labels = c("A", "B"))
+    width = 12, height = 12, res = 600, units = "in")
+ggarrange(ggarrange(single_vs_multi_plot, modelled_difference_plot,
+                    ncol = 2,
+                    labels = c("A", "B")), difference_plot, nrow = 2, labels = c("", "C"))
 dev.off()
 
 png("output/plots/distance_sd_plot.png",
-    width = 6, height = 4, res = 600, units = "in")
-print(sd_comp_plot)
+    width = 12, height = 12, res = 600, units = "in")
+ggarrange(sd_intercept_plot, sd_slope_plot, ncol = 2, labels = c("A", "B"))
 dev.off()
 
 png("output/plots/distance_predictions_plot.png",
-    width = 6, height = 4, res = 600, units = "in")
-print(species_plot)
+    width = 12, height = 12, res = 600, units = "in")
+print(species_prediction_plot)
 dev.off()
 
