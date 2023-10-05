@@ -163,12 +163,12 @@ ggarrange(ggarrange(single_vs_multi_plot, modelled_difference_plot,
 dev.off()
 
 png("output/plots/distance_sd_plot.png",
-    width = 6, height = 6, res = 600, units = "in")
+    width = 12, height = 12, res = 600, units = "in")
 ggarrange(sd_intercept_plot, sd_slope_plot, ncol = 2, labels = c("A", "B"))
 dev.off()
 
 png("output/plots/distance_predictions_plot.png",
-    width = 6, height = 4, res = 600, units = "in")
+    width = 12, height = 12, res = 600, units = "in")
 print(species_prediction_plot)
 dev.off()
 
