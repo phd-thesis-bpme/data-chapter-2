@@ -11,6 +11,8 @@
 \usepackage{amsmath}
 
 \usepackage{lineno}
+
+\usepackage{graphicx}
 \linenumbers
 
 %opening
@@ -46,6 +48,16 @@
 \end{abstract}
 
 \section{Introduction}
+
+\subsection{Predictions}
+\par We predict that for both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will change very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
+This is because the species that were modelled in \citet{edwards_point_2023} had a sufficient number of data points to stand on their own, and so adding in species-level effects should have little effect on estimates. 
+We also predict that a multi-species model will increase the precision of the estimates of cue rate and EDR, but only up to a certain sample size. 
+This is because there are many species for which NA-POPS has thousands to even tens of thousands of data points; given precision generally increases with sample size, after a certain sample size, a single-species vs multi-species estimate of cue rate and EDR should be similarly precise. 
+Put differently, we expect that species with a smaller sample size will have precision of cue rate and EDR estimates improved with a multi-species model.
+Finally, we expect that a multi-species model will be able to provide predictions of cue rate and EDR for species with little to no data, but should be able to provide better/more precise estimates for data-sparse species compared to data-absent species.
+Additionally, we expect to see a higher precision of estimates for species where there are more "similar" species.
+That is, species with more closely-related species modelled in the multi-species model will have more precise estimates of cue rate, and species with more species with similar traits will have more precise estimates of EDR.
 
 \section{Methods}
 
@@ -163,6 +175,46 @@ $$\sigma \sim exp(5)$$
 \par Results of simulated priors can be found in Appendix TO DO.
 
 \subsection{Model Assessment}
+
+\par For both the Bayesian hierarchical QPAD Removal and Distance models described above, we compared the estimated cue rates and effective detection radii, respectively, to those produced within a single-species context in \citet{edwards_point_2023}. 
+To do this, we modelled the difference as
+$$\Delta X \sim N(0,\sigma)$$
+$$\sigma \sim exp(1)$$
+
+where $\Delta X$ is calculated as the mean multi-species estimate of cue rate or EDR minus the mean single-species estimate of cue rate of EDR.
+If our predictions are true, we would expect to see a distribution of modelled differences centred about 0, indicating no real difference in estimates of cue rate or EDR between single-species and multi-species models, for species for which we have sufficient data.
+
+\par We were also interested in determining if a multi-species model improved the precision around the estimates of cue rate or EDR. 
+To do this, we modelled the standard deviations about each estimate of cue rate or EDR from both the multi-species and single-species models from \citet{edwards_point_2023}, and regressed them against the log sample size per species.
+That is
+$$SD \sim N(\alpha_M + \beta_M\times \log(N), \sigma)$$
+$$\alpha, \beta \sim N(0,1)$$
+$$\sigma \sim exp(1)$$
+
+where $\alpha$ is the model-specific intercept and $\beta$ is the model-specific slope.
+
+\par If our predictions are true, we would expect to see a higher value of $\alpha_1$ than for $\alpha_2$, corresponding to a higher baseline standard deviation in the single species models.
+We would also likely see a slightly smaller (i.e., more negative) value of $\beta_1$ than $\beta_2$ (which should also be negative), indicating that the standard deviation decreases with log sample size for both models, but should decrease at a slower rate with the multi-species model (which has a lower baseline standard deviation to begin with) than the single-species model.
+
+\subsection{Predicting Detection Probabilities}
+\par To predict estimates of cue rate or EDR from the multi-species models, we adopted two possible approaches.
+If the NA-POPS database contained some point-count data for the species of interest, we simply added these data into the model.
+This is different from \citet{edwards_point_2023, solymos_calibrating_2013, solymos_evaluating_2018}, where any species with less than 75 data points were removed from the analysis.
+For species that did not have any data in the NA-POPS database, we generated a row of traits data for the species and modelled the species just as a parameter.
+
+
+\section{Results}
+\includegraphics{../output/plots/removal_1vs1.png}
+
+\includegraphics{../output/plots/removal_sd_plot.png}
+
+\includegraphics{../output/plots/removal_predictions_plot.png}
+
+\includegraphics{../output/plots/distance_1vs1.png}
+
+\includegraphics{../output/plots/distance_sd_plot.png}
+
+\includegraphics{../output/plots/distance_predictions_plot.png}
 
 \bibliography{refs}
 
