@@ -28,15 +28,6 @@ load("data/generated/removal_stan_data.rda")
 # Extract log_phi summary statistics from full Stan model runs
 rem_summary <- rem_model$summary("log_phi")
 
-# Model diagnostics
-
-# diag <- rem_model$sampler_diagnostics(format = "df")
-# sigma_draws <- rem_model$draws(variables = "mu_mig_strat[1]", format = "df")
-# sigma_draws$.chain <- factor(sigma_draws$.chain, levels = c("1", "2", "3", "4"))
-# ggplot(data = sigma_draws, aes(x = .iteration, y = mu, group = (.chain), color = .chain)) +
-#   geom_line()
-# mcmc_hist(rem_model$draws("sigma")) 
-
 # Add species names to these summaries
 rem_summary$Scientific_BT <- gsub("_", " ", rownames(corr_matrix_predict))
 rem_summary <- join(rem_summary, binomial[, c("Scientific_BT", "Code")], by = "Scientific_BT")
@@ -161,14 +152,16 @@ species_vars <- to_plot$variable
 (species_prediction_plot <- bayesplot::mcmc_intervals(exp(rem_model$draws(species_vars))) + 
   xlab("Predicted Cue Rate") + 
   ylab("Species") +
-  scale_y_discrete(labels = rev(sp)) +
+  scale_y_discrete(labels = (to_plot$Code)) +
   coord_flip())
 
 ####### Output ####################################
 
 png("output/plots/removal_1vs1.png",
-    width = 12, height = 8, res = 600, units = "in")
-ggarrange(single_vs_multi_plot, modelled_difference_plot, ncol = 2, labels = c("A", "B"))
+    width = 12, height = 12, res = 600, units = "in")
+ggarrange(ggarrange(single_vs_multi_plot, modelled_difference_plot,
+                    ncol = 2,
+                    labels = c("A", "B")), difference_plot, nrow = 2, labels = c("", "C"))
 dev.off()
 
 png("output/plots/removal_sd_plot.png",
