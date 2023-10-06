@@ -6,7 +6,7 @@ subset_distance_data <- function(distance_stan_data = NULL,
 
   sp_df <- orig_data_df %>%
     group_by(species,sp_n) %>%
-    summarise(n_counts = n())
+    dplyr::summarise(n_counts = n())
 
   sub_data <- data.frame(mig_strat = distance_stan_data$mig_strat,
                          habitat = distance_stan_data$habitat,
