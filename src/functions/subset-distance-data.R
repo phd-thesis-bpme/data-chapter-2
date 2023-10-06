@@ -1,10 +1,9 @@
 subset_distance_data <- function(distance_stan_data = NULL,
                                  sps = NULL)
 {
-  orig_data_df <- data.frame(species = distance_stan_data$sp_list[,1],
+  orig_data_df <- data.frame(species = distance_stan_data$sp_list,
                              sp_n = distance_stan_data$species)
-  ### NOTE there are only 322 species in this list.
-  ### is n_species wrong (== 323)
+
   sp_df <- orig_data_df %>%
     group_by(species,sp_n) %>%
     summarise(n_counts = n())
@@ -37,6 +36,7 @@ subset_distance_data <- function(distance_stan_data = NULL,
 
   distance_stan_data2$n_species <- length(sps)
   distance_stan_data2$n_samples <- length(data_sel)
+  distance_stan_data2$sp_list <- distance_stan_data2$sp_list[which(distance_stan_data2$sp_list %in% sps)]
 
   return(distance_stan_data2)
 }

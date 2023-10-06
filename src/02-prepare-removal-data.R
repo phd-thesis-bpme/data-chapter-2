@@ -128,7 +128,7 @@ max_intervals_pred <- ncol(Y_pred)
 # a 1 corresponds with resident, a 2 corresponds with a migrant
 mig_strat_pred <- traits_pred$Migrant + 1
 
-removal_stan_data<- list(n_samples = n_samples_pred,
+removal_stan_data <- list(n_samples = n_samples_pred,
                          n_species = n_species_pred,
                          max_intervals = max_intervals_pred,
                          species = sp_pred_numeric$num,
@@ -136,9 +136,10 @@ removal_stan_data<- list(n_samples = n_samples_pred,
                          bands_per_sample = time_bands_per_sample_pred,
                          max_time = max_time_pred,
                          phylo_corr = corr_matrix_predict,
-                         sp_list = sp_list_pred,
+                         sp_list = sp_list_pred$Species,
                          n_mig_strat = max(mig_strat_pred),
-                         mig_strat = mig_strat_pred)
+                         mig_strat = mig_strat_pred,
+                         sp_all = species_pred_code)
 
 ####### Output ####################################
 save(removal_stan_data, file = "data/generated/removal_stan_data.rda")

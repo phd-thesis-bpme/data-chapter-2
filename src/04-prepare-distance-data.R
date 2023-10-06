@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 04-prepare-distance-data.R
 # Created August 2022
-# Last Updated May 2023
+# Last Updated October 2023
 
 ####### Import Libraries and External Files #######
 
@@ -163,14 +163,14 @@ distance_stan_data <- list(n_samples = n_samples_pred,
                            abund_per_band = abundance_per_band_pred,
                            bands_per_sample = dist_bands_per_sample_pred,
                            max_dist = max_dist_pred,
-                           phylo_corr = corr_matrix_predict,
-                           sp_list = sp_list_pred,
+                           sp_list = sp_list_pred$Species,
                            n_mig_strat = max(mig_strat_pred),
                            mig_strat = mig_strat_pred,
                            n_habitat = max(habitat_pred),
                            habitat = habitat_pred,
                            mass = mass_pred,
-                           pitch = pitch_pred)
+                           pitch = pitch_pred,
+                           sp_all = species_pred_code)
 
 ####### Output ####################################
 save(distance_stan_data, file = "data/generated/distance_stan_data.rda")
