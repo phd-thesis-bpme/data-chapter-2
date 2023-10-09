@@ -46,41 +46,47 @@ for (i in 1:max(cv_folds$cv_fold))
   drops <- cv_folds[which(cv_folds$cv_fold == i), "Species"]
   indices_to_drop <- which(dis_data$sp_list %in% drops)
   
+  stan_cv_data <- list(n_samples = dis_data$n_samples - length(indices_to_drop),
+                       n_species = dis_data$n_species,
+                       max_intervals = dis_data$max_intervals,
+                       species = dis_data$species[-indices_to_drop],
+                       abund_per_band = dis_data$abund_per_band[-indices_to_drop, ],
+                       bands_per_sample = dis_data$bands_per_sample[-indices_to_drop],
+                       max_dist = dis_data$max_dist[-indices_to_drop, ],
+                       n_mig_strat = dis_data$n_mig_strat,
+                       mig_strat = dis_data$mig_strat,
+                       n_habitat = dis_data$n_habitat,
+                       habitat = dis_data$habitat,
+                       mass = dis_data$mass,
+                       pitch = dis_data$pitch,
+                       sp_all = dis_data$sp_all)
+  
+  # Check to see if we can drop any training columns (i.e. if bands per sample is smaller)
+  if (max(stan_cv_data$bands_per_sample) < stan_cv_data$max_intervals)
+  {
+    max_intervals <- max(stan_cv_data$bands_per_sample)
+    
+    stan_cv_data$max_intervals <- max_intervals
+    stan_cv_data$abund_per_band <- stan_cv_data$abund_per_band[, 1:max_intervals]
+    stan_cv_data$max_dist <- stan_cv_data$max_dist[, 1:max_intervals]
+  }
+  
+  stan_cv_data$grainsize <- 1
+  stan_cv_data$max_dist <- stan_cv_data$max_dist / 100
+  
 }
-
-
-
-
-distance_stan_data$grainsize <- 1
-distance_stan_data$lambda <- 0
-
-distance_stan_data$sp_list <- NULL
-phylo_corr <- distance_stan_data$phylo_corr
-distance_stan_data$phylo_corr <- NULL
-
-# Scale the maximum distances for computational ease
-distance_stan_data$max_dist <- distance_stan_data$max_dist / 100
-
-# get rid of centre/scale attributes for modelling
-distance_stan_data$pitch <- distance_stan_data$pitch[,1]
-distance_stan_data$mass <- distance_stan_data$mass[,1]
-
-
-
-
-
-
-####### Run Model #################################
 
 inits <- generate_distance_inits(n_chains = n_chains,
                                  napops_skip = c("BITH", "HASP", "KIWA", "LCTH", "LEPC", "SPOW"),
                                  phylo_corr = phylo_corr,
-                                 param = "mixed",
-                                 species_cp = distance_stan_data$species_cp,
-                                 species_ncp = distance_stan_data$species_ncp)
+                                 param = "cp")
 
+####### Run Model #################################
+
+
+# NEED TO STILL UPDATE THIS FUNCTION CALL
 stan_run <- model_file$sample(
-  data = distance_stan_data,
+  data = stan_cv_data,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
