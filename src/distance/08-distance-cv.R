@@ -74,27 +74,24 @@ for (i in 1:max(cv_folds$cv_fold))
   stan_cv_data$grainsize <- 1
   stan_cv_data$max_dist <- stan_cv_data$max_dist / 100
   
+  inits <- generate_distance_inits(n_chains = n_chains,
+                                   sp_list = setdiff(as.vector(stan_cv_data$sp_all), pred_drops),
+                                   napops_skip = drops,
+                                   param = "cp")
+  stan_cv_data$sp_all <- NULL
+  
+  stan_run <- model_file$sample(
+    data = stan_cv_data,
+    iter_warmup = n_warmup,
+    iter_sampling = n_iter,
+    chains = n_chains,
+    parallel_chains = n_chains,
+    refresh = refresh,
+    threads_per_chain = threads_per_chain,
+    init = inits
+  )
+  
+  stan_run$save_object(file = paste0("output/model_runs/cv_distance/fold_",
+                                      i,
+                                      ".RDS"))
 }
-
-inits <- generate_distance_inits(n_chains = n_chains,
-                                 napops_skip = c("BITH", "HASP", "KIWA", "LCTH", "LEPC", "SPOW"),
-                                 phylo_corr = phylo_corr,
-                                 param = "cp")
-
-####### Run Model #################################
-
-
-# NEED TO STILL UPDATE THIS FUNCTION CALL
-stan_run <- model_file$sample(
-  data = stan_cv_data,
-  iter_warmup = n_warmup,
-  iter_sampling = n_iter,
-  chains = n_chains,
-  parallel_chains = n_chains,
-  refresh = refresh,
-  threads_per_chain = threads_per_chain,
-  output_dir = "output/model_runs/stan_output/",
-  init = inits
-)
-
-stan_run$save_object(file = paste0("output/model_runs/distance_predictions.RDS"))
