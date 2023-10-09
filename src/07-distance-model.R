@@ -26,15 +26,17 @@ n_chains <- 4
 refresh <- 10
 threads_per_chain <- 7
 
-#' If one wanted to subset the data for certain species, here is where it should be done
-#' using the subset_distance_data() function
-
 distance_stan_data$grainsize <- 1
-distance_stan_data$lambda <- 0
+
+inits <- generate_distance_inits(n_chains = n_chains,
+                                 napops_skip = c("BITH", "HASP", "KIWA", "LCTH", "LEPC", "SPOW"),
+                                 sp_list = distance_stan_data$sp_all,
+                                 param = "mixed",
+                                 species_cp = distance_stan_data$species_cp,
+                                 species_ncp = distance_stan_data$species_ncp)
 
 distance_stan_data$sp_list <- NULL
-phylo_corr <- distance_stan_data$phylo_corr
-distance_stan_data$phylo_corr <- NULL
+distance_stan_data$sp_all <- NULL
 
 # Scale the maximum distances for computational ease
 distance_stan_data$max_dist <- distance_stan_data$max_dist / 100
@@ -47,13 +49,6 @@ distance_stan_data$mass <- distance_stan_data$mass[,1]
 
 model_file <- cmdstan_model(stan_file = "models/distance_mixed.stan",
                             cpp_options = list(stan_threads = TRUE))
-
-inits <- generate_distance_inits(n_chains = n_chains,
-                                 napops_skip = c("BITH", "HASP", "KIWA", "LCTH", "LEPC", "SPOW"),
-                                 phylo_corr = phylo_corr,
-                                 param = "mixed",
-                                 species_cp = distance_stan_data$species_cp,
-                                 species_ncp = distance_stan_data$species_ncp)
 
 stan_run <- model_file$sample(
   data = distance_stan_data,

@@ -1,6 +1,6 @@
 generate_distance_inits <- function(n_chains = NULL,
                                     napops_skip = NULL,
-                                    phylo_corr = NULL,
+                                    sp_list = NULL,
                                     param = NULL,
                                     species_cp = NULL,
                                     species_ncp = NULL)
@@ -9,12 +9,9 @@ generate_distance_inits <- function(n_chains = NULL,
   
   binomial <- read.csv("data/generated/binomial_names.csv")
   
-  sp <- data.frame(Scientific_BT = gsub(pattern = "_",
-             replacement= " ",
-             x = dimnames(phylo_corr)[[1]]))
-  sp <- dplyr::left_join(sp, binomial, by = "Scientific_BT")
-  sp <- sp[, c("Scientific_BT", "Code")]
-  sp$edr <- NA
+  sp <- data.frame(Code = sp_list,
+                   edr = NA)
+
   for (i in 1:nrow(sp))
   {
     if (sp$Code[i] %in% napops_skip)
