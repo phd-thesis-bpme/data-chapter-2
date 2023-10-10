@@ -150,6 +150,22 @@ species_vars <- to_plot$variable
     scale_y_discrete(labels = (to_plot$Code)) +
     coord_flip())
 
+####### Plotting Other Parameters #################
+
+(covariates_factors <- bayesplot::mcmc_areas(dis_model$draws(c("intercept", 
+                                                       "mu_mig_strat[1]",
+                                                       "mu_mig_strat[2]",
+                                                       "mu_habitat[1]",
+                                                       "mu_habitat[2]")),
+                                         prob = 0.95))
+
+(covariates_slopes <- bayesplot::mcmc_areas(dis_model$draws(c("beta_mass", 
+                                                               "beta_pitch")),
+                                             prob = 0.95))
+
+(sigma_plot <- bayesplot::mcmc_areas(dis_model$draws(c("sigma")),
+                                     prob = 0.95))
+
 ####### Output ####################################
 
 png("output/plots/distance_1vs1.png",
@@ -169,3 +185,7 @@ png("output/plots/distance_predictions_plot.png",
 print(species_prediction_plot)
 dev.off()
 
+png("output/plots/distance_other_params.png",
+    width = 6, height = 6, res = 600, units = "in")
+ggarrange(covariates_factors, covariates_slopes, sigma_plot, nrow = 3, labels = c("A", "B", "C"))
+dev.off()

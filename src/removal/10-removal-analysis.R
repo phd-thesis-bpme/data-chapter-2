@@ -152,6 +152,14 @@ species_vars <- to_plot$variable
   scale_y_discrete(labels = (to_plot$Code)) +
   coord_flip())
 
+####### Plotting Other Parameters #################
+
+(mig_strat_plot <- bayesplot::mcmc_areas(rem_model$draws(c("mu_mig_strat[1]", "mu_mig_strat[2]")),
+                                        prob = 0.95))
+
+(sigma_plot <- bayesplot::mcmc_areas(rem_model$draws(c("sigma")),
+                                         prob = 0.95))
+
 ####### Output ####################################
 
 png("output/plots/removal_1vs1.png",
@@ -169,5 +177,10 @@ dev.off()
 png("output/plots/removal_predictions_plot.png",
     width = 6, height = 6, res = 600, units = "in")
 print(species_prediction_plot)
+dev.off()
+
+png("output/plots/removal_other_params.png",
+    width = 6, height = 6, res = 600, units = "in")
+ggarrange(mig_strat_plot, sigma_plot, nrow = 2, labels = c("A", "B"))
 dev.off()
 
