@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 07-removal-model.R
 # Created December 2022
-# Last Updated May 2023
+# Last Updated October 2023
 
 ####### Import Libraries and External Files #######
 
@@ -24,6 +24,9 @@ n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
 threads_per_chain <- 3
+
+removal_stan_data$sp_list <- NULL
+removal_stan_data$sp_all <- NULL
 
 ####### Run Model #################################
 
