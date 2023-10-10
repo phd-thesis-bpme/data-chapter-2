@@ -20,7 +20,7 @@ bayesplot::color_scheme_set("red")
 dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
 load("data/generated/distance_stan_data.rda")
 
-####### Main Code #################################
+####### Data Wrangling ############################
 
 # Extract log_phi summary statistics from full Stan model runs
 dis_summary <- dis_model$summary("log_tau")
