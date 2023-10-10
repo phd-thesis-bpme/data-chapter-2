@@ -19,8 +19,6 @@ bayesplot::color_scheme_set("red")
 ####### Read Data #################################
 
 rem_model <- readRDS("output/model_runs/removal_predictions.RDS")
-load("data/generated/corr_matrix_predict.rda")
-binomial <- read.csv("data/generated/binomial_names.csv")
 load("data/generated/removal_stan_data.rda")
 
 ####### Data Wrangling ############################
@@ -29,8 +27,7 @@ load("data/generated/removal_stan_data.rda")
 rem_summary <- rem_model$summary("log_phi")
 
 # Add species names to these summaries
-rem_summary$Scientific_BT <- gsub("_", " ", rownames(corr_matrix_predict))
-rem_summary <- join(rem_summary, binomial[, c("Scientific_BT", "Code")], by = "Scientific_BT")
+rem_summary$Code <- removal_stan_data$sp_all
 
 # Get data sample size for all species and add to summary
 species_n <- data.frame(table(removal_stan_data$species))
@@ -135,11 +132,11 @@ sd_model_run <- sd_model$sample(
   refresh = 10
 )
 
-sd_intercept_plot <- bayesplot::mcmc_areas(sd_model_run$draws(c("alpha[1]", "alpha[2]")),
-                      prob = 0.95)
+(sd_intercept_plot <- bayesplot::mcmc_areas(sd_model_run$draws(c("alpha[1]", "alpha[2]")),
+                      prob = 0.95))
 
-sd_slope_plot <- bayesplot::mcmc_areas(sd_model_run$draws(c("beta[1]", "beta[2]")),
-                      prob = 0.95)
+(sd_slope_plot <- bayesplot::mcmc_areas(sd_model_run$draws(c("beta[1]", "beta[2]")),
+                      prob = 0.95))
 
 ####### Species-specific Plots ####################
 

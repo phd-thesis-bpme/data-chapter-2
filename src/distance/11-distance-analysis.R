@@ -18,8 +18,6 @@ bayesplot::color_scheme_set("red")
 ####### Read Data #################################
 
 dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
-load("data/generated/corr_matrix_predict.rda")
-binomial <- read.csv("data/generated/binomial_names.csv")
 load("data/generated/distance_stan_data.rda")
 
 ####### Main Code #################################
@@ -28,8 +26,7 @@ load("data/generated/distance_stan_data.rda")
 dis_summary <- dis_model$summary("log_tau")
 
 # Add species names to these summaries
-dis_summary$Scientific_BT <- gsub("_", " ", rownames(corr_matrix_predict))
-dis_summary <- join(dis_summary, binomial[, c("Scientific_BT", "Code")], by = "Scientific_BT")
+dis_summary$Code <- distance_stan_data$sp_all
 
 # Get data sample size for all species and add to summary
 species_n <- data.frame(table(distance_stan_data$species))
