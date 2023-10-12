@@ -154,6 +154,9 @@ species_vars <- to_plot$variable
 
 ####### Plotting Other Parameters #################
 
+(intercept_plot <- bayesplot::mcmc_areas(rem_model$draws(c("intercept")),
+                                         prob = 0.95))
+
 (mig_strat_plot <- bayesplot::mcmc_areas(rem_model$draws(c("mu_mig_strat[1]", "mu_mig_strat[2]")),
                                         prob = 0.95))
 
@@ -181,6 +184,6 @@ dev.off()
 
 png("output/plots/removal_other_params.png",
     width = 6, height = 6, res = 600, units = "in")
-ggarrange(mig_strat_plot, sigma_plot, nrow = 2, labels = c("A", "B"))
+ggarrange(intercept_plot, mig_strat_plot, sigma_plot, nrow = 3, labels = c("A", "B", "C"))
 dev.off()
 
