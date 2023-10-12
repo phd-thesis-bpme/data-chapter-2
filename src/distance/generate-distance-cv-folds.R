@@ -17,7 +17,7 @@ load("data/generated/distance_stan_data.rda")
 
 ####### Set Constants #############################
 
-k <- 10
+k <- 5
 
 ####### Allocate CV Numbers #######################
 
@@ -30,32 +30,26 @@ dis_data <- subset_distance_data(distance_stan_data = distance_stan_data,
                                                pred_drops))
 rm(distance_stan_data) #clear up some mem
 
-# Create a dataframe of traits from the current distance data, including species name
-traits <- data.frame(Mig = dis_data$mig_strat,
-                     Habitat = dis_data$habitat,
-                     Mass = dis_data$mass,
-                     Pitch = dis_data$pitch,
-                     Species = unique(dis_data$sp_list))
+#' Create a dataframe that is just the species (for each observation) and
+#' fold number
+cv_folds <- data.frame(Species = dis_data$sp_list,
+                      cv_fold = NA)
 
-# Create an indicator for each Mig x Hab association
-traits$Mig_Hab <- paste0(traits$Mig, "-", traits$Habitat)
-counts_per_group <- data.frame(table(traits$Mig_Hab))
-
-traits$cv_fold <- NA
-
-for (i in 1:nrow(counts_per_group))
+for (sp in unique(cv_folds$Species))
 {
-  group <- counts_per_group$Var1[i]
-  n_sp <- counts_per_group$Freq[i]
+  n_obs <- nrow(cv_folds[which(cv_folds$Species == sp), ])
   
-  cv_allocs <- rep(seq(1,k), times = ceiling(n_sp / k))
-  cv_allocs <- cv_allocs[1:n_sp]
-  cv_alloc_random <- sample(cv_allocs)
+  obs_per_fold <- ceiling(n_obs / k)
   
-  traits[which(traits$Mig_Hab == group), "cv_fold"] <- cv_alloc_random
+  fold <- NULL
+  for (i in 1:k)
+  {
+    fold <- c(fold, rep(i, obs_per_fold))
+  }
+  fold <- sample(fold[1:n_obs])
+  
+  cv_folds[which(cv_folds$Species == sp), "cv_fold"] <- fold
 }
-
-cv_folds <- traits[, c("Species", "cv_fold")]
 
 ####### Output ####################################
 
