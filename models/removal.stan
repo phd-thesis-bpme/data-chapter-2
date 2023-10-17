@@ -22,7 +22,7 @@ functions {
       }
       Pi[Pi_index,1] = 1 - sum(Pi[Pi_index,]);
       
-      lp = lp + multinomial_lpmf(slice_abund_per_band[Pi_index,] | to_vector(Pi[Pi_index,]));
+      lp = lp + multinomial_lupmf(slice_abund_per_band[Pi_index,] | to_vector(Pi[Pi_index,]));
       Pi_index = Pi_index + 1;
     }
 
@@ -69,32 +69,36 @@ transformed data {
 }
 
 parameters {
+  real intercept_raw;
   row_vector[n_mig_strat] mu_mig_strat_raw;
   real<lower = 0> sigma;
   vector[n_species] log_phi;
 }
 
 transformed parameters {
-  row_vector[n_species] mu;
+  real intercept;
   row_vector[n_mig_strat] mu_mig_strat;
+  row_vector[n_species] mu;
   
-  mu_mig_strat = -1 + 0.01*mu_mig_strat_raw; //we expect log_phi to be negative
+  intercept = -1 + (intercept_raw * 0.1); // we expect log_phi to be negative
+  
+  mu_mig_strat = 0.01 * mu_mig_strat_raw; 
   
   for (sp in 1:n_species)
   {
-    mu[sp] = mu_mig_strat[mig_strat[sp]];
+    mu[sp] = intercept + mu_mig_strat[mig_strat[sp]];
   }
 }
 
 model {
   log_phi ~ multi_normal(mu, phylo_corr_pl * sigma);// quad_form_diag(phylo_corr_pl, rep_vector(sigma, n_species)));
-  
 
+  intercept_raw ~ std_normal();
   mu_mig_strat_raw ~ std_normal();
   
   sigma ~ exponential(5);
   
-  target += reduce_sum(partial_sum_lpmf,
+  target += reduce_sum(partial_sum_lupmf,
                        abund_per_band,
                        grainsize,
                        max_intervals,

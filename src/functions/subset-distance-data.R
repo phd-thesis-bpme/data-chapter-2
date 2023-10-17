@@ -1,20 +1,20 @@
 subset_distance_data <- function(distance_stan_data = NULL,
                                  sps = NULL)
 {
-  orig_data_df <- data.frame(species = distance_stan_data$sp_list[,1],
+  library(dplyr)
+  orig_data_df <- data.frame(species = distance_stan_data$sp_list,
                              sp_n = distance_stan_data$species)
-  ### NOTE there are only 322 species in this list.
-  ### is n_species wrong (== 323)
+
   sp_df <- orig_data_df %>%
     group_by(species,sp_n) %>%
-    summarise(n_counts = n())
+    dplyr::summarise(n_counts = dplyr::n())
 
   sub_data <- data.frame(mig_strat = distance_stan_data$mig_strat,
                          habitat = distance_stan_data$habitat,
                          pitch = distance_stan_data$pitch,
                          mass = distance_stan_data$mass,
                          sp_n = 1:length(distance_stan_data$mig_strat))
-  sp_df <- left_join(sp_df,sub_data)
+  sp_df <- dplyr::left_join(sp_df,sub_data)
 
   sp_sel <- sp_df[which(sp_df$species %in% sps),]
   sp_sel[,"new_sp_n"] <- 1:length(sps) # new species indicators
@@ -37,6 +37,7 @@ subset_distance_data <- function(distance_stan_data = NULL,
 
   distance_stan_data2$n_species <- length(sps)
   distance_stan_data2$n_samples <- length(data_sel)
+  distance_stan_data2$sp_list <- distance_stan_data2$sp_list[which(distance_stan_data2$sp_list %in% sps)]
 
   return(distance_stan_data2)
 }
