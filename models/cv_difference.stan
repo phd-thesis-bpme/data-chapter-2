@@ -8,23 +8,14 @@ data {
 parameters {
   real overall_difference;
   vector[n_species] species_difference;
-  //real<lower = 1> nu;
   real<lower=0> sigma;
 }
 
-transformed parameters {
-  vector[N] mu;
-  
-  mu = overall_difference + species_difference[species];
-}
-
 model {
-  //difference ~ student_t(nu, mu, sigma);
-  difference ~ normal(mu, sigma);
+  difference ~ normal(overall_difference + species_difference[species], sigma);
   
-  //nu ~ gamma(2, 0.1);
-  overall_difference ~ std_normal();
-  species_difference ~ std_normal();
-  sigma ~ exponential(1);
+  overall_difference ~ normal(0,0.1);
+  species_difference ~ normal(0,0.1);
+  sigma ~ exponential(5);
 }
 
