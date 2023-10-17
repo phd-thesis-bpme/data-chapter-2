@@ -50,14 +50,16 @@
 \section{Introduction}
 
 \subsection{Predictions}
-\par We predict that for both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will change very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
-This is because the species that were modelled in \citet{edwards_point_2023} had a sufficient number of data points to stand on their own, and so adding in species-level effects should have little effect on estimates. 
-We also predict that a multi-species model will increase the precision of the estimates of cue rate and EDR, but only up to a certain sample size. 
-This is because there are many species for which NA-POPS has thousands to even tens of thousands of data points; given precision generally increases with sample size, after a certain sample size, a single-species vs multi-species estimate of cue rate and EDR should be similarly precise. 
-Put differently, we expect that species with a smaller sample size will have precision of cue rate and EDR estimates improved with a multi-species model.
-Finally, we expect that a multi-species model will be able to provide predictions of cue rate and EDR for species with little to no data, but should be able to provide better/more precise estimates for data-sparse species compared to data-absent species.
-Additionally, we expect to see a higher precision of estimates for species where there are more "similar" species.
-That is, species with more closely-related species modelled in the multi-species model will have more precise estimates of cue rate, and species with more species with similar traits will have more precise estimates of EDR.
+\begin{enumerate}
+	\item\label{pred1} For both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will change very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
+	This is because the species that were modelled in \citet{edwards_point_2023} had a sufficient number of data points to stand on their own, and so adding in species-level effects should have little effect on estimates. 
+	\item\label{pred2} A multi-species model will increase the precision of the estimates of cue rate and EDR, but only up to a certain sample size. 
+	This is because there are many species for which NA-POPS has thousands to even tens of thousands of data points; given precision generally increases with sample size, after a certain sample size, a single-species vs multi-species estimate of cue rate and EDR should be similarly precise. 
+	Put differently, we expect that species with a smaller sample size will have precision of cue rate and EDR estimates improved with a multi-species model.
+	\item\label{pred3} A multi-species model will have greater predictive capacity than a single-species model, particularly for species which are data-sparse.
+\end{enumerate}
+
+\par With the predictions above, we then expect to be able to generate estimates of cue rate and EDR for species with very little data, thus relaxing previous sample size requirements; additionally, we expect to be able to predict cue rate and EDR for species with no data by making use of the shrinkage effect offered by a multi-species model.
 
 \section{Methods}
 
@@ -174,18 +176,24 @@ $$\sigma \sim exp(5)$$
 
 \par Results of simulated priors can be found in Appendix TO DO.
 
+\subsection{Single Species Models}
+
+\par To directly compare the multi-species models described above to its single-species equivalent, we built two Bayesian single-species models in Stan.
+The single species models used the same likelihood statements as above for the count data, except rather than cue rate and EDR being estimated with shared information, they are estimated independently from each other.
+That is, $\log \phi \sim N(0,1) \forall \phi_{s}$, and $\log \tau \sim N(0,1) \forall \tau_s$, thus making it equivalent to the Null model in \citet{edwards_point_2023}, just estimated in a Bayesian framework rather than maximum likelihood. 
+
 \subsection{Model Assessment}
 
-\par For both the Bayesian hierarchical QPAD Removal and Distance models described above, we compared the estimated cue rates and effective detection radii, respectively, to those produced within a single-species context in \citet{edwards_point_2023}. 
-To do this, we modelled the difference as
+\par To test prediction \ref{pred1}, we ran the Bayesian hierarchical QPAD Removal and Distance models, as well as the single-species QPAD Removal and Distance models described above, on the set of species for which there was sufficient data in the original NA-POPS analysis.
+In this case, we ran both removal models for 316 species of birds, and we ran both distance models for 317 species of birds (Tricoloured Blackbird was included in the distance models but not the removal models).
+We then modelled the difference in estimated cue rates and EDRs as
 $$\Delta X \sim N(0,\sigma)$$
 $$\sigma \sim exp(1)$$
 
 where $\Delta X$ is calculated as the mean multi-species estimate of cue rate or EDR minus the mean single-species estimate of cue rate of EDR.
-If our predictions are true, we would expect to see a distribution of modelled differences centred about 0, indicating no real difference in estimates of cue rate or EDR between single-species and multi-species models, for species for which we have sufficient data.
+If prediction \ref{pred1} is true, we would expect to see a distribution of modelled differences centred about 0, indicating no real difference in estimates of cue rate or EDR between single-species and multi-species models, for species for which we have sufficient data.
 
-\par We were also interested in determining if a multi-species model improved the precision around the estimates of cue rate or EDR. 
-To do this, we modelled the standard deviations about each estimate of cue rate or EDR from both the multi-species and single-species models from \citet{edwards_point_2023}, and regressed them against the log sample size per species.
+\par To test prediction \ref{pred2}, we modelled the standard deviations about each estimate of cue rate or EDR from both the multi-species and single-species models, and regressed them against the log sample size per species.
 That is
 $$SD \sim N(\alpha_M + \beta_M\times \log(N), \sigma)$$
 $$\alpha, \beta \sim N(0,1)$$
@@ -193,14 +201,23 @@ $$\sigma \sim exp(1)$$
 
 where $\alpha$ is the model-specific intercept and $\beta$ is the model-specific slope.
 
-\par If our predictions are true, we would expect to see a higher value of $\alpha_1$ than for $\alpha_2$, corresponding to a higher baseline standard deviation in the single species models.
+\par If prediction \ref{pred2} is true, we would expect to see a higher value of $\alpha_1$ than for $\alpha_2$, corresponding to a higher baseline standard deviation in the single species models.
 We would also likely see a slightly smaller (i.e., more negative) value of $\beta_1$ than $\beta_2$ (which should also be negative), indicating that the standard deviation decreases with log sample size for both models, but should decrease at a slower rate with the multi-species model (which has a lower baseline standard deviation to begin with) than the single-species model.
+
+\par To test prediction \ref{pred3}, we ran a k-fold cross-validation with 5 folds, stratified by species. That is, for each cross-validation run, we held out 20\% of the data for each species for both the multi-species and single-species models. 
+We then estimated multi-species estimates of cue rate and EDR and single-species estimates of cue rate and EDR for each cross-validation run, and used these parameter estimates to calculate the posterior predictive density of each of the held out data points. 
+We then calculated the difference in posterior predictive density for removal and distance models, by subtracting the pointwise posterior predictive density of the single-species model from the pointwise posterior predictive density of the multi-species model.
+Finally, we took the mean of the difference in pointwise posterior predictive density for each species to create a species-specific mean pointwise predictive density.
+With this, positive values of this mean would indicate that the multi-species model was preferred, and negative values would indicate that the single-species model was preferred.
+If prediction \ref{pred3} is true, then we would expect to see majority positive values of the specific-specific mean pointwise predictive density.
+
 
 \subsection{Predicting Detection Probabilities}
 \par To predict estimates of cue rate or EDR from the multi-species models, we adopted two possible approaches.
 If the NA-POPS database contained some point-count data for the species of interest, we simply added these data into the model.
 This is different from \citet{edwards_point_2023, solymos_calibrating_2013, solymos_evaluating_2018}, where any species with less than 75 data points were removed from the analysis.
 For species that did not have any data in the NA-POPS database, we generated a row of traits data for the species and modelled the species just as a parameter.
+We then ran the multi-species models described above using these additional data points (and hence an updated phylogenetic correlation structure for the removal model) to generate estimates of cue rate and EDR for these new species.
 
 
 \section{Results}
