@@ -1,7 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{setspace}
-\onehalfspacing
+\doublespacing
 
 \usepackage{natbib}
 \bibliographystyle{apalike}
@@ -261,8 +261,14 @@ We then ran the multi-species models described above using these additional data
 
 \subsection{Analysis}
 \par All analyses were performed in R version TO DO: CHECK (CITATION).
+Manipulation of phylogenetic trees, including finding a consensus tree for visualization and generating variance-covariance matrices based on the 2000 bootstrapped trees, was done using the \texttt{ape} R package.
 All Bayesian models were coded in the Stan Probabilistic Language \cite{stan_development_team_stan_2019}, and models were run using the \texttt{cmdstanr} R package (CITATION) and visualized using the \texttt{bayesplot} R package (CITATION).
-Any manipulation of phylogenetic trees, including finding a consensus tree for visualization and generating variance-covariance matrices based on the 2000 bootstrapped trees, was done using the \texttt{ape} R package.
+Each of the single-species models and multi-species models running both the initial comparison set of species and the final predictive set of species, as well as the models created to assess performance, were run using 1000 warmup iterations and 2000 sampling iterations, each on 4 chains for a total of 8000 draws per model run.
+Cross-validation models were run with 250 warmup iterations and 500 sampling iterations, each on 4 chains for a total of 2000 draws per model run.
+All of the models made use of Stan's reduce\_sum functionality, which allows for within-chain parallelization as well as the usual across-chain parallelization (CITATION).
+This was particularly useful in our case as the multi-species removal model contained over 3.5 million data points and the multi-species distance model contained over 4.5 million data points, and so computational expense was a large concern.
+All models were run on one of two multi-core processing servers, one running Ubuntu 20.04.4 LTS and one running Ubuntu 20.04.6 LTS.
+
 
 \section{Results}
 \includegraphics{../output/plots/removal_1vs1.png}
