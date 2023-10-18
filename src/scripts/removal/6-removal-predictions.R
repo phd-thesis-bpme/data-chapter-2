@@ -1,7 +1,7 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 07-removal-model.R
+# 6-removal-predictions.R
 # Created December 2022
 # Last Updated October 2023
 
