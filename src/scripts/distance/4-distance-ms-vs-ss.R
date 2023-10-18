@@ -16,7 +16,6 @@ source("src/functions/subset-distance-data.R")
 ####### Load Data #################################
 
 load("data/generated/distance_stan_data.rda")
-cv_folds <- read.csv("data/generated/distance_cv_folds.csv")
 
 ####### Set Constants #############################
 
@@ -83,6 +82,4 @@ stan_run_ss <- ss_model$sample(
   threads_per_chain = threads_per_chain,
   init = inits
 )
-stan_run_ss$save_object(file = paste0("output/model_runs/cv_distance/ss_fold_",
-                                      i,
-                                      ".RDS"))
+stan_run_ss$save_object(file = paste0("output/model_runs/distance_ss.RDS"))
