@@ -49,6 +49,42 @@
 
 \section{Introduction}
 
+\par Detectability is an important metric for many conservation problems, but often goes unaccounted for, or detectability data just does not exist \citep{bennett_how_2023}.
+In conservation management situations, detectability can be used as a metric of sensitivity to evaluate when to monitor a system for a species, or when to act on current information \citep{canessa_when_2015, bennett_when_2018}.
+When estimating population sizes of an organism, detectability often comes into play as a way to convert observed counts into densities or estimates of true abundance.
+As such, accurate and precise estimates of detectability are important both for making accurate conservation decisions, and estimating accurate population sizes.
+
+\par The wealth of bird data that has been collected and is available in North America means that estimates of detectability for birds are relatively easy to come by \citep{bennett_how_2023}.
+The NA-POPS project is an effort to estimate detectability functions that take into account variability in detection through environmental and temporal covariates, for as many of North America's landbird species as possible \citep{edwards_point_2023}. 
+To date, the project has estimated availability (the probability a bird sings or gives a cue) and perceptibility (the probability an observer sees or hears a cueing bird) for 319 species of birds, with an additional 19 species having estimates of availability or perceptibility (but not necessarily both) estimated.
+This project built off previous efforts by the Boreal Avian Modelling project \citep{cumming_toward_2010} to systematically estimate detectability in landbirds \citep{solymos_calibrating_2013, solymos_evaluating_2018}.
+Both the NA-POPS project and previous estimates by Boreal Avian Modelling project use the QPAD methodology, which is a flexible method to estimate availability and perceptibility given a harmonized dataset \citep{barker_ecological_2015, solymos_calibrating_2013}.
+
+\par Despite the efforts of the NA-POPS project, the 338 species of birds considered in the modelling exercise still only account for about 75\% of Partners in Flight's 2016 Landbird Conservation Plan \citep{edwards_point_2023, rosenberg_partners_2016}.
+This is because of sample size limitations that are recommended for removal and distance modelling, in that a modeller should have at least 75 data points for reasonable estimates \citep{buckland_introduction_2001}. 
+Many of the species that fell short of that threshold in the NA-POPS database are systematically rare or undersampled species, that are either low in population size to begin with, or occur in rare habitats.
+Some examples of species not modelled include Kirtland's Warbler (SCIENTIFIC NAME) and Bicknell's Thrush (SCIENTIFIC NAME), both of which have low population sizes, and LeConte's Thrasher (SCIENTIFIC NAME) and Harris's Sparrow (SCIENTIFIC NAME), both of which have rare habitat associations  (PARNTERS IN FLIGHT WATCHLIST CITATION).
+Of course, despite not having good estimates of detectability availabile for these rare and undersampled species, these are the groups of species that need these estimates the most as their conservation status often depend on accurate population size estimates, and estimates of trend in those population sizes.
+
+\par Detectability in birds has been shown to at least be partly driven by variation in traits. \cite{johnston_species_2014} showed in a selection of European landbirds that body mass and habitat association had an effect on the detection distance, which influences the perceptibility.
+In this case, a larger body size tended to be associated with larger detection distances, which makes sense considering larger body sizes are associated with louder and lower-pitched songs in birds \citep{bowman_adaptive_1979, fletcher_acoustics_1999, ryan_role_1985}.
+Habitat associations tends to influence the attenuation of sound, whereby sound diminishes quicker in a closed-forested habitat compared to a more open habitat \citep{waide_tropical_1988, yip_sound_2017}.
+A study by \cite{solymos_phylogeny_2018} expanded on this effort by also considering the effects of species traits and phylogeny on both detection distance and cue rate, the latter of which influences the availability of birds.
+They found that cue rate is most influenced by phylogeny, and, to a lesser extent, whether a bird was a long-distance migrant or a resident species.
+They also found that while the best model that explained detection distance did include phylogeny, the strength of the phylogenetic relationship was reduced to effectively 0 after accounting for traits such as body mass, song pitch, habitat association, and migratory status. 
+Both these studies and others (see CITATIONSSSSS) provide useful evidence that detectability in birds can be reasonably predicted by some combinations of phylogeny and traits.
+
+\par One recommendation for future research that come out of \cite{solymos_phylogeny_2018} was to try to use these phylogenetic and trait relationships in detectability to then predict components of detectability (i.e., availability through cue rate, and perceptibility through detection distance) in other birds.
+Indeed, by making use of shrinkage factors and partial pooling, such as what can be done in a Bayesian hierarchical models (CITATION), and by accounting phylogenetic relationships and the relative "relatedness" of different species, such as what can be done with Gaussian processes \citep{bernardo_regression_1998, mcelreath_continous_2020}, we can leverage the information provided by species with many data points to use to inform species with much fewer (included potentially zero) data points.
+Thus, the goal of this paper is to create a multi-species model of detectability that incorporates species traits and phylogeny, to then predict estimates of detectability for rare and undersampled species of North American landbirds.
+To do so, we developed a Bayesian hierarchical version of the QPAD Removal model initially derived in \cite{solymos_calibrating_2013}, that allows for information exchange between species based on phylogenetic distance and binned migratory status.
+Phylogenetic distance was coded as a correlation structure and used as a Gaussian random field in this model, and migratory status was coded similar to \cite{solymos_phylogeny_2018} where a species was considered either "migrant" or "resident.
+We also developed a Bayesian hierarchical version of the QPAD Distance model initially derived in \cite{solymos_calibrating_2013}, that allows for information exchange between species based only on the traits that came out as being significant in \cite{solymos_phylogeny_2018}.
+These traits include migratory status (coded the same as removal models), habitat association (coded as either "open" or "closed"), song pitch, and body mass.
+We also developed a Bayesian single species version of the QPAD Removal and Distance models (i.e., as opposed to the maximum likelihood models available in the \texttt{detect} R package; \cite{solymos_detect_2020}) to allow for direct comparison through cross validation.
+Finally, we ran these models with the full set of data points used in \cite{edwards_point_2023}, plus additional data for seven species that did not meet the initial sample size thresholds for NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird, and Spotted Owl. 
+All seven of these bird species are listed on Partner's in Flight's watchlist for various threats (CITATION). 
+
 \subsection{Predictions}
 \begin{enumerate}
 	\item\label{pred1} For both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will change very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
@@ -65,40 +101,25 @@
 
 \par The following subsections outline the modelling techniques used in this study as well as the data that were collected. 
 We start by introducing the Bayesian hierarchical QPAD removal and distance models, and then describe the input.
-
-\subsection{Data Collection}
-\subsubsection{Point Count Data}
-\par We used the same standardized database of point count data that was put together through the NA-POPS project \cite{edwards_point_2023}. 
-This consists of $712138$ point counts conducted across $292$ projects in Canada and the United States, $422514$ of which used removal sampling and $522820$ of which used distance sampling.
-
-\subsubsection{Phylogenetic Trees}
-\par We accessed 2000 pseudo-posterior trees from \citet{jetz_global_2012} that contains phylogeny for all species that contained sufficient data for removal modelling ($>75$ observations as per \cite{edwards_point_2023,solymos_evaluating_2018,buckland_introduction_2001}). 
-We also requested that the phylogenies include the following bird species with insufficient data from NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird, and Spotted Owl. 
-All seven of these bird species are listed on Partner's in Flight's watchlist for various threats (CITATION). 
-This resulted in 2000 pseudo-posterior trees that contained 323 species.
-
-\par We generated a phylogenetic correlation matrix using the same methods outlined in the Appendix of \citet{solymos_phylogeny_2018} that generate distances between species, and further processed using the R package "ape" \citet{paradis_ape_2019}.
-
-\subsubsection{Species Traits}
-\par Species traits (song pitch, migratory vs resident, open vs. closed habitat) were obtained from Birds of the World accounts of all the birds to model in this study (CITATION). 
-Body mass for each bird species was obtained form the Elton traits dataset (CITATION). 
-Where body mass was not available through the Elton traits dataset, the Birds of the World account was used instead.
+Finally, we describe the experiments conducted to assess model performance and model comparison, which then allow us to make predictions for the seven undersampled species of interest.
 
 \subsection{Bayesian Hierarchical Models}
 
-\par For any point count that employs removal and/or distance sampling, let $Y_{sijk}$ be the observed count of species $s$ during sampling event $i$, occuring in time band $j \in [1,J]$ and/or distance band $k \in [1,K]$.
-That is, if we have a point count where removal sampling or distance sampling (but not both) is not used, then we have that either $J = 1$ or $K = 1$, respectively. 
-The following two subsections detail the Bayesian hierarchical QPAD Removal and Distance Models.
+\par For any point count that employs removal sampling \citep{alldredge_time--detection_2007, farnsworth_removal_2002} and/or distance sampling \citep{buckland_introduction_2001, buckland_distance_2015}, let $Y_{sijk}$ be the observed count of species $s$ during sampling event $i$, occuring in time band $j \in [1,J]$ and/or distance band $k \in [1,K]$.
+That is, if we have a point count where removal sampling or distance sampling (but not both) is not used, then we have that either $J = 1$ or $K = 1$, respectively; whereas, if we have a point count where both removal sampling and distance sampling is used, then we have that both $J,K \geq 2$.
+The case where $J = K = 1$ is where neither removal sampling nor distance sampling is used, and so these data points are not appropriate for the modelling techniques described here.
+
+\par The following two subsections detail the Bayesian hierarchical QPAD Removal and Distance Models.
 
 \subsubsection{Bayesian Hierarchical QPAD Removal Model}
 
 \par For removal modelling, we are not interested in distance to the bird, and so we will sum counts from each sampling event $i$ over all distance bands. 
-Thus, we will be considering counts $Y_{sij.}$. 
+Thus, we will be considering counts $Y_{sij.} = \sum_{k=1}^{K}$. 
 From \citet{solymos_calibrating_2013}, we model $Y_{sij.}$ as
 $$Y_{sij.} \sim multinomial\left(Y_{si..}, \Pi_{si.}\right).$$
 
 \par For sample $i$, $\Pi_{si.}$ is the corresponding probability vector that determines how the total number of species $s$ observed at sample $i$ (i.e., $Y_{si..}$) are to be distributed across the $J$ time bands; in essense, it is the mixing parameter.
-Let $t_ij$ be the maximum time for time band $j$ during sampling event $i$, and let $phi_s$ be the unknown cue rate for species $s$.
+Let $t_{ij}$ be the maximum time for time band $j$ during sampling event $i$, and let $\phi_s$ be the unknown cue rate for species $s$.
 We then have the following calculation of each component $\pi_{sij}$ of the mixing parameter $\Pi_{si.}$:
 
 \begin{equation*}
@@ -109,15 +130,15 @@ We then have the following calculation of each component $\pi_{sij}$ of the mixi
 	\end{cases}
 \end{equation*}
 
-\par We are most interested in estimating $phi_s$, the cue rate for species $s$. 
-To allow for the partial pooling of estimates for each species to be based on a phylogenic relationship, we can use Gaussian processes, which are effectively allow for "continuous" factors. 
+\par We are most interested in estimating $\phi_s$, the cue rate for species $s$. 
+To allow for the partial pooling of estimates for each species to be based on a phylogenic relationship, we can use Gaussian processes, which effectively allow for "continuous" factors \citep{bernardo_regression_1998, mcelreath_continous_2020}. 
 Let $\Phi$ be the vector of cue rates (of length $s$). 
 We then have:
 
 $$\log \Phi \sim MVN\left( \mu_{[s]}, \Sigma_{[s \times s]} \right).$$
 
 \par The covariance function $\Sigma$ (denoted with subscript $[s \times s]$ to show dimensionality) determines the strength of the partial pooling, and can be any function that contains a measure of distance. 
-In this case, we created a function based on phylogenetic distance $D_{[s \times s]}$, i.e.,
+In this case, we will create a function based on phylogenetic distance $D_{[s \times s]}$, i.e.,
 
 $$\Sigma_{[s \times s]} = D_{[s \times s]}\lambda\sigma.$$
 
@@ -133,12 +154,12 @@ We set priors on both migratory strategies to be $\alpha_M \sim N(-1, 0.01)$, be
 \subsubsection{Bayesian Hierarchical QPAD Distance Model}
 
 \par For distance modelling, we are not interested in the time bin that the bird was recorded in, and so we will sum counts from each sampling event $i$ over all time bands. 
-Thus, we will be considering counts $Y_{si.k}$. 
+Thus, we will be considering counts $Y_{si.k} = \sum_{j=1}^{J}$. 
 From \citet{solymos_calibrating_2013}, we model $Y_{si.k}$ as
 $$Y_{si.k} \sim multinomial\left(Y_{si..}, \Pi_{si.}\right).$$
 
 \par For sample $i$, $\Pi_{si.}$ is the corresponding probability vector that determines how the total number of species $s$ observed at sample $i$ (i.e., $Y_{si..}$) are to be distributed across the $K$ distance bins; in essense, it is the mixing parameter. 
-Let $r_ik$ be the maximum distance for distance bin $k$ during sampling event $i$, and let $tau_s$ be the unknown effective detection radius for species $s$. 
+Let $r_{ik}$ be the maximum distance for distance bin $k$ during sampling event $i$, and let $\tau_s$ be the unknown effective detection radius for species $s$. 
 We then have the following calculation of each component $\pi_{sik}$ of the mixing parameter $\Pi_{si.}$:
 
 %\begin{equation*}
@@ -154,7 +175,7 @@ We then have the following calculation of each component $\pi_{sik}$ of the mixi
 	\pi_{sik} = 
 	\begin{cases}
 		\dfrac{f(r_{i,k}, \tau_s) - f(r_{i,k-1}, \tau_s)}{f(r_{i,K}, \tau_s)} & \text{for } k > 1 \\
-		1 - \sum_{n = 2}^{J} \pi_{sin} & \text{for } k = 1
+		1 - \sum_{n = 2}^{K} \pi_{sin} & \text{for } k = 1
 	\end{cases}
 \end{equation*}
 
@@ -182,6 +203,24 @@ $$\sigma \sim exp(5)$$
 The single species models used the same likelihood statements as above for the count data, except rather than cue rate and EDR being estimated with shared information, they are estimated independently from each other.
 That is, $\log \phi \sim N(0,1) \forall \phi_{s}$, and $\log \tau \sim N(0,1) \forall \tau_s$, thus making it equivalent to the Null model in \citet{edwards_point_2023}, just estimated in a Bayesian framework rather than maximum likelihood. 
 
+\subsection{Data Collection}
+\subsubsection{Point Count Data}
+\par We used the same standardized database of point count data that was put together through the NA-POPS project \cite{edwards_point_2023}. 
+This consists of $712138$ point counts conducted across $292$ projects in Canada and the United States, $422514$ of which used removal sampling and $522820$ of which used distance sampling.
+
+\subsubsection{Phylogenetic Trees}
+\par We accessed 2000 pseudo-posterior trees from \citet{jetz_global_2012} that contains phylogeny for all species that contained sufficient data for removal modelling ($>75$ observations as per \cite{edwards_point_2023,solymos_evaluating_2018,buckland_introduction_2001}). 
+We also requested that the phylogenies include the following bird species with insufficient data from NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird, and Spotted Owl. 
+All seven of these bird species are listed on Partner's in Flight's watchlist for various threats (CITATION). 
+This resulted in 2000 pseudo-posterior trees that contained 323 species.
+
+\par We generated a phylogenetic correlation matrix $D$ using the same methods outlined in the Appendix of \citet{solymos_phylogeny_2018} that generate distances between species, and further processed using the R package "ape" \citet{paradis_ape_2019}.
+
+\subsubsection{Species Traits}
+\par Species traits (song pitch, migratory vs resident, open vs. closed habitat) were obtained from Birds of the World accounts of all the birds to model in this study (CITATION). 
+Body mass for each bird species was obtained form the Elton traits dataset (CITATION). 
+Where body mass was not available through the Elton traits dataset, the Birds of the World account was used instead.
+
 \subsection{Model Assessment}
 
 \par To test prediction \ref{pred1}, we ran the Bayesian hierarchical QPAD Removal and Distance models, as well as the single-species QPAD Removal and Distance models described above, on the set of species for which there was sufficient data in the original NA-POPS analysis.
@@ -200,6 +239,7 @@ $$\alpha, \beta \sim N(0,1)$$
 $$\sigma \sim exp(1)$$
 
 where $\alpha$ is the model-specific intercept and $\beta$ is the model-specific slope.
+In both cases, $M=1$ corresponds to the single species model and $M=2$ corresponds to the multi-species model.
 
 \par If prediction \ref{pred2} is true, we would expect to see a higher value of $\alpha_1$ than for $\alpha_2$, corresponding to a higher baseline standard deviation in the single species models.
 We would also likely see a slightly smaller (i.e., more negative) value of $\beta_1$ than $\beta_2$ (which should also be negative), indicating that the standard deviation decreases with log sample size for both models, but should decrease at a slower rate with the multi-species model (which has a lower baseline standard deviation to begin with) than the single-species model.
@@ -219,6 +259,10 @@ This is different from \citet{edwards_point_2023, solymos_calibrating_2013, soly
 For species that did not have any data in the NA-POPS database, we generated a row of traits data for the species and modelled the species just as a parameter.
 We then ran the multi-species models described above using these additional data points (and hence an updated phylogenetic correlation structure for the removal model) to generate estimates of cue rate and EDR for these new species.
 
+\subsection{Analysis}
+\par All analyses were performed in R version TO DO: CHECK (CITATION).
+All Bayesian models were coded in the Stan Probabilistic Language \cite{stan_development_team_stan_2019}, and models were run using the \texttt{cmdstanr} R package (CITATION) and visualized using the \texttt{bayesplot} R package (CITATION).
+Any manipulation of phylogenetic trees, including finding a consensus tree for visualization and generating variance-covariance matrices based on the 2000 bootstrapped trees, was done using the \texttt{ape} R package.
 
 \section{Results}
 \includegraphics{../output/plots/removal_1vs1.png}
