@@ -131,7 +131,7 @@ preference <- data.frame(table(lppd_summary$Model_Preference))
 
 lppd_summary <- merge(lppd_summary, binomial[,c("Code", "Scientific_BT")],
                       by.x = "Species", by.y = "Code")
-lppd_summary$Scientific_BT <- gsub(" ", "_", lppd_summary)
+lppd_summary$Scientific_BT <- gsub(" ", "_", lppd_summary$Scientific_BT)
 lppd_summary <- merge(lppd_summary, traits[, c("Code", "Migrant")],
                       by.x = "Species", by.y = "Code")
 tree <- ape::consensus(phylo_tree)
