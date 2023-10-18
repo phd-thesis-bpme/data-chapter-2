@@ -13,12 +13,12 @@ dis_lik <- function(abund = NULL,
     {
       if (k > 1)
       {
-        Pi[k] <- ((1 - exp(-(max_dist[i,k]^2 / (tau)^2))) - 
-                    (1 - exp(-(max_dist[i,k - 1]^2 / (tau)^2)))) / 
-          (1 - exp(-(max_dist[i,bands[i]]^2 / (tau)^2)))
+        Pi[k] <- ((1 - exp(-(max_dist[i,k]^2 / (tau[i])^2))) - 
+                    (1 - exp(-(max_dist[i,k - 1]^2 / (tau[i])^2)))) / 
+          (1 - exp(-(max_dist[i,bands[i]]^2 / (tau[i])^2)))
       }else{
-        Pi[k] = (1 - exp(-(max_dist[i,k]^2 / (tau)^2))) /
-          (1 - exp(-(max_dist[i,bands[i]]^2 / (tau)^2)))
+        Pi[k] = (1 - exp(-(max_dist[i,k]^2 / (tau[i])^2))) /
+          (1 - exp(-(max_dist[i,bands[i]]^2 / (tau[i])^2)))
       }
     }
     
