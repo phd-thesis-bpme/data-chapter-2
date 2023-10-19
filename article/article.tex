@@ -199,7 +199,7 @@ $$\sigma \sim exp(5)$$
 
 \subsection{Single Species Models}
 
-\par To directly compare the multi-species models described above to its single-species equivalent, we built two Bayesian single-species models in Stan.
+\par To directly compare the multi-species models described above to its single-species equivalent in a cross-validation (see below), we built two Bayesian single-species models in Stan.
 The single species models used the same likelihood statements as above for the count data, except rather than cue rate and EDR being estimated with shared information, they are estimated independently from each other.
 That is, $\log \phi \sim N(0,1) \forall \phi_{s}$, and $\log \tau \sim N(0,1) \forall \tau_s$, thus making it equivalent to the Null model in \citet{edwards_point_2023}, just estimated in a Bayesian framework rather than maximum likelihood. 
 
@@ -223,8 +223,9 @@ Where body mass was not available through the Elton traits dataset, the Birds of
 
 \subsection{Model Assessment}
 
-\par To test prediction \ref{pred1}, we ran the Bayesian hierarchical QPAD Removal and Distance models, as well as the single-species QPAD Removal and Distance models described above, on the set of species for which there was sufficient data in the original NA-POPS analysis.
-In this case, we ran both removal models for 316 species of birds, and we ran both distance models for 317 species of birds (Tricoloured Blackbird was included in the distance models but not the removal models).
+\par To test prediction \ref{pred1}, we ran the Bayesian hierarchical QPAD Removal and Distance models on the set of species for which there was sufficient data in the original NA-POPS analysis.
+In this case, we ran both removal model for 316 species of birds, and we ran the distance model for 317 species of birds (Tricoloured Blackbird was included in the distance models but not the removal models).
+We accessed the single-species estimates of cue rate and EDR from the NA-POPS Null models using the \texttt{napops} R package (CITATION).
 We then modelled the difference in estimated cue rates and EDRs as
 $$\Delta X \sim N(0,\sigma)$$
 $$\sigma \sim exp(1)$$
@@ -244,7 +245,7 @@ In both cases, $M=1$ corresponds to the single species model and $M=2$ correspon
 \par If prediction \ref{pred2} is true, we would expect to see a higher value of $\alpha_1$ than for $\alpha_2$, corresponding to a higher baseline standard deviation in the single species models.
 We would also likely see a slightly smaller (i.e., more negative) value of $\beta_1$ than $\beta_2$ (which should also be negative), indicating that the standard deviation decreases with log sample size for both models, but should decrease at a slower rate with the multi-species model (which has a lower baseline standard deviation to begin with) than the single-species model.
 
-\par To test prediction \ref{pred3}, we ran a k-fold cross-validation with 5 folds, stratified by species. That is, for each cross-validation run, we held out 20\% of the data for each species for both the multi-species and single-species models. 
+\par To test prediction \ref{pred3}, we ran a k-fold cross-validation with 5 folds, stratified by species. That is, for each cross-validation run, we held out 20\% of the data for each species for both the multi-species and Bayesian single-species models. 
 We then estimated multi-species estimates of cue rate and EDR and single-species estimates of cue rate and EDR for each cross-validation run, and used these parameter estimates to calculate the posterior predictive density of each of the held out data points. 
 We then calculated the difference in posterior predictive density for removal and distance models, by subtracting the pointwise posterior predictive density of the single-species model from the pointwise posterior predictive density of the multi-species model.
 Finally, we took the mean of the difference in pointwise posterior predictive density for each species to create a species-specific mean pointwise predictive density.
@@ -271,17 +272,134 @@ All models were run on one of two multi-core processing servers, one running Ubu
 
 
 \section{Results}
-\includegraphics{../output/plots/removal_1vs1.png}
+\subsection{Removal Model Comparisons}
 
-\includegraphics{../output/plots/removal_sd_plot.png}
+\par We found very little evidence for an overall change in cue rate for a given species modelled by a single-species model vs a multi-species model (Figure \ref{fig:removal_1vs1}A).
+Seven out of the 316 species considered for removal modelling had a percent change in cue rate of more than 20\%.
+All seven of these species were among the lowest cue rates in both the single-species and multi-species context (Figure \ref{fig:removal_1vs1}B).
 
-\includegraphics{../output/plots/removal_predictions_plot.png}
+\begin{figure}[h!]
+	\includegraphics{../output/plots/removal_1vs1.png}
+	\caption{TO DO}
+	\label{fig:removal_1vs1}
+\end{figure}
 
-\includegraphics{../output/plots/distance_1vs1.png}
 
-\includegraphics{../output/plots/distance_sd_plot.png}
+\par We found much less support for a difference in cue rate between resident and migrant species than was found in \citet{solymos_evaluating_2018}. 
+Mean overall log cue rate in the multi-species model was TO DO; both estimated effects for resident and migrant species were effectively 0 (Figure \ref{fig:removal_params}).
 
-\includegraphics{../output/plots/distance_predictions_plot.png}
+\begin{figure}[h!]
+	\includegraphics{../output/plots/removal_other_params.png}
+	\caption{TODO}
+	\label{fig:removal_params}
+\end{figure}
+
+\par We found some evidence that a multi-species removal model improved the precision of cue rate estimates compared to estimates from a single-species model.
+The intercept of standard deviations of cue rates estimated in a single species model was greater than the intercept of standard deviations of cue rates estimated in a multi-species model, with very little overlap in their 95\% credible intervals (Figure \ref{fig:removal_sd}A).
+This implies that the baseline standard deviation of cue rates is higher in a single species model than a multi species model for very low sample sizes.
+However, the slope of standard deviations of cue rates estimated in a single species model was farther from 0 (i.e., more negative) than the slope of standard deviations of cue rates estimated in a multi-species model, with very little overlap in their 95\% credible intervals (Figure \ref{fig:removal_sd}B).
+This implies that the decrease in standard deviation as sample size increases is lesser in a multi-species model than a single-species model.
+This indicates that after a certain sample size, it is likely that the difference in standard deviation between a single species and multi species model would be negligible.
+
+\begin{figure}[h!]
+	\includegraphics{../output/plots/removal_sd_plot.png}
+	\caption{TODO}
+	\label{fig:removal_sd}
+\end{figure}
+
+\par The cross validation revealed that single species model actually had better predictive capacity for more species than the multi-species model, but the difference in predictive capacity was overall very small.
+Mean overall difference in posterior predictive density was $-2.21 \times 10^{-5}$.
+Single-species models tended to have better predicitve capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:removal_cv}).
+There did not appear to be any patterns in model selection among phylogeny or traits (see Appendix SOMETHING for full phylogenetic tree).
+Six out of the 7 species that had a percent change in cue rate of more than 20\% had the multi-species model chosen as the better predictive model.
+Common Redpoll was the only species that had the single-species model chosen (but please see Discussion about this particular species).
+
+\begin{figure}[h!]
+	\includegraphics{../output/plots/cv_removal_diff_vs_n.png}
+	\caption{TODO}
+	\label{fig:removal_cv}
+\end{figure}
+
+\subsection{Distance Model Comparisons}
+
+\par We found some evidence for a change in modelled EDR between single species and multi-species distance models, in that the multi-species model tended to produce slightly smaller estimates of EDR (Figure \ref{fig:distance_1vs1}A). 
+Still, the majority of the species had very little change; six out of the 317 species had a percent change in EDR of more than 20\% (Figure \ref{fig:distance_1vs1}B).
+
+\begin{figure}[h!]
+	\includegraphics{../output/plots/distance_1vs1.png}
+	\caption{TO DO}
+	\label{fig:distance_1vs1}
+\end{figure}
+
+\par We found little support for migration strategy having any effect on EDR.
+There is some evidence that a resident species may have a slightly higher EDR than a migrant species, but the 95\% credible intervals of both effects overlapped with the 95\% credible interval of the overall estimated intercept (Figure \ref{fig:distance_params}A).
+We did find similar support for change in EDR by body size and pitch, in that body size tended to have an increasing effect on EDR, and song pitch had a decreasing effect on EDR (Figure \ref{fig:distance_params}B).
+
+\begin{figure}[h!]
+	\includegraphics{../output/plots/distance_other_params.png}
+	\caption{TODO}
+	\label{fig:distance_params}
+\end{figure}
+
+\par We found little evidence that a multi-species model improves the precision of EDR compared to that of a single-species model.
+The 95\% credible intervals for both estimated slopes and intercepts overlapped with each other, indicating that the standard deviations are effectively the same for a single-species and multi-species estimate as sample size increases (Figure \ref{fig:distance_sd}).
+
+\begin{figure}[h!]
+	\includegraphics{../output/plots/distance_sd_plot.png}
+	\caption{TODO}
+	\label{fig:distance_sd}
+\end{figure}
+
+\par The cross validation revealed that the multi-species model tended to have slightly more support than the single-species model in terms of predicting EDR.
+However, similar to the removal model cross-validation results, the overall difference in posterior predictive density was very small, with a mean difference of $1.85 \times 10^{-4}$.
+Multi-species models tended to have better predicitve capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:distance_cv}).
+Interestingly, only two of the six species with a greater than 20\% change in EDR had the multi-species model chosen as the better predictive model (NOTE this could change as new results come in).
+TO DO: Any patterns among traits?
+
+\begin{figure}[h!]
+	\includegraphics{../output/plots/cv_distance_diff_vs_n.png}
+	\caption{TODO}
+	\label{fig:distance_cv}
+\end{figure}
+
+\subsection{Predictions of Cue Rate and EDR for Undersampled Species}
+
+\par We used the multi-species removal model and distance model to generate predictions of cue rate and EDR, respectively, for 7 species of undersampled birds from the original NA-POPS analysis (6 for distance modelling because Tricoloured Blackbird had sufficient distance sampling data).
+
+\par The multi-species removal model produced reasonable estimates of cue rates for all seven species of bird considered here (Figure \ref{fig:removal_predictions}).
+Species where the sample size requirements were relaxed (i.e., all except Bicknell's Thrush and Kirtland's Warbler) had reasonable precision associated with the estimates.
+One exception to this was LeConte's Thrasher, where the precision was rather low.
+The species for which we had no data (i.e., Bicknell's Thrush and Kirtland's Warbler) had estimates of cue rate similar to that of their closely-related species, demonstrating the shrinkage effect of the multi-species model.
+
+\begin{figure}[h!]
+	\includegraphics{../output/plots/removal_predictions_plot.png}
+	\caption{TODO}
+	\label{fig:removal_predictions}
+\end{figure}
+
+\par The multi-species distance model also produced reasonable estimates of EDR for all six species of landbird considered here (Figure \ref{fig:distance_predictions}).
+Species where the sample size requirements were relaxed (i.e., all except Bicknell's Thrush) had fairly precise estimates, except for LeConte's Thrasher and Lesser Prairie Chicken where the estimated EDR spanned greater than 50 m in either direction.
+The species for which we had no data (i.e., Bicknell's Thrush) had an estimate of EDR similar to what would be expected by a bird of its size, song pitch, and habitat association, demonstrating the shrinkage effect of the multi-species model.
+
+\begin{figure}[h!]
+	\includegraphics{../output/plots/distance_predictions_plot.png}
+	\caption{TODO}
+	\label{fig:distance_predictions}
+\end{figure}
+
+\section{Discussion}
+
+
+
+* results somewhat underwhelming for cross validation, but both models showed some support that a multi species model can improve precision of estimates (removal model in particular)
+
+* 
+
+* migration strategy mattering less
+
+* talk about Common Redpoll removal modelling
+
+* talk about Bicknell's Thrush removal and distance modelling
 
 \bibliography{refs}
 
