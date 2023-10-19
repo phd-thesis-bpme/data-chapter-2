@@ -167,7 +167,7 @@ species_vars <- to_plot$variable
 
 png("output/plots/removal_1vs1.png",
     width = 6, height = 6, res = 600, units = "in")
-ggarrange(ggarrange(single_vs_multi_plot, modelled_difference_plot,
+ggarrange(ggarrange(modelled_difference_plot, single_vs_multi_plot,
                     ncol = 2,
                     labels = c("A", "B")), difference_plot, nrow = 2, labels = c("", "C"))
 dev.off()
