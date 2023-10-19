@@ -1,7 +1,7 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 01-prepare-phylogenies.R
+# 2-prepare-phylogenies.R
 # Created August 2022
 # Last Updated December 2022
 

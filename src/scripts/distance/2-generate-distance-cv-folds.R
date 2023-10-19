@@ -1,7 +1,7 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 07-generate-distance-cv-folds.R
+# 2-generate-distance-cv-folds.R
 # Created October 2023
 # Last Updated October 2023
 

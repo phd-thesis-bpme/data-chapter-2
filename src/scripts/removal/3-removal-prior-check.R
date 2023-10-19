@@ -1,7 +1,7 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 03-removal-prior-check.R
+# 3-removal-prior-check.R
 # Created May 2023
 # Last Updated May 2023
 

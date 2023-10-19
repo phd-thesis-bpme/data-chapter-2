@@ -1,7 +1,7 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# 00-extract-binomial-names.R
+# 1-extract-binomial-names.R
 # Created March 2022
 # Last Updated August 2022
 
