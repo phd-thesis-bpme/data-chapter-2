@@ -166,19 +166,17 @@ species_vars <- to_plot$variable
 ####### Output ####################################
 
 png("output/plots/removal_1vs1.png",
-    width = 6, height = 6, res = 600, units = "in")
-ggarrange(ggarrange(modelled_difference_plot, single_vs_multi_plot,
-                    ncol = 2,
-                    labels = c("A", "B")), difference_plot, nrow = 2, labels = c("", "C"))
+    width = 6, height = 3, res = 600, units = "in")
+ggarrange(modelled_difference_plot, single_vs_multi_plot, ncol = 2, labels = c("A", "B"))
 dev.off()
 
 png("output/plots/removal_sd_plot.png",
-    width = 6, height = 6, res = 600, units = "in")
+    width = 6, height = 4, res = 600, units = "in")
 ggarrange(sd_intercept_plot, sd_slope_plot, ncol = 2, labels = c("A", "B"))
 dev.off()
 
 png("output/plots/removal_predictions_plot.png",
-    width = 6, height = 6, res = 600, units = "in")
+    width = 6, height = 4, res = 600, units = "in")
 print(species_prediction_plot)
 dev.off()
 
