@@ -148,6 +148,6 @@ print(lppd_difference_plot)
 dev.off()
 
 png(filename = "output/plots/cv_distance_diff_vs_n.png",
-    width = 10, height = 6, units = "in", res = 300)
+    width = 6, height = 4, units = "in", res = 300)
 print(lppd_diff_vs_n)
 dev.off()
