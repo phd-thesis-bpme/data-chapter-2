@@ -416,17 +416,27 @@ Additionally, while \citet{solymos_phylogeny_2018} only regressed estimates of c
 \subsection{Distance Modelling}
 \par Estimates of EDR also changed very little from species that were originally modelled by the single-species models in \citet{edwards_point_2023}, to the same ones modelled in the multi-species model here.
 However, there was evidence for an average small downward shift in EDRs when modelled under a multi-species context.
-Still, the 5-fold cross validation tended to show little to no preference for one more or another when the sample size was large, and a slight (but still very small) preference for the multi-species model when the sample size was smaller.
+Still, the 5-fold cross validation tended to show almost no preference for one model or another when the sample size was large, and a slight (but still very small) preference for the multi-species model when the sample size was small.
 There was less evidence for the multi-species model being able to improve the precision of EDR estimates across sample sizes, indicating that a single-species model may mostly be sufficient for precise estimates.
 Under this context, it would appear that a multi-species model may slightly bring down estimates of EDR for species with a smaller sample size.
 
-\par Talk about species with a large relative difference
+\par There were six species where the relative difference in EDR between the single-species model and multi-species model was over 20\%. Unlike removal modelling, these species (Sharp-tailed Grouse, Sedge Wren, Ring-necked Pheasant, Chimney Swift, Boat-tailed Grackle, and Baird's Sparrow) had little in common with each other in terms of sample size (range of 227 for Boat-tailed Grackle through 4466 for Baird's Sparrow) and EDR (ranging from 50.8 m to 226 m in single-species, and from 73.2 m to 159.1 m in the multi-species model). 
+Additionally, there was mixed support among these species for single-species vs. multi-species: Chimney Swift and Boat-tailed Grackle had the multi-species model preferred, whereas the others had the single-species model preferred.
+It could be noted that both Chimney Swift and Boat-tailed Grackle showed an increase in estimated EDR from single-species to multi-species modelling and preferred the multi-species model, but Baird's Sparrow also showed an increase and preferred the single-species model.
 
-\par Talk about parameters
+\par Similar to removal modelling, we found less support than \citet{solymos_phylogeny_2018} for migration strategy having an effect on EDR, although the posterior distribution for both the resident and migrant species were much further away from zero, indicating at least some support.
+Habitat type, body mass, and song pitch, as expected, all had an overall effect on EDR, as was found in \citet{solymos_phylogeny_2018} and \cite{johnston_species_2014}.
 
 \subsection{Predictions of Cue Rate and EDR}
 
-* talk about Bicknell's Thrush removal and distance modelling
+\par We generated predictions of cue rate for seven species of landbirds that are listed on Partners in Flight's watchlist: Spotted Owl, Bicknell's Thrush, LeConte's Thrasher, Tricoloured Blackbird, Harris's Sparrow, Kirtland's Warbler, and Lesser Prairie-chicken. 
+For all species except Bicknell's Thrush and Kirtland's Warbler, we had at least some samples, but fewer than the minimum threshold of 75 for NA-POPS.
+For these five species, we used the multi-species model as a way to relax the sample size requirements by allowing for the sharing of information among related species via phylogeny.
+For Bicknell's Thrush and Kirtland's Warbler, we had zero samples, and so we used the multi-species model purely to predict estimates of cue rate, again based off of information sharing from similar species.
+
+Overall, the estimates of cue rate fell roughly where we would expect based on related species.
+For example, Harris's Sparrow (n = 65) had an estimated cue rate of 0.30 cues per minute, with a 95\% credible interval of [0.21, 0.42].
+
 
 \bibliography{refs}
 
