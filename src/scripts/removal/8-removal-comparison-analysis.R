@@ -27,10 +27,10 @@ load("data/generated/removal_stan_data_pred.rda")
 rem_summary <- rem_model$summary("log_phi")
 
 # Add species names to these summaries
-rem_summary$Code <- removal_stan_data$sp_all
+rem_summary$Code <- removal_stan_data_pred$sp_all
 
 # Get data sample size for all species and add to summary
-species_n <- data.frame(table(removal_stan_data$species))
+species_n <- data.frame(table(removal_stan_data_pred$species))
 names(species_n) <- c("index", "N")
 rem_summary$index <- seq(1, nrow(rem_summary))
 rem_summary$N <- 0
