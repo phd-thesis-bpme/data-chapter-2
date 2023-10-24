@@ -286,7 +286,7 @@ All seven of these species were among the lowest cue rates in both the single-sp
 
 
 \par We found much less support for a difference in cue rate between resident and migrant species than was found in \citet{solymos_evaluating_2018}. 
-Mean overall log cue rate in the multi-species model was TO DO; both estimated effects for resident and migrant species were effectively 0 (Figure \ref{fig:removal_params}).
+Mean overall log cue rate in the multi-species model was -1.09 (95\% credible interval of [-1.24, -0.94]); both estimated effects for resident and migrant species were effectively 0 (Figure \ref{fig:removal_params}).
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/removal_other_params.png}
@@ -307,7 +307,7 @@ This indicates that after a certain sample size, it is likely that the differenc
 	\label{fig:removal_sd}
 \end{figure}
 
-\par The cross validation revealed that single species model actually had better predictive capacity for more species than the multi-species model, but the difference in predictive capacity was overall very small.
+\par The cross validation revealed that single species model actually had better predictive capacity for more species (222 out of 316) than the multi-species model (94 out of 316), but the difference in predictive capacity was overall very small.
 Mean overall difference in posterior predictive density was $-2.21 \times 10^{-5}$.
 Single-species models tended to have better predicitve capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:removal_cv}).
 There did not appear to be any patterns in model selection among phylogeny or traits (see Appendix SOMETHING for full phylogenetic tree).
@@ -427,16 +427,35 @@ It could be noted that both Chimney Swift and Boat-tailed Grackle showed an incr
 \par Similar to removal modelling, we found less support than \citet{solymos_phylogeny_2018} for migration strategy having an effect on EDR, although the posterior distribution for both the resident and migrant species were much further away from zero, indicating at least some support.
 Habitat type, body mass, and song pitch, as expected, all had an overall effect on EDR, as was found in \citet{solymos_phylogeny_2018} and \cite{johnston_species_2014}.
 
-\subsection{Predictions of Cue Rate and EDR}
+\subsection{Predictions of Cue Rate}
 
 \par We generated predictions of cue rate for seven species of landbirds that are listed on Partners in Flight's watchlist: Spotted Owl, Bicknell's Thrush, LeConte's Thrasher, Tricoloured Blackbird, Harris's Sparrow, Kirtland's Warbler, and Lesser Prairie-chicken. 
 For all species except Bicknell's Thrush and Kirtland's Warbler, we had at least some samples, but fewer than the minimum threshold of 75 for NA-POPS.
 For these five species, we used the multi-species model as a way to relax the sample size requirements by allowing for the sharing of information among related species via phylogeny.
 For Bicknell's Thrush and Kirtland's Warbler, we had zero samples, and so we used the multi-species model purely to predict estimates of cue rate, again based off of information sharing from similar species.
 
-Overall, the estimates of cue rate fell roughly where we would expect based on related species.
-For example, Harris's Sparrow (n = 65) had an estimated cue rate of 0.30 cues per minute, with a 95\% credible interval of [0.21, 0.42].
+\par Overall, the estimates of cue rate fell roughly where we would expect based on related species, for species where we were simply relaxing the sample size requirements.
+For example, Harris's Sparrow (n = 65) had an estimated cue rate of 0.30 cues per minute, with a 95\% credible interval of [0.21, 0.42], compared to the overall mean cue rate of 0.37 cues per minute for all 32 other Passerellidae species in NA-POPS.
+Similarly, LeConte's Thrasher (n = 1) had an estimated cue rate of 0.32 cues per minute, with a 95\% credible interval of [0.18, 0.57].
+Though this was a much larger interval than Harris's Sparrow, it still falls within a reasonable distance from the overall mean cue rate of 0.36 cues per minute for all 6 other Mimidae species in NA-POPS.
+Of course, it is likely that the width of the credible intervals (i.e., the precision) of these relaxed sample-size species are going to depend both on the number of data points available for that particular species, the number of "similar" species, and the number of data points available for those similar species.
 
+\par For species where we were making predictions of cue rate based on no data (i.e., Bicknell's Thrush and Kirtland's Warbler), we found reasonable estimates but with fairly wide credible intervals.
+As expected, the predicted cue rate for Bicknell's Thrush (0.28 cues per minute) and the predicted cue rate for Kirtland's Warbler (0.29 cues per minute) fell very close to the overall mean cue rate of 0.27 for all 11 other Turdidae species and 0.31 for all 44 other Parulidae species in NA-POPS, respectively.
+That is, in the absence of any data, the estimated cue rate of Bicknell's Thrush and Kirtland's Warbler was shrunk toward cue rates of most similar species.
+However, the magnitude of contribution of data from related species appeared to play a role in the width of the credible intervals.
+Although both credible intervals were fairly wide, Bicknell's Thrush had a 95\% credible interval of [0.16, 0.48], representing an approximate 53\% change on either end, whereas Kirtland's Warbler had a 95\% credible interval of [0.18, 0.48], representing an approximate 49\% change on either end.
+Although the difference in width of the intervals is small, this could be due to the greater number of other species contributing information to Kirtland's Warbler estimates than to Bicknell's Thrush.
+With that in mind, it would likely be important to consider how many "related" species are available with information (and how many data points do each of those related species have) when deciding on making a prediction of cue rate.
+
+\subsection{Predictions of Effective Detection Radius}
+
+\par We generated predictions of EDR for six species of landbirds that are listed in Partners in Flight's watchlist: Spotted Owl, Bicknell's Thrush, LeConte's Thrasher, Harris's Sparrow, Kirtland's Warbler, and Lesser Prairie-chicken. 
+For all species except Bicknell's Thrush, we had at least some samples, but fewer than the minimum threshold of 75 for NA-POPS.
+For these five species, we used the multi-species model as a way to relax the sample size requirements by allowing for the sharing of information among related species via traits.
+For Bicknell's Thrush, we had zero samples, and so we used the multi-species model purely to predict estimates of EDR, again based off of information sharing from species with similar traits.
+
+\par Similar to multi-species removal modelling, estimates of EDR fell roughly where we would expect based on species of similar traits, for the species where we were relaxing samples sizes.
 
 \bibliography{refs}
 
