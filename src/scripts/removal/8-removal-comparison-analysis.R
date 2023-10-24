@@ -100,6 +100,8 @@ diff_model_run <- diff_model$sample(
                                                    prob = 0.95) +
   xlab("Modelled Difference"))
 
+cr_differences <- to_plot
+
 ####### SD Comparison Plot ########################
 
 to_plot <- rem_summary[which(rem_summary$Code %in% napops_summary$Species), 
@@ -163,7 +165,13 @@ species_vars <- to_plot$variable
 (sigma_plot <- bayesplot::mcmc_areas(rem_model$draws(c("sigma")),
                                          prob = 0.95))
 
+params_summary <- rem_model$summary(c("intercept", "mu_mig_strat", "sigma"))
+
 ####### Output ####################################
+
+write.table(rem_summary, file = "data/generated/phi.csv", sep = ",", row.names = FALSE)
+write.table(cr_differences, file = "data/generated/phi_differences.csv", sep = ",", row.names = FALSE)
+write.table(params_summary, file = "data/generated/removal_params.csv", sep = ",", row.names = FALSE)
 
 png("output/plots/removal_1vs1.png",
     width = 6, height = 3, res = 600, units = "in")
