@@ -19,7 +19,7 @@ bayesplot::color_scheme_set("red")
 ####### Read Data #################################
 
 rem_model <- readRDS("output/model_runs/removal_predictions.RDS")
-load("data/generated/removal_stan_data.rda")
+load("data/generated/removal_stan_data_pred.rda")
 
 ####### Data Wrangling ############################
 
