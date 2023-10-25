@@ -505,11 +505,30 @@ In fact, it could be argued that a taxonomy based on how humans observe birds ma
 
 \subsection{Model Performance}
 
-* removal modelling was always okay
+\par The multi-species QPAD Distance model had several issues related to initialization, sampling, and convergence throughout this study.
+For many iterations of the model development, Stan's generation of initial values proved difficult.
+For all unconstrained parameters, Stan draws initial values from a uniform(-2,2) distribution.
+On the scale that we modelled detection distances (i.e., log detection distance in hundreds of metres), these are reasonable values.
+At the low end, an initial value of -2 would correspond to a detection distance of $e^{-2} \times 100 = 13.5$ m, which is low but somewhat plausible for a small-bodied, high-pitched species such as a hummingbird.
+At the high end, an initial value of 2 would correspond to a detection distance of $e^{2} \times 100 = 739$ m, which is high but still somewhat plausible for large-bodied, low-pitched species like a grouse or prairie-chickens.
+However, where Stan seemed to struggle is when these randomly assigned values for detection distances were effectively impossible for a large set of species.
+That is to say, if the values were initialized such that hummingbirds had a detection distance of 500 m or more, and grouse or prairie-chickens had a detection distance of 15 m or less, this would result in an impossible likelihood, forcing Stan to reject the initial values.
+Our fix was to set initial values to be jittered mean detection distances originally estimated in \citet{edwards_point_2023}; for species without estimates, we used the mean EDR for all species.
+This approach seemed to work as the initial values were no longer rejected, but we caution that this could very well be a "bandaid solution" to an underlying issue with the model itself.
 
-* distance model struggled significantly
+\par The distance models also seemed to struggle with sampling the posterior distribution, in that over a quarter of the iterations resulted in a divergent transition (CITATION for divergent transitions).
+This is likely due to hierarchical nature of the model and the parameterization choices that we made.
+\citet{betancourt_hierarchical_2020} discuss at length some issues that arise when sampling from hierarchical models in cases where the hierarchical groups are data rich, where a "centred parameterization" should be used, or data poor, where a "non-centred parameterization" should be used.
+We experimented with using only a non-centred parameterization which resulted in extremely low effective sample sizes (as low as 4 for 8000 iterations), large R-hat values, and took an unreasonable amount of time to finish sampling (approximately 2.5 weeks).
+The model presented in this paper is a centred parameterization, which produced much more reasonable effective sample sizes and R hat values, finished within a day and a half, but still suffered from degeneracies such as hierarchical funneling as described by \citet{betancourt_hierarchical_2020}.
+In our case, because we are modelling on a hierarchy that contain many data points for some species x trait groups and fewer data points for other species x trait groups, our divergent transitions may be resolved if we were to implement our model using a mixture of centred and non-centred parametrization as described by \citet{betancourt_hierarchical_2020}.
 
-\subsection{Recommendations for Multi-species Predictions of Detectability}
+\par For removal modelling, we experience no issues related to initialization, sampling, or convergence. 
+The model finished within approximately 24 hours, and all parameters had R-hat values of 1, or within 0.001 of it.
+We note that even though we used a Gaussian process to estimate cue rate, we did not have to estimate the covariance matrix used for the Gaussian process, because it was effectively a known parameter provided by the phylogenetic relationship.
+This would account for the relatively quick performance of this model given the number of parameters to estimate and the amount of data used; had the covariance matrix needed to be estimated, this model would have likely taken much longer to complete.
+
+\subsection{Conservation Implications}
 
 
 \bibliography{refs}
