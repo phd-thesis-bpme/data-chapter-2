@@ -427,38 +427,81 @@ It could be noted that both Chimney Swift and Boat-tailed Grackle showed an incr
 \par Similar to removal modelling, we found less support than \citet{solymos_phylogeny_2018} for migration strategy having an effect on EDR, although the posterior distribution for both the resident and migrant species were much further away from zero, indicating at least some support.
 Habitat type, body mass, and song pitch, as expected, all had an overall effect on EDR, as was found in \citet{solymos_phylogeny_2018} and \cite{johnston_species_2014}.
 
-\subsection{Predictions of Cue Rate}
+\subsection{Relaxation of Sample Size}
 
-\par We generated predictions of cue rate for seven species of landbirds that are listed on Partners in Flight's watchlist: Spotted Owl, Bicknell's Thrush, LeConte's Thrasher, Tricoloured Blackbird, Harris's Sparrow, Kirtland's Warbler, and Lesser Prairie-chicken. 
-For all species except Bicknell's Thrush and Kirtland's Warbler, we had at least some samples, but fewer than the minimum threshold of 75 for NA-POPS.
-For these five species, we used the multi-species model as a way to relax the sample size requirements by allowing for the sharing of information among related species via phylogeny.
-For Bicknell's Thrush and Kirtland's Warbler, we had zero samples, and so we used the multi-species model purely to predict estimates of cue rate, again based off of information sharing from similar species.
+\par For five out of the seven species where we generated new predictions of detectability in this study, we were interested in seeing how a multi-species QPAD removal model could estimate cue rate with few data, and how a multi-species QPAD distance model could estimate EDR with few data.
 
 \par Overall, the estimates of cue rate fell roughly where we would expect based on related species, for species where we were simply relaxing the sample size requirements.
 For example, Harris's Sparrow (n = 65) had an estimated cue rate of 0.30 cues per minute, with a 95\% credible interval of [0.21, 0.42], compared to the overall mean cue rate of 0.37 cues per minute for all 32 other Passerellidae species in NA-POPS.
 Similarly, LeConte's Thrasher (n = 1) had an estimated cue rate of 0.32 cues per minute, with a 95\% credible interval of [0.18, 0.57].
 Though this was a much larger interval than Harris's Sparrow, it still falls within a reasonable distance from the overall mean cue rate of 0.36 cues per minute for all 6 other Mimidae species in NA-POPS.
-Of course, it is likely that the width of the credible intervals (i.e., the precision) of these relaxed sample-size species are going to depend both on the number of data points available for that particular species, the number of "similar" species, and the number of data points available for those similar species.
-
-\par For species where we were making predictions of cue rate based on no data (i.e., Bicknell's Thrush and Kirtland's Warbler), we found reasonable estimates but with fairly wide credible intervals.
-As expected, the predicted cue rate for Bicknell's Thrush (0.28 cues per minute) and the predicted cue rate for Kirtland's Warbler (0.29 cues per minute) fell very close to the overall mean cue rate of 0.27 for all 11 other Turdidae species and 0.31 for all 44 other Parulidae species in NA-POPS, respectively.
-That is, in the absence of any data, the estimated cue rate of Bicknell's Thrush and Kirtland's Warbler was shrunk toward cue rates of most similar species.
-However, the magnitude of contribution of data from related species appeared to play a role in the width of the credible intervals.
-Although both credible intervals were fairly wide, Bicknell's Thrush had a 95\% credible interval of [0.16, 0.48], representing an approximate 53\% change on either end, whereas Kirtland's Warbler had a 95\% credible interval of [0.18, 0.48], representing an approximate 49\% change on either end.
-Although the difference in width of the intervals is small, this could be due to the greater number of other species contributing information to Kirtland's Warbler estimates than to Bicknell's Thrush.
-With that in mind, it would likely be important to consider how many "related" species are available with information (and how many data points do each of those related species have) when deciding on making a prediction of cue rate.
-
-\subsection{Predictions of Effective Detection Radius}
-
-\par We generated predictions of EDR for six species of landbirds that are listed in Partners in Flight's watchlist: Spotted Owl, Bicknell's Thrush, LeConte's Thrasher, Harris's Sparrow, Kirtland's Warbler, and Lesser Prairie-chicken. 
-For all species except Bicknell's Thrush, we had at least some samples, but fewer than the minimum threshold of 75 for NA-POPS.
-For these five species, we used the multi-species model as a way to relax the sample size requirements by allowing for the sharing of information among related species via traits.
-For Bicknell's Thrush, we had zero samples, and so we used the multi-species model purely to predict estimates of EDR, again based off of information sharing from species with similar traits.
 
 \par Similar to multi-species removal modelling, estimates of EDR fell roughly where we would expect based on species of similar traits, for the species where we were relaxing samples sizes.
 For example, Harris's Sparrow (n = 13) had an estimated mean EDR of 65.6 m, with a 95\% credible interval of [53.1, 82.5].
 This range does fall below the mean EDR of 85.3 m for the other sparrows in NA-POPS, but Harris's Sparrow song pitch of approximately 3.8 Hz falls above the average song pitch of 3.0 Hz for the other sparrows in NA-POPS, which could contribute to the smaller EDR.
 On the other hand, LeConte's Thrasher (n = 1) had an estimated EDR of 134.2 m, with a 95\% credible interval of [81.8, 230.5], which falls roughly in line with the mean EDR of 113.2 m of the six other thrashers in NA-POPS.
+
+\par Of course, it is likely that the width of the credible intervals (i.e., the precision) of these relaxed sample-size species are going to depend both on the number of data points available for that particular species, the number of "similar" species, and the number of data points available for those similar species.
+However, species that do not have many other similar species from which to borrow information still have the benefit of using information from the priors that we set in the model, which is a large advantage to modelling detectability in a Bayesian context.
+Additionally, it is important to note that we did not account for other sources of variation at the survey level, such as when the survey was conducted (i.e., time of day, time of year), or where the survey was conducted (e.g., in a forest, by a roadside).
+It is well known that the ability to detect a species can be very dependent on the time of day or year that an observer is surveying, as well as the environmental conditions of the survey \citep{edwards_point_2023}.
+Thus, some of the variation in these estimates of cue rate and EDR could be due to not accounting for survey-level variation that affects detectability, and so it is important that future iterations of this model incorporate both species-level effects on detectability \textit{and} survey-level effects on detectability.
+
+\subsection{Predicting Detectability for Species with No Data}
+
+\par We generated predictions of cue rate and EDR for both Bicknell's Thrush and Kirtland's Warbler.
+For both species, we had zero removal sampling data, and so cue rates were solely based off information sharing among phylogeny (and to a much lesser extent, migration status).
+For Kirtland's Warbler, we did have one data point for distance sampling, so predictions of EDR for Kirtland's Warbler here is not entirely based off zero data points.
+Bicknell's Thrush, however, had zero data points, and so EDRs for this species were based solely off information sharing among other species with similar traits.
+
+\par As expected, the predicted cue rate for Bicknell's Thrush (0.28 cues per minute) and the predicted cue rate for Kirtland's Warbler (0.29 cues per minute) fell very close to the overall mean cue rate of 0.27 for all 11 other Turdidae species and 0.31 for all 44 other Parulidae species in NA-POPS, respectively.
+That is, in the absence of any data, the estimated cue rate of Bicknell's Thrush and Kirtland's Warbler was shrunk toward cue rates of most similar species.
+
+\par For distance modelling, the predicted EDR for Bicknell's Thrush (73.1 m) and the predicted EDR for Kirtland's Warbler (75.0 m) fell reasonably close to the overall mean EDR of 92.7 m for all other 11 Turdidae species and 61.2 m for all 44 other Parulidae species in NA-POPS, respectively.
+That is, in the absence of any data (or with very little data in the case of Kirtland's Warbler), the estimated EDR of Bicknell's Thrush and Kirtland's Warbler was s
+
+\par In both the removal modelling and distance modelling, the magnitude of contribution of data from related species appeared to play a role in the width of the credible intervals.
+For removal modelling, although both credible intervals were fairly wide, Bicknell's Thrush had a 95\% credible interval of [0.16, 0.48], representing an approximate 53\% change on either end, whereas Kirtland's Warbler had a 95\% credible interval of [0.18, 0.48], representing an approximate 49\% change on either end.
+For distance modelling, both credible intervals were also fairly wide, but Bicknell's Thrush had a 95\% credible interval of [40.4, 135.0], representing an approximate 58\% change on either end, whereas Kirtland's Warbler had a 95\% credible interval of [46.6, 124.8], representing an approximate 47\% change on either end.
+Although the difference in width of the intervals is small, this could be due to the greater number of other species contributing information to Kirtland's Warbler estimates than to Bicknell's Thrush.
+In the case of distance modelling, the one data point contributing to Kirtland's Warbler's EDR could have also played a part.
+With that in mind, it would likely be important to consider how many "related" species are available with information (and how many data points do each of those related species have) when deciding on making a prediction of cue rate.
+
+\subsection{Comparisons of Predicted Detectability to Other Studies}
+
+\par Using the predictions of cue rate and EDR for Bicknell's Thrush and Kirtland's Warbler, we can calculate availability and perceptibility, and hence detectability, for a given survey type, and compare to previous estimates of detectability obtained from other studies.
+As a reminder, following derivations in \citet{solymos_calibrating_2013}, we note that detectability is the product of availability and perceptibility.
+Availability $p(t)$ is defined as the probability of a bird giving a cue during a survey run for $t$ minutes, and is calculated as
+$p(t) = 1 - e^{-t\phi}$
+where $\phi$ is the cue rate of the species.
+Perceptibility $q(r)$ is defined as the probability of an observer hearing or seeing a bird, given the bird gives a cue, with a survey radius of $r$ metres, and is calculated as
+$q(r) = \dfrac{\tau^2 \left\{1 - e^{-\dfrac{r^2}{\tau^2}}\right\}}{r^2}$
+where $\tau$ is the EDR of the species.
+
+\par For Bicknell's Thrush, using the equations above, the predicted cue rate of 0.28, predicted EDR of 73.1 m, and an example survey design of 5 minutes recording all birds within 100 m, we estimate a detectability of 0.34.
+We can also use the lowest predicted cue rate and EDR and the highest predicted cue rate and EDR (based on the respectively credible intervals) to get a range of detectabilities from 0.09 through 0.70.
+A study by \citet{aubry_bicknells_2018} noted that they had estimated detection probabilities $\geq$ 0.74 and $\leq$ 0.88, and so even our highest potential value of detectability falls short of their estimated range.
+However, we note that \citet{aubry_bicknells_2018} are using data that specifically target Bicknell's Thrush in their range, and they are using surveys conducted at peak Bicknell's Thrush breeding time, and so it is likely that detectability will be high in that specific case.
+
+\par For Kirtland's Warbler, using the equations above, the predicted cue rate of 0.29, predicted EDR of 75.0 m, and an example survey design of 5 minutes recording all birds within 100 m, we estimate a detectability of 0.36.
+Similar to our Bicknell's Thrush example, we can also use the lowest predicted cue rate and EDR and the highest predicted cue rate and EDR (based on the respective credible intervals) to obtain a range of detectabilities from 0.13 through 0.67.
+A study by \citet{van_dyke_comparative_2022} found esitmated detection probabilities for Kirtland's Warbler that ranged from effectively 0, through to a detection probability of 0.73.
+In that study, they compared estimates of detectability among different jack pine stands and red pine stands, where the detectability was highest in jack pine stands than the red pine stands.
+
+Both these examples highlight the need for future iterations of this multi-species model to consider environmental and temporal covariates that affect peaks in detectability through the year and for different environmental conditions.
+This is especially true for the types of species we are interested in generating predictions for, i.e., rare and/or undersampled species.
+In general, rare and undersampled species will likely prefer rare habitats or be confined to a very small range (as is the case with Bicknell's Thrush and Kirtland's Warbler above).
+Thus, while we can generate reasonable estimates of the components of detectability (i.e., availability through cue rate and perceptibility through EDR) based on information borrowed from similar species (either through phylogeny or traits), this model as it stands may fail to glean more specific information that takes into account detectability peaks throughout the year, or detectability peaks given specific habitats.
+With this in mind, it may be beneficial to include temporal covariates at the survey level, similar to what was done in \citet{solymos_calibrating_2013, solymos_evaluating_2018, edwards_point_2023}, so that further information about cue rate may be shared among similar species giving cues at similar times of day or year.
+Similarly, it may be beneficial to include environmental covariates at the survey level, similar to what was done in \citet{solymos_calibrating_2013, edwards_point_2023}, so that further information about EDR may be shared among similar species being surveyed at similar habitats.
+This could also provide an opportunity to disentangle species x survey interactions in detectability.
+
+\par The examples above additionally highlight an excellent opportunity to make use of a powerful feature of Bayesian models, that being the inclusion of expert knowledge as prior information.
+For example, if a Bicknell's Thrush expert knows that there is something particular about how often they sing or give a cue compared to other thrushes, or how disproportionately quiet or loud they are comapred to species with similar traits, this can be coded directly into the prior distribution.
+Similarly, this may also provide a unique opportunity to make use of traditional ecological knowledge to further inform predictions of detectability.
+For example, in the Anishinaabe language, bird taxonomy is based both on physical features, but also behaviours such as flight, calls, morning rituals, and weather (CITATION Joe Pitawanakwat presentation).
+This taxonomy is based off observations of bird behaviour that has been passed down through generations, and may vary slightly (or heavily) from taxonomy based on genomics.
+In fact, it could be argued that a taxonomy based on how humans observe birds may actually be more relevant for detectability, and so a future opportunity could be to adopt a two-eyed seeing approach \cite{reid_twoeyed_2021} to predicting detectability in rare birds.
 
 \subsection{Model Performance}
 

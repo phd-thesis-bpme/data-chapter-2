@@ -113,3 +113,24 @@ Mean EDR for thrashers (except LCTH): `r mean(fam_df_thrasher$Tau)`, n = `r nrow
 Mean EDR for thrushes (except BITH): `r mean(fam_df_thrush$Tau)`, n = `r nrow(fam_df_thrush)`
 
 Mean EDR for warblers (except KIWA): `r mean(fam_df_warbler$Tau)`, n = `r nrow(fam_df_warbler)`
+
+# Detectability Estimates
+```{r detectability}
+# Set constants based off predictions here and in the cue rate output
+bith_cr <- c(0.28, 0.16, 0.48)
+bith_edr <- c(73.1, 40.4, 135.0)
+kiwa_cr <- c(0.29, 0.18, 0.48)
+kiwa_edr <- c(75, 46.6, 124.8)
+t = 5
+r = 100
+
+bith_avail <- 1 - exp(-t * bith_cr)
+bith_percept <- (bith_edr^2 * (1 - exp(-r^2/bith_edr^2))) / (r^2)
+bith_detect <- bith_avail * bith_percept
+print(bith_detect)
+
+kiwa_avail <- 1 - exp(-t * kiwa_cr)
+kiwa_percept <- (kiwa_edr^2 * (1 - exp(-r^2/kiwa_edr^2))) / (r^2)
+kiwa_detect <- kiwa_avail * kiwa_percept
+print(kiwa_detect)
+```
