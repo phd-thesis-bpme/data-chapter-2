@@ -98,6 +98,8 @@ diff_model_run <- diff_model$sample(
                                                    prob = 0.95) +
     xlab("Modelled Difference"))
 
+edr_differences <- to_plot
+
 ####### SD Comparison Plot ########################
 
 to_plot <- dis_summary[which(dis_summary$Code %in% napops_summary$Species), 
@@ -166,7 +168,15 @@ species_vars <- to_plot$variable
 (sigma_plot <- bayesplot::mcmc_areas(dis_model$draws(c("sigma")),
                                      prob = 0.95))
 
+params_summary <- dis_model$summary(c("intercept", "mu_mig_strat",
+                                      "mu_habitat", "beta_mass", "beta_pitch",
+                                      "sigma"))
+
 ####### Output ####################################
+
+write.table(dis_summary, file = "data/generated/tau.csv", sep = ",", row.names = FALSE)
+write.table(edr_differences, file = "data/generated/tau_differences.csv", sep = ",", row.names = FALSE)
+write.table(params_summary, file = "data/generated/distance_params.csv", sep = ",", row.names = FALSE)
 
 png("output/plots/distance_1vs1.png",
     width = 6, height = 3, res = 600, units = "in")
