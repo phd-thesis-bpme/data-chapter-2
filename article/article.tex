@@ -253,9 +253,10 @@ We then ran the multi-species models described above using these additional data
 Manipulation of phylogenetic trees, including finding a consensus tree for visualization and generating variance-covariance matrices based on the 2000 bootstrapped trees, was done using the \texttt{ape} R package \citep{paradis_ape_2019}.
 All Bayesian models were coded in the Stan Probabilistic Language \cite{stan_development_team_stan_2019}, and models were run using the \texttt{cmdstanr} R package \citep{gabry_cmdstanr_2022} and visualized using the \texttt{bayesplot} R package \citep{gabry_visualization_2019}.
 Each of the single-species models and multi-species models running both the initial comparison set of species and the final predictive set of species, as well as the models created to assess performance, were run using 1000 warmup iterations and 2000 sampling iterations, each on 4 chains for a total of 8000 draws per model run.
+To mitigate issues surrounding initial values being rejected in the distance model (see Discussion), we set the initial values of EDR to be the mean EDR from NA-POPS estimates; for species where EDR estimates did not exist in NA-POPS, we used the overall mean EDR as initial value.
 Cross-validation models were run with 250 warmup iterations and 500 sampling iterations, each on 4 chains for a total of 2000 draws per model run.
 All of the models made use of Stan's reduce\_sum functionality, which allows for within-chain parallelization as well as the usual across-chain parallelization.
-This was particularly useful in our case as the multi-species removal model contained over 3.5 million data points and the multi-species distance model contained over 4.5 million data points, and so computational expense was a large concern.
+This was particularly useful in our case as the multi-species removal model contained over 3 million data points and the multi-species distance model contained over 4 million data points, and so computational expense was a large concern.
 All models were run on one of two multi-core processing servers, one running Ubuntu 20.04.4 LTS and one running Ubuntu 20.04.6 LTS.
 
 
@@ -264,11 +265,12 @@ All models were run on one of two multi-core processing servers, one running Ubu
 
 \par We found very little evidence for an overall change in cue rate for a given species modelled by a single-species model vs a multi-species model (Figure \ref{fig:removal_1vs1}A).
 Seven out of the 316 species considered for removal modelling had a percent change in cue rate of more than 20\%.
+These species were Willow Ptarmigan (\textit{Lagopus lagopus}), Rusty Blackbird (\textit{Euphagus carolinus}), Red-bellied Sapsucker (\textit{Sphyrapicus ruber}), Common Redpoll (\textit{Acanthis flammea}), Calliope Hummingbird (\textit{Selasphorus calliope}), Bohemian Waxwing (\textit{Bombycilla garrulus}), and Allen's Hummingbird (\textit{Selasphorus sasin}).
 All seven of these species were among the lowest cue rates in both the single-species and multi-species context (Figure \ref{fig:removal_1vs1}B).
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/removal_1vs1.png}
-	\caption{TO DO}
+	\caption{Modelled difference with 95\% credible interval (shaded area) between cue rates estimated from the multi-species model developed here, minus the single-species model in NA-POPS \citep{edwards_point_2023} (A); and 1-to-1 plot comparing cue rates estimated from the single-species model vs the multi-species model for each species (B).}
 	\label{fig:removal_1vs1}
 \end{figure}
 
@@ -278,7 +280,7 @@ Mean overall log cue rate in the multi-species model was -1.09 (95\% credible in
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/removal_other_params.png}
-	\caption{TODO}
+	\caption{Posterior distributions with 95\% credible intervals (shaded area) of parameters estimated in the multi-species removal model, with overall mean log cue rate as the intercept (A), migratory strategy as departures from the intercept based on whether a species was a resident (mu\_mig\_strat[1]) or migrant (mu\_mig\_strat[B]) (B), and extra variance term after accounting for the phylogenetic variation (C).}
 	\label{fig:removal_params}
 \end{figure}
 
@@ -291,20 +293,20 @@ This indicates that after a certain sample size, it is likely that the differenc
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/removal_sd_plot.png}
-	\caption{TODO}
+	\caption{Posterior distributions with 95\% credible intervals (shaded areas) of (A) modelled intercepts of standard deviation for the single-species removal model (alpha[1]) and multi-species removal model (alpha[2]), and (B) modelled slopes of standard deviation with increasing sample size for the single-species removal model (beta[1]) and multi-species removal model (beta[2]).}
 	\label{fig:removal_sd}
 \end{figure}
 
 \par The cross validation revealed that single species model actually had better predictive capacity for more species (222 out of 316) than the multi-species model (94 out of 316), but the difference in predictive capacity was overall very small.
 Mean overall difference in posterior predictive density was $-2.21 \times 10^{-5}$.
 Single-species models tended to have better predicitve capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:removal_cv}).
-There did not appear to be any patterns in model selection among phylogeny or traits (see Appendix SOMETHING for full phylogenetic tree).
+There did not appear to be any patterns in model selection among phylogeny or traits (see Supplemental Figure 1 for full phylogenetic tree).
 Six out of the 7 species that had a percent change in cue rate of more than 20\% had the multi-species model chosen as the better predictive model.
 Common Redpoll was the only species that had the single-species model chosen (but please see Discussion about this particular species).
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/cv_removal_diff_vs_n.png}
-	\caption{TODO}
+	\caption{Mean difference in pointwise posterior predictive density. Points are mean difference by species. Difference was calculated as multi-species minus single-species, and so positive differences (coloured in red for clarity) represent a multi-species model preference, whereas negative differences (coloured in blue for clarity) reprepresent a single-species model preference. Regression line shows the relationship between mean difference and species sample size.}
 	\label{fig:removal_cv}
 \end{figure}
 
@@ -312,10 +314,11 @@ Common Redpoll was the only species that had the single-species model chosen (bu
 
 \par We found some evidence for a change in modelled EDR between single species and multi-species distance models, in that the multi-species model tended to produce slightly smaller estimates of EDR (Figure \ref{fig:distance_1vs1}A). 
 Still, the majority of the species had very little change; six out of the 317 species had a percent change in EDR of more than 20\% (Figure \ref{fig:distance_1vs1}B).
+These species were Sharp-tailed Grouse (\textit{Tympanuchus phasianellus}), Sedge Wren (\textit{Cistothorus stellaris}), Ring-necked Pheasant (\textit{Phasianus colchicus}), Chimney Swift (\textit{Chaetura pelagica}), Boat-tailed Grackle (\textit{Quiscalus major}), and Baird's Sparrow (\textit{Ammodramus bairdii}).
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/distance_1vs1.png}
-	\caption{TO DO}
+	\caption{Modelled difference with 95\% credible interval (shaded area) between EDR estimated from the multi-species model developed here, minus the single-species model in NA-POPS \citep{edwards_point_2023} (A); and 1-to-1 plot comparing EDR estimated from the single-species model vs the multi-species model for each species (B).}
 	\label{fig:distance_1vs1}
 \end{figure}
 
@@ -325,7 +328,7 @@ We did find similar support for change in EDR by body size and pitch, in that bo
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/distance_other_params.png}
-	\caption{TODO}
+	\caption{Posterior distributions with 95\% credible intervals (shaded area) of parameters estimated in the multi-species distance model, with (A) overall mean log EDR as the intercept, with departures from the intercept modelled as migratory strategy (resident: mu\_mig\_strat[1], migrant: mu\_mig\_strat[B]), (B) slope parameters of changes in EDR given change in mass and pitch, and (C) extra variance term after accounting for traits.}
 	\label{fig:distance_params}
 \end{figure}
 
@@ -334,19 +337,17 @@ The 95\% credible intervals for both estimated slopes and intercepts overlapped 
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/distance_sd_plot.png}
-	\caption{TODO}
+	\caption{Posterior distributions with 95\% credible intervals (shaded areas) of (A) modelled intercepts of standard deviation for the single-species distance model (alpha[1]) and multi-species distance model (alpha[2]), and (B) modelled slopes of standard deviation with increasing sample size for the single-species distance model (beta[1]) and multi-species distance model (beta[2]).}
 	\label{fig:distance_sd}
 \end{figure}
 
 \par The cross validation revealed that the multi-species model tended to have slightly more support than the single-species model in terms of predicting EDR.
 However, similar to the removal model cross-validation results, the overall difference in posterior predictive density was very small, with a mean difference of $1.85 \times 10^{-4}$.
 Multi-species models tended to have better predicitve capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:distance_cv}).
-Interestingly, only two of the six species with a greater than 20\% change in EDR had the multi-species model chosen as the better predictive model (NOTE this could change as new results come in).
-TO DO: Any patterns among traits?
-
+Interestingly, only two (Chimney Swift and Boat-tailed Grackle) of the six species with a greater than 20\% change in EDR had the multi-species model chosen as the better predictive model.
 \begin{figure}[h!]
 	\includegraphics{../output/plots/cv_distance_diff_vs_n.png}
-	\caption{TODO}
+	\caption{Mean difference in pointwise posterior predictive density. Points are mean difference by species. Difference was calculated as multi-species minus single-species, and so positive differences (coloured in red for clarity) represent a multi-species distance model preference, whereas negative differences (coloured in blue for clarity) represent a single-species distance model preference. Regression line shows the relationship between mean difference and species sample size.}
 	\label{fig:distance_cv}
 \end{figure}
 
@@ -361,7 +362,7 @@ The species for which we had no data (i.e., Bicknell's Thrush and Kirtland's War
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/removal_predictions_plot.png}
-	\caption{TODO}
+	\caption{Cue rates (points), 50\% credible interval (bolded line), and 95\% credible interval (thin line) for seven species of rare and undersampled North American landbirds. Species are 4 letter banding codes: SPOW = Spotted Owl (n = 7), BITH = Bicknell's Thrush (n = 0), LCTH = LeConte's Thrasher (n = 1), TRBL = Tricoloured Blackbird (n = 74), HASP = Harris's Sparrow (n = 65), KIWA = Kirtland's Warbler (n = 0), and LEPC = Lesser Prairie-chicken (n = 45).}
 	\label{fig:removal_predictions}
 \end{figure}
 
@@ -371,7 +372,7 @@ The species for which we had no data (i.e., Bicknell's Thrush) had an estimate o
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/distance_predictions_plot.png}
-	\caption{TODO}
+	\caption{Effective detection radius (points), 50\% credible interval (bolded line), and 95\% credible interval (thin line) for six species of rare and undersampled North American landbirds. Species are 4 letter banding codes: SPOW = Spotted Owl (n = 28), BITH = Bicknell's Thrush (n = 0), LCTH = LeConte's Thrasher (n = 1), HASP = Harris's Sparrow (n = 13), KIWA = Kirtland's Warbler (n = 1), and LEPC = Lesser Prairie-chicken (n = 45).}
 	\label{fig:distance_predictions}
 \end{figure}
 
@@ -379,18 +380,18 @@ The species for which we had no data (i.e., Bicknell's Thrush) had an estimate o
 
 \par In this paper, we developed a multi-species model of detectability by expanding upon the QPAD methodology developed by \citet{solymos_calibrating_2013}.
 We applied the multi-species QPAD removal model and multi-species QPAD distance model to the large dataset of point counts collected by the NA-POPS project \citep{edwards_point_2023}, and compared estimates of cue rate and EDR from a multi-species context to estimates of cue rate and EDR from the previous single species context.
-Given the results of these comparisons, we sought to predict these components of detectability for seven species of North American landbird that are rare and undersampled.
+Given the results of these comparisons, we predicted these components of detectability for seven species of North American landbird that are rare and undersampled.
 
 \subsection{Removal Modelling}
 \par Estimates of cue rate changed very little from species that were originally modelled by the single-species models in \citet{edwards_point_2023}, to the same ones modelled in the multi-species model here.
-The 5-fold cross validation tended to show either no preference for one model or another when sample size was large, and a preference (albeit an extremely small preference) for single-species models when sample size was smaller.
+The 5-fold cross validation tended to show no preference for one model or another when sample size was large, and a preference (albeit an extremely small preference) for single-species models when sample size was smaller.
 When sample size was small, a multi-species model tended to produce more precise estimates of cue rate.
 Given the extremely small preference for single-species models under a lower sample size, it would appear that the bias-variance tradeoff is likely a welcome tradeoff here, because the decrease in variance is met by only a very slight increase in bias.
 
 \par There were seven species where the relative difference in cue rate between the single-species model and multi-species model was over 20\% (noting that this threshold was chosen arbitrarily).
 These species (Willow Ptarmagin, Rusty Blackbird, Red-breasted Sapsucker, Common Redpoll, Calliope Hummingbird, Allen's Hummingbird, and Bohemian Waxwing), mostly had fairly small sample sizes ($\leq 515$ for all species except Red-breasted Sapsucker [$n = 1854$] and Common Redpoll [$n = 2009$]), had the lowest cue rate in the single-species models, and had among the lowest cue rates in the multi-species model.
 For removal modelling, all those species except for Common Redpoll ended up having the multi-species model chosen as the more predictive model, indicating that sharing information among related species tended to improve their estimates of cue rate.
-Common Redpoll was likely an exception to this because the original estimate of cue rate in NA-POPS was a wild underestimate (cue rate of TO DO), likely because of a convergence issue in the \texttt{detect} package.
+Common Redpoll was likely an exception to this because the original estimate of cue rate in NA-POPS was a wild underestimate (cue rate of $5.9\times 10^{-9}$), likely because of a convergence issue in the \texttt{detect} package.
 It could be worth running Common Redpoll using the Bayesian single species model developed here to see if the estimate of cue rate is still extremely low, or if the vague but still somewhat informative prior helps to bring the estimated parameter into a more sensible space.
 It could also be worth investigating the merit of this type of modelling to estimate cue rate for species where the cue rate is extremely low.
 In our case, 41 out of the 79 species that had the lowest 25\% quantile of cue rate in the single-species model ended up having the multi-species model chosen as the preferred model.
