@@ -471,7 +471,7 @@ Bicknell's Thrush, however, had zero data points, and so EDRs for this species w
 \par As expected, the predicted cue rate for Bicknell's Thrush (0.28 cues per minute) and the predicted cue rate for Kirtland's Warbler (0.29 cues per minute) fell very close to the overall mean cue rate of 0.27 for all 11 other Turdidae species and 0.31 for all 44 other Parulidae species in NA-POPS, respectively.
 That is, in the absence of any data, the estimated cue rate of Bicknell's Thrush and Kirtland's Warbler was shrunk toward cue rates of most similar species.
 
-\par For distance modelling, the predicted EDR for Bicknell's Thrush (73.1 m) and the predicted EDR for Kirtland's Warbler (75.0 m) fell reasonably close to the overall mean EDR of 92.7 m for all other 11 Turdidae species and 61.2 m for all 44 other Parulidae species in NA-POPS, respectively.
+\par TO DO For distance modelling, the predicted EDR for Bicknell's Thrush (73.1 m) and the predicted EDR for Kirtland's Warbler (75.0 m) fell reasonably close to the overall mean EDR of 92.7 m for all other 11 Turdidae species and 61.2 m for all 44 other Parulidae species in NA-POPS, respectively.
 That is, in the absence of any data (or with very little data in the case of Kirtland's Warbler), the estimated EDR of Bicknell's Thrush and Kirtland's Warbler was s
 
 \par In both the removal modelling and distance modelling, the magnitude of contribution of data from related species appeared to play a role in the width of the credible intervals.
@@ -520,7 +520,21 @@ This taxonomy is based off observations of bird behaviour that has been passed d
 In fact, it could be argued that a taxonomy based on how humans observe birds may actually be more relevant for detectability, and so a future opportunity could be to adopt a two-eyed seeing approach \cite{reid_twoeyed_2021} to predicting detectability in rare birds.
 
 \subsection{Conservation Implications}
+\par Detectability often goes unaccounted for in conservation problems, often because the estimates of detection probability simply do not exist, or they are extremely uncertain \citep{bennett_how_2023}.
+This model provides an excellent opportunity for detection probabilities to be estimated with higher precision for several species of landbirds in North America, and also provides an opportunity to predict detection probabilities for species which have very little (or even no) data.
+This means that conservation problems that rely on estimates of detectability such as Value of Information analyses \citep{canessa_when_2015, bennett_when_2018} or prioritizations \citep{hanson_prioritizr_2023} can look to make more accurate decisions.
+For organizations such as Partners in Flight, Boreal Avian Modelling project (\citep{cumming_toward_2010}), and others that rely on detectability information for bird population size estimates, these improved estimates (and new estimates and predictions) provide a way forward for continuing to produce accurate estimates of population size that are based on data-driven detectability estimates.
 
+\par The model presented here can be used to fill out the remaining missing species in the NA-POPS database, in order to estimate detectability for every species of North American landbird.
+By making use of phylogeny and trait information, bird species with fewer than 75 data points can have estimates generated based on the few data points available, and information available from other species.
+As shown here, birds with no data points can have detectability predicted that falls closely in line with similar species.
+We caution that birds that are to have detectability predicted should be noted as such on any communications, such that organizations know that the estimate is simply a "best guess" based on other similar species.
+
+\par Finally, we see this model as a proof-of-concept for use with other taxa.
+Obviously, given the vast amount of bird data available, it was easy enough to obtain estimates for enough data-rich species such that the few data-poor species could have enough information to borrow.
+However, one benefit that we have shown here is that Bayesian models can still come up with reasonable predictions if there are informed enough priors on which to fall back.
+That is to say, for a taxon such as butterflies where there are some species with data and others with very little data, but there is overall very little data in general (CITE Lewthwaite paper(s)), with reasonably-informed priors, a researcher may still be able to glean reasonable estimates of detectability with the little data available.
+We suggest that this type of model where information about detectability is shared among species be tested with taxon that generally have fewer data collected.
 
 \bibliography{refs}
 
