@@ -382,6 +382,31 @@ The species for which we had no data (i.e., Bicknell's Thrush) had an estimate o
 We applied the multi-species QPAD removal model and multi-species QPAD distance model to the large dataset of point counts collected by the NA-POPS project \citep{edwards_point_2023}, and compared estimates of cue rate and EDR from a multi-species context to estimates of cue rate and EDR from the previous single species context.
 Given the results of these comparisons, we predicted these components of detectability for seven species of North American landbird that are rare and undersampled.
 
+\subsection{Model Performance}
+
+\par The multi-species QPAD Distance model had several issues related to initialization, sampling, and convergence throughout this study.
+For many iterations of the model development, Stan's generation of initial values proved difficult.
+For all unconstrained parameters, Stan draws initial values from a uniform(-2,2) distribution.
+On the scale that we modelled detection distances (i.e., log detection distance in hundreds of metres), these are reasonable values.
+At the low end, an initial value of -2 would correspond to a detection distance of $e^{-2} \times 100 = 13.5$ m, which is low but somewhat plausible for a small-bodied, high-pitched species such as a hummingbird.
+At the high end, an initial value of 2 would correspond to a detection distance of $e^{2} \times 100 = 739$ m, which is high but still somewhat plausible for large-bodied, low-pitched species like a grouse or prairie-chickens.
+However, where Stan seemed to struggle is when these randomly assigned values for detection distances were effectively impossible for a large set of species.
+That is to say, if the values were initialized such that hummingbirds had a detection distance of 500 m or more, and grouse or prairie-chickens had a detection distance of 15 m or less, this would result in an impossible likelihood, forcing Stan to reject the initial values.
+Our fix was to set initial values to be jittered mean detection distances originally estimated in \citet{edwards_point_2023}; for species without estimates, we used the mean EDR for all species.
+This approach seemed to work as the initial values were no longer rejected, but we caution that this could very well be a "bandaid solution" to an underlying issue with the model itself.
+
+\par The distance models also seemed to struggle with sampling the posterior distribution, in that over a quarter of the iterations resulted in a divergent transition (CITATION for divergent transitions).
+This is likely due to hierarchical nature of the model and the parameterization choices that we made.
+\citet{betancourt_hierarchical_2020} discuss at length some issues that arise when sampling from hierarchical models in cases where the hierarchical groups are data rich, where a "centred parameterization" should be used, or data poor, where a "non-centred parameterization" should be used.
+We experimented with using only a non-centred parameterization which resulted in extremely low effective sample sizes (as low as 4 for 8000 iterations), large R-hat values, and took an unreasonable amount of time to finish sampling (approximately 2.5 weeks).
+The model presented in this paper is a centred parameterization, which produced much more reasonable effective sample sizes and R hat values, finished within a day and a half, but still suffered from degeneracies such as hierarchical funneling as described by \citet{betancourt_hierarchical_2020}.
+In our case, because we are modelling on a hierarchy that contain many data points for some species x trait groups and fewer data points for other species x trait groups, our divergent transitions may be resolved if we were to implement our model using a mixture of centred and non-centred parametrization as described by \citet{betancourt_hierarchical_2020}.
+
+\par For removal modelling, we experience no issues related to initialization, sampling, or convergence. 
+The model finished within approximately 24 hours, and all parameters had R-hat values of 1, or within 0.001 of it.
+We note that even though we used a Gaussian process to estimate cue rate, we did not have to estimate the covariance matrix used for the Gaussian process, because it was effectively a known parameter provided by the phylogenetic relationship.
+This would account for the relatively quick performance of this model given the number of parameters to estimate and the amount of data used; had the covariance matrix needed to be estimated, this model would have likely taken much longer to complete.
+
 \subsection{Removal Modelling}
 \par Estimates of cue rate changed very little from species that were originally modelled by the single-species models in \citet{edwards_point_2023}, to the same ones modelled in the multi-species model here.
 The 5-fold cross validation tended to show no preference for one model or another when sample size was large, and a preference (albeit an extremely small preference) for single-species models when sample size was smaller.
@@ -403,7 +428,7 @@ One potential reason is that we had proportionally more resident species in our 
 Additionally, while \citet{solymos_phylogeny_2018} only regressed estimates of cue rate against the predictor variables, we actually estimated cue rate within the context of the same predictors, and so the phylogenetic effect could have just overwhelmed the estimates, making the migratory strategy meaningless.
 
 \subsection{Distance Modelling}
-\par Estimates of EDR also changed very little from species that were originally modelled by the single-species models in \citet{edwards_point_2023}, to the same ones modelled in the multi-species model here.
+\par Estimates of EDR also changed very little, albeit a non-zero amount, from species that were originally modelled by the single-species models in \citet{edwards_point_2023}, to the same ones modelled in the multi-species model here.
 However, there was evidence for an average small downward shift in EDRs when modelled under a multi-species context.
 Still, the 5-fold cross validation tended to show almost no preference for one model or another when the sample size was large, and a slight (but still very small) preference for the multi-species model when the sample size was small.
 There was less evidence for the multi-species model being able to improve the precision of EDR estimates across sample sizes, indicating that a single-species model may mostly be sufficient for precise estimates.
@@ -425,7 +450,7 @@ For example, Harris's Sparrow (n = 65) had an estimated cue rate of 0.30 cues pe
 Similarly, LeConte's Thrasher (n = 1) had an estimated cue rate of 0.32 cues per minute, with a 95\% credible interval of [0.18, 0.57].
 Though this was a much larger interval than Harris's Sparrow, it still falls within a reasonable distance from the overall mean cue rate of 0.36 cues per minute for all 6 other Mimidae species in NA-POPS.
 
-\par Similar to multi-species removal modelling, estimates of EDR fell roughly where we would expect based on species of similar traits, for the species where we were relaxing samples sizes.
+\par Estimates of EDR also fell roughly where we would expect based on species of similar traits, for the species where we were relaxing samples sizes.
 For example, Harris's Sparrow (n = 13) had an estimated mean EDR of 65.6 m, with a 95\% credible interval of [53.1, 82.5].
 This range does fall below the mean EDR of 85.3 m for the other sparrows in NA-POPS, but Harris's Sparrow song pitch of approximately 3.8 Hz falls above the average song pitch of 3.0 Hz for the other sparrows in NA-POPS, which could contribute to the smaller EDR.
 On the other hand, LeConte's Thrasher (n = 1) had an estimated EDR of 134.2 m, with a 95\% credible interval of [81.8, 230.5], which falls roughly in line with the mean EDR of 113.2 m of the six other thrashers in NA-POPS.
@@ -459,7 +484,7 @@ With that in mind, it would likely be important to consider how many "related" s
 \subsection{Comparisons of Predicted Detectability to Other Studies}
 
 \par Using the predictions of cue rate and EDR for Bicknell's Thrush and Kirtland's Warbler, we can calculate availability and perceptibility, and hence detectability, for a given survey type, and compare to previous estimates of detectability obtained from other studies.
-As a reminder, following derivations in \citet{solymos_calibrating_2013}, we note that detectability is the product of availability and perceptibility.
+As a reminder, following derivations in \citet{solymos_calibrating_2013}, detectability is the product of availability and perceptibility.
 Availability $p(t)$ is defined as the probability of a bird giving a cue during a survey run for $t$ minutes, and is calculated as
 $p(t) = 1 - e^{-t\phi}$
 where $\phi$ is the cue rate of the species.
@@ -469,7 +494,7 @@ where $\tau$ is the EDR of the species.
 
 \par For Bicknell's Thrush, using the equations above, the predicted cue rate of 0.28, predicted EDR of 73.1 m, and an example survey design of 5 minutes recording all birds within 100 m, we estimate a detectability of 0.34.
 We can also use the lowest predicted cue rate and EDR and the highest predicted cue rate and EDR (based on the respectively credible intervals) to get a range of detectabilities from 0.09 through 0.70.
-A study by \citet{aubry_bicknells_2018} noted that they had estimated detection probabilities $\geq$ 0.74 and $\leq$ 0.88, and so even our highest potential value of detectability falls short of their estimated range.
+\citet{aubry_bicknells_2018}, however, estimate detection probabilities of $\geq$ 0.74 and $\leq$ 0.88, and so even our highest potential value of detectability falls short of their estimated range.
 However, we note that \citet{aubry_bicknells_2018} are using data that specifically target Bicknell's Thrush in their range, and they are using surveys conducted at peak Bicknell's Thrush breeding time, and so it is likely that detectability will be high in that specific case.
 
 \par For Kirtland's Warbler, using the equations above, the predicted cue rate of 0.29, predicted EDR of 75.0 m, and an example survey design of 5 minutes recording all birds within 100 m, we estimate a detectability of 0.36.
@@ -477,9 +502,11 @@ Similar to our Bicknell's Thrush example, we can also use the lowest predicted c
 A study by \citet{van_dyke_comparative_2022} found esitmated detection probabilities for Kirtland's Warbler that ranged from effectively 0, through to a detection probability of 0.73.
 In that study, they compared estimates of detectability among different jack pine stands and red pine stands, where the detectability was highest in jack pine stands than the red pine stands.
 
-Both these examples highlight the need for future iterations of this multi-species model to consider environmental and temporal covariates that affect peaks in detectability through the year and for different environmental conditions.
+\subsection{Improvements to this model}
+
+Both examples in the previous section highlight the need for future iterations of this multi-species model to consider environmental and temporal covariates that affect peaks in detectability through the year and for different environmental conditions.
 This is especially true for the types of species we are interested in generating predictions for, i.e., rare and/or undersampled species.
-In general, rare and undersampled species will likely prefer rare habitats or be confined to a very small range (as is the case with Bicknell's Thrush and Kirtland's Warbler above).
+In general, rare species will prefer rare habitats, or will at least be confined to a very small range (as is the case with Bicknell's Thrush and Kirtland's Warbler above).
 Thus, while we can generate reasonable estimates of the components of detectability (i.e., availability through cue rate and perceptibility through EDR) based on information borrowed from similar species (either through phylogeny or traits), this model as it stands may fail to glean more specific information that takes into account detectability peaks throughout the year, or detectability peaks given specific habitats.
 With this in mind, it may be beneficial to include temporal covariates at the survey level, similar to what was done in \citet{solymos_calibrating_2013, solymos_evaluating_2018, edwards_point_2023}, so that further information about cue rate may be shared among similar species giving cues at similar times of day or year.
 Similarly, it may be beneficial to include environmental covariates at the survey level, similar to what was done in \citet{solymos_calibrating_2013, edwards_point_2023}, so that further information about EDR may be shared among similar species being surveyed at similar habitats.
@@ -488,34 +515,9 @@ This could also provide an opportunity to disentangle species x survey interacti
 \par The examples above additionally highlight an excellent opportunity to make use of a powerful feature of Bayesian models, that being the inclusion of expert knowledge as prior information.
 For example, if a Bicknell's Thrush expert knows that there is something particular about how often they sing or give a cue compared to other thrushes, or how disproportionately quiet or loud they are comapred to species with similar traits, this can be coded directly into the prior distribution.
 Similarly, this may also provide a unique opportunity to make use of traditional ecological knowledge to further inform predictions of detectability.
-For example, in the Anishinaabe language, bird taxonomy is based both on physical features, but also behaviours such as flight, calls, morning rituals, and weather (CITATION Joe Pitawanakwat presentation).
+For example, in the Anishinaabe language, bird taxonomy is based both on physical features, but also behaviours such as flight, calls, morning rituals, and weather \citep{pitawanakwat_evening_2022}.
 This taxonomy is based off observations of bird behaviour that has been passed down through generations, and may vary slightly (or heavily) from taxonomy based on genomics.
 In fact, it could be argued that a taxonomy based on how humans observe birds may actually be more relevant for detectability, and so a future opportunity could be to adopt a two-eyed seeing approach \cite{reid_twoeyed_2021} to predicting detectability in rare birds.
-
-\subsection{Model Performance}
-
-\par The multi-species QPAD Distance model had several issues related to initialization, sampling, and convergence throughout this study.
-For many iterations of the model development, Stan's generation of initial values proved difficult.
-For all unconstrained parameters, Stan draws initial values from a uniform(-2,2) distribution.
-On the scale that we modelled detection distances (i.e., log detection distance in hundreds of metres), these are reasonable values.
-At the low end, an initial value of -2 would correspond to a detection distance of $e^{-2} \times 100 = 13.5$ m, which is low but somewhat plausible for a small-bodied, high-pitched species such as a hummingbird.
-At the high end, an initial value of 2 would correspond to a detection distance of $e^{2} \times 100 = 739$ m, which is high but still somewhat plausible for large-bodied, low-pitched species like a grouse or prairie-chickens.
-However, where Stan seemed to struggle is when these randomly assigned values for detection distances were effectively impossible for a large set of species.
-That is to say, if the values were initialized such that hummingbirds had a detection distance of 500 m or more, and grouse or prairie-chickens had a detection distance of 15 m or less, this would result in an impossible likelihood, forcing Stan to reject the initial values.
-Our fix was to set initial values to be jittered mean detection distances originally estimated in \citet{edwards_point_2023}; for species without estimates, we used the mean EDR for all species.
-This approach seemed to work as the initial values were no longer rejected, but we caution that this could very well be a "bandaid solution" to an underlying issue with the model itself.
-
-\par The distance models also seemed to struggle with sampling the posterior distribution, in that over a quarter of the iterations resulted in a divergent transition (CITATION for divergent transitions).
-This is likely due to hierarchical nature of the model and the parameterization choices that we made.
-\citet{betancourt_hierarchical_2020} discuss at length some issues that arise when sampling from hierarchical models in cases where the hierarchical groups are data rich, where a "centred parameterization" should be used, or data poor, where a "non-centred parameterization" should be used.
-We experimented with using only a non-centred parameterization which resulted in extremely low effective sample sizes (as low as 4 for 8000 iterations), large R-hat values, and took an unreasonable amount of time to finish sampling (approximately 2.5 weeks).
-The model presented in this paper is a centred parameterization, which produced much more reasonable effective sample sizes and R hat values, finished within a day and a half, but still suffered from degeneracies such as hierarchical funneling as described by \citet{betancourt_hierarchical_2020}.
-In our case, because we are modelling on a hierarchy that contain many data points for some species x trait groups and fewer data points for other species x trait groups, our divergent transitions may be resolved if we were to implement our model using a mixture of centred and non-centred parametrization as described by \citet{betancourt_hierarchical_2020}.
-
-\par For removal modelling, we experience no issues related to initialization, sampling, or convergence. 
-The model finished within approximately 24 hours, and all parameters had R-hat values of 1, or within 0.001 of it.
-We note that even though we used a Gaussian process to estimate cue rate, we did not have to estimate the covariance matrix used for the Gaussian process, because it was effectively a known parameter provided by the phylogenetic relationship.
-This would account for the relatively quick performance of this model given the number of parameters to estimate and the amount of data used; had the covariance matrix needed to be estimated, this model would have likely taken much longer to complete.
 
 \subsection{Conservation Implications}
 
