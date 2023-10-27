@@ -64,7 +64,7 @@ Both the NA-POPS project and previous estimates by Boreal Avian Modelling projec
 This is because of sample size limitations that are recommended for removal and distance modelling, in that a modeller should have at least 75 data points for reasonable estimates \citep{buckland_introduction_2001, solymos_calibrating_2013}. 
 Many of the species that fell short of that threshold in the NA-POPS database are systematically rare or undersampled species, that are either low in population size to begin with, or occur in rare habitats.
 Some examples of species not modelled include Kirtland's Warbler (\textit{Setophaga kirtlandii}) and Bicknell's Thrush (\textit{Catharus bicknelli}), both of which have low population sizes, and LeConte's Thrasher (\textit{Toxostoma lecontei}) and Harris's Sparrow (\textit{Zonotrichia querula}), both of which have rare habitat associations \citep{will_handbook_2020}.
-Of course, despite not having good estimates of detectability availabile for these rare and undersampled species, these are the groups of species that need these estimates the most as their conservation status often depend on accurate population size estimates, and estimates of trend in those population sizes.
+Of course, despite not having good estimates of detectability available for these rare and undersampled species, these are the groups of species that need these estimates the most as their conservation status often depend on accurate population size estimates, and estimates of trend in those population sizes.
 
 \par Detectability in birds has been shown to at least be partly driven by variation in traits. \cite{johnston_species_2014} showed in a selection of European landbirds that body mass and habitat association had an effect on the detection distance, which influences the perceptibility.
 In this case, a larger body size tended to be associated with larger detection distances, which makes sense considering larger body sizes are associated with louder and lower-pitched songs in birds \citep{bowman_adaptive_1979, fletcher_acoustics_1999, ryan_role_1985}.
@@ -82,7 +82,7 @@ Phylogenetic distance was coded as a correlation structure and used as a Gaussia
 We also developed a Bayesian hierarchical version of the QPAD Distance model initially derived in \cite{solymos_calibrating_2013}, that allows for information exchange between species based only on the traits that came out as being significant in \cite{solymos_phylogeny_2018}.
 These traits include migratory status (coded the same as removal models), habitat association (coded as either "open" or "closed"), song pitch, and body mass.
 We also developed a Bayesian single species version of the QPAD Removal and Distance models (i.e., as opposed to the maximum likelihood models available in the \texttt{detect} R package; \cite{solymos_detect_2020}) to allow for direct comparison through cross validation.
-Finally, we ran these models with the full set of data points used in \cite{edwards_point_2023}, plus additional data for seven species that did not meet the initial sample size thresholds for NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken (\textit{Tympanuchus pallidicinctus}), Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird (\textit{Agelaius tricolor}), and Spotted Owl (\textit{Strix occidentalis}). 
+Finally, we ran these models with the full set of data points used in \cite{edwards_point_2023}, plus additional data for seven species that did not meet the initial sample size thresholds for NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken (\textit{Tympanuchus pallidicinctus}), Harris's Sparrow, Kirtland's Warbler, Tricoloured Blackbird (\textit{Agelaius tricolor}), and Spotted Owl (\textit{Strix occidentalis}). 
 All seven of these bird species are listed on Partner's in Flight's watchlist for various threats \citep{will_handbook_2020}. 
 
 \subsection{Predictions}
@@ -105,7 +105,7 @@ Finally, we describe the experiments conducted to assess model performance and m
 
 \subsection{Bayesian Hierarchical Models}
 
-\par For any point count that employs removal sampling \citep{alldredge_time--detection_2007, farnsworth_removal_2002} and/or distance sampling \citep{buckland_introduction_2001, buckland_distance_2015}, let $Y_{sijk}$ be the observed count of species $s$ during sampling event $i$, occuring in time band $j \in [1,J]$ and/or distance band $k \in [1,K]$.
+\par For any point count that employs removal sampling \citep{alldredge_time--detection_2007, farnsworth_removal_2002} and/or distance sampling \citep{buckland_introduction_2001, buckland_distance_2015}, let $Y_{sijk}$ be the observed count of species $s$ during sampling event $i$, occurring in time band $j \in [1,J]$ and/or distance band $k \in [1,K]$.
 That is, if we have a point count where removal sampling or distance sampling (but not both) is not used, then we have that either $J = 1$ or $K = 1$, respectively; whereas, if we have a point count where both removal sampling and distance sampling is used, then we have that both $J,K \geq 2$.
 The case where $J = K = 1$ is where neither removal sampling nor distance sampling is used, and so these data points are not appropriate for the modelling techniques described here.
 
@@ -118,7 +118,7 @@ Thus, we will be considering counts $Y_{sij.} = \sum_{k=1}^{K}$.
 From \citet{solymos_calibrating_2013}, we model $Y_{sij.}$ as
 $$Y_{sij.} \sim multinomial\left(Y_{si..}, \mathbf{\Pi}_{si.}\right).$$
 
-\par For sample $i$, $\mathbf{\Pi}_{si.}$ is the corresponding probability vector that determines how the total number of species $s$ observed at sample $i$ (i.e., $Y_{si..}$) are to be distributed across the $J$ time bands; in essense, it is the mixing parameter.
+\par For sample $i$, $\mathbf{\Pi}_{si.}$ is the corresponding probability vector that determines how the total number of species $s$ observed at sample $i$ (i.e., $Y_{si..}$) are to be distributed across the $J$ time bands; in essence, it is the mixing parameter.
 Let $t_{ij}$ be the maximum time for time band $j$ during sampling event $i$, and let $\phi_s$ be the unknown cue rate for species $s$.
 We then have the following calculation of each component $\pi_{sij}$ of the mixing parameter $\mathbf{\Pi}_{si.}$:
 
@@ -156,7 +156,7 @@ Thus, we will be considering counts $Y_{si.k} = \sum_{j=1}^{J}$.
 From \citet{solymos_calibrating_2013}, we model $Y_{si.k}$ as
 $$Y_{si.k} \sim multinomial\left(Y_{si..}, \mathbf{\Pi}_{si.}\right).$$
 
-\par For sample $i$, $\mathbf{\Pi}_{si.}$ is the corresponding probability vector that determines how the total number of species $s$ observed at sample $i$ (i.e., $Y_{si..}$) are to be distributed across the $K$ distance bins; in essense, it is the mixing parameter. 
+\par For sample $i$, $\mathbf{\Pi}_{si.}$ is the corresponding probability vector that determines how the total number of species $s$ observed at sample $i$ (i.e., $Y_{si..}$) are to be distributed across the $K$ distance bins; in essence, it is the mixing parameter. 
 Let $r_{ik}$ be the maximum distance for distance bin $k$ during sampling event $i$, and let $\tau_s$ be the unknown effective detection radius for species $s$. 
 We then have the following calculation of each component $\pi_{sik}$ of the mixing parameter $\mathbf{\Pi}_{si.}$:
 
@@ -198,7 +198,7 @@ All of these point counts were standardized using practices developed by the Bor
 
 \subsubsection{Phylogenetic Trees}
 \par We accessed 2000 pseudo-posterior trees from \citet{jetz_global_2012} that contains phylogeny for all species that contained sufficient data for removal modelling ($>75$ observations as per \cite{edwards_point_2023,solymos_evaluating_2018,buckland_introduction_2001}). 
-We also requested that the phylogenies include the following bird species with insufficient data from NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird, and Spotted Owl. 
+We also requested that the phylogenies include the following bird species with insufficient data from NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricoloured Blackbird, and Spotted Owl. 
 All seven of these bird species are listed on Partner's in Flight's watchlist for various threats \citep{will_handbook_2020}. 
 This resulted in 2000 pseudo-posterior trees that contained 323 species.
 
@@ -299,14 +299,14 @@ This indicates that after a certain sample size, it is likely that the differenc
 
 \par The cross validation revealed that single species model actually had better predictive capacity for more species (222 out of 316) than the multi-species model (94 out of 316), but the difference in predictive capacity was overall very small.
 Mean overall difference in posterior predictive density was $-2.21 \times 10^{-5}$.
-Single-species models tended to have better predicitve capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:removal_cv}).
+Single-species models tended to have better predictive capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:removal_cv}).
 There did not appear to be any patterns in model selection among phylogeny or traits (see Supplemental Figure 1 for full phylogenetic tree).
 Six out of the 7 species that had a percent change in cue rate of more than 20\% had the multi-species model chosen as the better predictive model.
 Common Redpoll was the only species that had the single-species model chosen (but please see Discussion about this particular species).
 
 \begin{figure}[h!]
 	\includegraphics{../output/plots/cv_removal_diff_vs_n.png}
-	\caption{Mean difference in pointwise posterior predictive density. Points are mean difference by species. Difference was calculated as multi-species minus single-species, and so positive differences (coloured in red for clarity) represent a multi-species model preference, whereas negative differences (coloured in blue for clarity) reprepresent a single-species model preference. Regression line shows the relationship between mean difference and species sample size.}
+	\caption{Mean difference in pointwise posterior predictive density. Points are mean difference by species. Difference was calculated as multi-species minus single-species, and so positive differences (coloured in red for clarity) represent a multi-species model preference, whereas negative differences (coloured in blue for clarity) represent a single-species model preference. Regression line shows the relationship between mean difference and species sample size.}
 	\label{fig:removal_cv}
 \end{figure}
 
@@ -343,7 +343,7 @@ The 95\% credible intervals for both estimated slopes and intercepts overlapped 
 
 \par The cross validation revealed that the multi-species model tended to have slightly more support than the single-species model in terms of predicting EDR.
 However, similar to the removal model cross-validation results, the overall difference in posterior predictive density was very small, with a mean difference of $1.85 \times 10^{-4}$.
-Multi-species models tended to have better predicitve capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:distance_cv}).
+Multi-species models tended to have better predictive capacity when sample size was low (again noting a very small difference), and a negligible difference as sample size increased (Figure \ref{fig:distance_cv}).
 Interestingly, only two (Chimney Swift and Boat-tailed Grackle) of the six species with a greater than 20\% change in EDR had the multi-species model chosen as the better predictive model.
 \begin{figure}[h!]
 	\includegraphics{../output/plots/cv_distance_diff_vs_n.png}
@@ -395,11 +395,11 @@ That is to say, if the values were initialized such that hummingbirds had a dete
 Our fix was to set initial values to be jittered mean detection distances originally estimated in \citet{edwards_point_2023}; for species without estimates, we used the mean EDR for all species.
 This approach seemed to work as the initial values were no longer rejected, but we caution that this could very well be a "bandaid solution" to an underlying issue with the model itself.
 
-\par The distance models also seemed to struggle with sampling the posterior distribution, in that over a quarter of the iterations resulted in a divergent transition (CITATION for divergent transitions).
+\par The distance models also seemed to struggle with sampling the posterior distribution, in that over a quarter of the iterations resulted in a divergent transition \citep{betancourt_diagnosing_2016, leimkuhler_simulating_2005}.
 This is likely due to hierarchical nature of the model and the parameterization choices that we made.
 \citet{betancourt_hierarchical_2020} discuss at length some issues that arise when sampling from hierarchical models in cases where the hierarchical groups are data rich, where a "centred parameterization" should be used, or data poor, where a "non-centred parameterization" should be used.
 We experimented with using only a non-centred parameterization which resulted in extremely low effective sample sizes (as low as 4 for 8000 iterations), large R-hat values, and took an unreasonable amount of time to finish sampling (approximately 2.5 weeks).
-The model presented in this paper is a centred parameterization, which produced much more reasonable effective sample sizes and R hat values, finished within a day and a half, but still suffered from degeneracies such as hierarchical funneling as described by \citet{betancourt_hierarchical_2020}.
+The model presented in this paper is a centred parameterization, which produced much more reasonable effective sample sizes and R hat values, finished within a day and a half, but still suffered from degeneracies such as hierarchical funnelling as described by \citet{betancourt_hierarchical_2020}.
 In our case, because we are modelling on a hierarchy that contain many data points for some species x trait groups and fewer data points for other species x trait groups, our divergent transitions may be resolved if we were to implement our model using a mixture of centred and non-centred parametrization as described by \citet{betancourt_hierarchical_2020}.
 
 \par For removal modelling, we experience no issues related to initialization, sampling, or convergence. 
@@ -411,7 +411,7 @@ This would account for the relatively quick performance of this model given the 
 \par Estimates of cue rate changed very little from species that were originally modelled by the single-species models in \citet{edwards_point_2023}, to the same ones modelled in the multi-species model here.
 The 5-fold cross validation tended to show no preference for one model or another when sample size was large, and a preference (albeit an extremely small preference) for single-species models when sample size was smaller.
 When sample size was small, a multi-species model tended to produce more precise estimates of cue rate.
-Given the extremely small preference for single-species models under a lower sample size, it would appear that the bias-variance tradeoff is likely a welcome tradeoff here, because the decrease in variance is met by only a very slight increase in bias.
+Given the extremely small preference for single-species models under a lower sample size, it would appear that the bias-variance trade-off is likely a welcome trade-off here, because the decrease in variance is met by only a very slight increase in bias.
 
 \par There were seven species where the relative difference in cue rate between the single-species model and multi-species model was over 20\% (noting that this threshold was chosen arbitrarily).
 These species (Willow Ptarmagin, Rusty Blackbird, Red-breasted Sapsucker, Common Redpoll, Calliope Hummingbird, Allen's Hummingbird, and Bohemian Waxwing), mostly had fairly small sample sizes ($\leq 515$ for all species except Red-breasted Sapsucker [$n = 1854$] and Common Redpoll [$n = 2009$]), had the lowest cue rate in the single-species models, and had among the lowest cue rates in the multi-species model.
@@ -420,10 +420,9 @@ Common Redpoll was likely an exception to this because the original estimate of 
 It could be worth running Common Redpoll using the Bayesian single species model developed here to see if the estimate of cue rate is still extremely low, or if the vague but still somewhat informative prior helps to bring the estimated parameter into a more sensible space.
 It could also be worth investigating the merit of this type of modelling to estimate cue rate for species where the cue rate is extremely low.
 In our case, 41 out of the 79 species that had the lowest 25\% quantile of cue rate in the single-species model ended up having the multi-species model chosen as the preferred model.
-TO DO Re-read results of Martin-Schwarze.
 
 \par Although this was not a primary goal of our study, we found much less support than \citet{solymos_phylogeny_2018} for migration strategy having an effect on cue rate.
-Both the estimate effects for resident species and migratory species were effectively 0, with very little of the density above or below 0.025 of 0.
+Both the estimate effects for resident species and migratory species were effectively 0, with very little of the density above or below 0.025 from 0.
 One potential reason is that we had proportionally more resident species in our analysis (85 out of 316; 26.9\%) compared to \citet{solymos_phylogeny_2018} (23 out of 141; 16.3\%), and so the richer information provided by these additional species could have brought the effect down to 0.
 Additionally, while \citet{solymos_phylogeny_2018} only regressed estimates of cue rate against the predictor variables, we actually estimated cue rate within the context of the same predictors, and so the phylogenetic effect could have just overwhelmed the estimates, making the migratory strategy meaningless.
 
@@ -434,7 +433,8 @@ Still, the 5-fold cross validation tended to show almost no preference for one m
 There was less evidence for the multi-species model being able to improve the precision of EDR estimates across sample sizes, indicating that a single-species model may mostly be sufficient for precise estimates.
 Under this context, it would appear that a multi-species model may slightly bring down estimates of EDR for species with a smaller sample size.
 
-\par There were six species where the relative difference in EDR between the single-species model and multi-species model was over 20\%. Unlike removal modelling, these species (Sharp-tailed Grouse, Sedge Wren, Ring-necked Pheasant, Chimney Swift, Boat-tailed Grackle, and Baird's Sparrow) had little in common with each other in terms of sample size (range of 227 for Boat-tailed Grackle through 4466 for Baird's Sparrow) and EDR (ranging from 50.8 m to 226 m in single-species, and from 73.2 m to 159.1 m in the multi-species model). 
+\par There were six species where the relative difference in EDR between the single-species model and multi-species model was over 20\%. 
+Unlike removal modelling, these species (Sharp-tailed Grouse, Sedge Wren, Ring-necked Pheasant, Chimney Swift, Boat-tailed Grackle, and Baird's Sparrow) had little in common with each other in terms of sample size (range of 227 for Boat-tailed Grackle through 4466 for Baird's Sparrow) and EDR (ranging from 50.8 m to 226 m in single-species, and from 73.2 m to 159.1 m in the multi-species model). 
 Additionally, there was mixed support among these species for single-species vs. multi-species: Chimney Swift and Boat-tailed Grackle had the multi-species model preferred, whereas the others had the single-species model preferred.
 It could be noted that both Chimney Swift and Boat-tailed Grackle showed an increase in estimated EDR from single-species to multi-species modelling and preferred the multi-species model, but Baird's Sparrow also showed an increase and preferred the single-species model.
 
@@ -471,8 +471,8 @@ Bicknell's Thrush, however, had zero data points, and so EDRs for this species w
 \par As expected, the predicted cue rate for Bicknell's Thrush (0.28 cues per minute) and the predicted cue rate for Kirtland's Warbler (0.29 cues per minute) fell very close to the overall mean cue rate of 0.27 for all 11 other Turdidae species and 0.31 for all 44 other Parulidae species in NA-POPS, respectively.
 That is, in the absence of any data, the estimated cue rate of Bicknell's Thrush and Kirtland's Warbler was shrunk toward cue rates of most similar species.
 
-\par TO DO For distance modelling, the predicted EDR for Bicknell's Thrush (73.1 m) and the predicted EDR for Kirtland's Warbler (75.0 m) fell reasonably close to the overall mean EDR of 92.7 m for all other 11 Turdidae species and 61.2 m for all 44 other Parulidae species in NA-POPS, respectively.
-That is, in the absence of any data (or with very little data in the case of Kirtland's Warbler), the estimated EDR of Bicknell's Thrush and Kirtland's Warbler was s
+\par For distance modelling, the predicted EDR for Bicknell's Thrush (73.1 m) and the predicted EDR for Kirtland's Warbler (75.0 m) fell reasonably close to the overall mean EDR of 92.7 m for all other 11 Turdidae species and 61.2 m for all 44 other Parulidae species in NA-POPS, respectively.
+That is, in the absence of any data (or with very little data in the case of Kirtland's Warbler), the estimated EDR of Bicknell's Thrush and Kirtland's Warbler was similar to those of other Thrushes and Warblers, respectively, but with departures from overall mean based on specific traits.
 
 \par In both the removal modelling and distance modelling, the magnitude of contribution of data from related species appeared to play a role in the width of the credible intervals.
 For removal modelling, although both credible intervals were fairly wide, Bicknell's Thrush had a 95\% credible interval of [0.16, 0.48], representing an approximate 53\% change on either end, whereas Kirtland's Warbler had a 95\% credible interval of [0.18, 0.48], representing an approximate 49\% change on either end.
@@ -499,7 +499,7 @@ However, we note that \citet{aubry_bicknells_2018} are using data that specifica
 
 \par For Kirtland's Warbler, using the equations above, the predicted cue rate of 0.29, predicted EDR of 75.0 m, and an example survey design of 5 minutes recording all birds within 100 m, we estimate a detectability of 0.36.
 Similar to our Bicknell's Thrush example, we can also use the lowest predicted cue rate and EDR and the highest predicted cue rate and EDR (based on the respective credible intervals) to obtain a range of detectabilities from 0.13 through 0.67.
-A study by \citet{van_dyke_comparative_2022} found esitmated detection probabilities for Kirtland's Warbler that ranged from effectively 0, through to a detection probability of 0.73.
+A study by \citet{van_dyke_comparative_2022} found estimated detection probabilities for Kirtland's Warbler that ranged from effectively 0, through to a detection probability of 0.73.
 In that study, they compared estimates of detectability among different jack pine stands and red pine stands, where the detectability was highest in jack pine stands than the red pine stands.
 
 \subsection{Improvements to this model}
@@ -513,7 +513,7 @@ Similarly, it may be beneficial to include environmental covariates at the surve
 This could also provide an opportunity to disentangle species x survey interactions in detectability.
 
 \par The examples above additionally highlight an excellent opportunity to make use of a powerful feature of Bayesian models, that being the inclusion of expert knowledge as prior information.
-For example, if a Bicknell's Thrush expert knows that there is something particular about how often they sing or give a cue compared to other thrushes, or how disproportionately quiet or loud they are comapred to species with similar traits, this can be coded directly into the prior distribution.
+For example, if a Bicknell's Thrush expert knows that there is something particular about how often they sing or give a cue compared to other thrushes, or how disproportionately quiet or loud they are compared to species with similar traits, this can be coded directly into the prior distribution.
 Similarly, this may also provide a unique opportunity to make use of traditional ecological knowledge to further inform predictions of detectability.
 For example, in the Anishinaabe language, bird taxonomy is based both on physical features, but also behaviours such as flight, calls, morning rituals, and weather \citep{pitawanakwat_evening_2022}.
 This taxonomy is based off observations of bird behaviour that has been passed down through generations, and may vary slightly (or heavily) from taxonomy based on genomics.
@@ -533,7 +533,7 @@ We caution that birds that are to have detectability predicted should be noted a
 \par Finally, we see this model as a proof-of-concept for use with other taxa.
 Obviously, given the vast amount of bird data available, it was easy enough to obtain estimates for enough data-rich species such that the few data-poor species could have enough information to borrow.
 However, one benefit that we have shown here is that Bayesian models can still come up with reasonable predictions if there are informed enough priors on which to fall back.
-That is to say, for a taxon such as butterflies where there are some species with data and others with very little data, but there is overall very little data in general (CITE Lewthwaite paper(s)), with reasonably-informed priors, a researcher may still be able to glean reasonable estimates of detectability with the little data available.
+That is to say, for a taxon such as butterflies where there are some species with data and others with very little data, but there is overall very little data in general \citep{lewthwaite_geographical_2022} with reasonably-informed priors, a researcher may still be able to glean reasonable estimates of detectability with the little data available.
 We suggest that this type of model where information about detectability is shared among species be tested with taxon that generally have fewer data collected.
 
 \bibliography{refs}
