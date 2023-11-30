@@ -70,6 +70,9 @@ species_pred <- gsub(pattern = "_",
                      x = rownames(corr_matrix_predict))
 binomial_pred <- binomial[which(binomial$Scientific_BT %in% species_pred), ]
 binomial_pred <- binomial_pred[match(species_pred, binomial_pred$Scientific_BT), ]
+#' There is a non-zero chance that Rufous hummingbird is weirdly a problematic species
+#' so we are going to get rid of it.
+binomial_pred <- binomial_pred[-which(binomial_pred$Code == "RUHU"), ]
 species_pred_code <- binomial_pred$Code
 
 # Create subset of traits dataset for the prediction matrix

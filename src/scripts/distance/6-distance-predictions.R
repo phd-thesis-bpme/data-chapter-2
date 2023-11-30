@@ -31,7 +31,7 @@ distance_stan_data$grainsize <- 1
 inits <- generate_distance_inits(n_chains = n_chains,
                                  napops_skip = c("BITH", "HASP", "KIWA", "LCTH", "LEPC", "SPOW"),
                                  sp_list = distance_stan_data$sp_all,
-                                 param = "mixed",
+                                 param = "cp",
                                  species_cp = distance_stan_data$species_cp,
                                  species_ncp = distance_stan_data$species_ncp)
 
@@ -47,7 +47,7 @@ distance_stan_data$mass <- distance_stan_data$mass[,1]
 
 ####### Run Model #################################
 
-model_file <- cmdstan_model(stan_file = "models/distance_mixed.stan",
+model_file <- cmdstan_model(stan_file = "models/distance_cp.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
