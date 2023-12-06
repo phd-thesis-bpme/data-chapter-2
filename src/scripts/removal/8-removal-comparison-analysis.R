@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 8-removal-comparison-analysis.R
 # Created April 2022
-# Last Updated October 2023
+# Last Updated December 2023
 
 ####### Import Libraries and External Files #######
 
@@ -13,6 +13,8 @@ library(napops)
 library(plyr)
 library(ggplot2)
 library(ggpubr)
+library(ggrepel)
+library(patchwork)
 theme_set(theme_pubclean())
 bayesplot::color_scheme_set("red")
 
@@ -67,7 +69,7 @@ for (i in 1:nrow(to_plot))
   geom_abline(slope = 1) +
   xlim(0,1) +
   ylim(0,1) +
-  geom_text(aes(label = Label)) +
+  geom_text_repel(box.padding = 0.5, max.overlaps = Inf, aes(label = Label)) +
   xlab("Cue Rate (Single Species)") + 
     ylab("Cue Rate (Multi Species)") +
   NULL)
@@ -101,6 +103,25 @@ diff_model_run <- diff_model$sample(
   xlab("Modelled Difference"))
 
 cr_differences <- to_plot
+
+####### Plotting Other Parameters #################
+
+(intercept_plot <- bayesplot::mcmc_areas(rem_model$draws(c("intercept")),
+                                         prob = 0.95))
+
+(mig_strat_plot <- bayesplot::mcmc_areas(rem_model$draws(c("mu_mig_strat[1]", "mu_mig_strat[2]")),
+                                         prob = 0.95))
+
+(sigma_plot <- bayesplot::mcmc_areas(rem_model$draws(c("sigma")),
+                                     prob = 0.95))
+
+(other_params_plot <- bayesplot::mcmc_intervals(rem_model$draws(c("intercept",
+                                                                     "mu_mig_strat[1]", 
+                                                                     "mu_mig_strat[2]",
+                                                                     "sigma"))) +
+    scale_y_discrete(labels = c("Intercept", "Resident", "Migrant", "Sigma")))
+
+params_summary <- rem_model$summary(c("intercept", "mu_mig_strat", "sigma"))
 
 ####### SD Comparison Plot ########################
 
@@ -154,28 +175,19 @@ species_vars <- to_plot$variable
   scale_y_discrete(labels = (to_plot$Code)) +
   coord_flip())
 
-####### Plotting Other Parameters #################
-
-(intercept_plot <- bayesplot::mcmc_areas(rem_model$draws(c("intercept")),
-                                         prob = 0.95))
-
-(mig_strat_plot <- bayesplot::mcmc_areas(rem_model$draws(c("mu_mig_strat[1]", "mu_mig_strat[2]")),
-                                        prob = 0.95))
-
-(sigma_plot <- bayesplot::mcmc_areas(rem_model$draws(c("sigma")),
-                                         prob = 0.95))
-
-params_summary <- rem_model$summary(c("intercept", "mu_mig_strat", "sigma"))
-
 ####### Output ####################################
 
 write.table(rem_summary, file = "data/generated/phi.csv", sep = ",", row.names = FALSE)
 write.table(cr_differences, file = "data/generated/phi_differences.csv", sep = ",", row.names = FALSE)
 write.table(params_summary, file = "data/generated/removal_params.csv", sep = ",", row.names = FALSE)
 
-png("output/plots/removal_1vs1.png",
-    width = 6, height = 3, res = 600, units = "in")
-ggarrange(modelled_difference_plot, single_vs_multi_plot, ncol = 2, labels = c("A", "B"))
+tiff("output/plots/removal_1vs1.tiff",
+     width = 6, height = 4, res = 600, units = "in")
+single_vs_multi_plot + inset_element(modelled_difference_plot,
+                                     left = 0.6, 
+                                     bottom = 0.1, 
+                                     right = 1, 
+                                     top = 0.6)
 dev.off()
 
 png("output/plots/removal_sd_plot.png",
