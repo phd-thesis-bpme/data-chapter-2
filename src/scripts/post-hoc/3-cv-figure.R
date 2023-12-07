@@ -287,3 +287,8 @@ tiff(filename = "output/plots/cv_plot.tiff",
     width = 6, height = 6, units = "in", res = 600)
 ggarrange(lppd_diff_vs_n_rem, lppd_diff_vs_n_dis, nrow = 2, labels = c("A", "B"))
 dev.off()
+
+png(filename = "output/plots/cv_plot.png",
+     width = 6, height = 6, units = "in", res = 600)
+ggarrange(lppd_diff_vs_n_rem, lppd_diff_vs_n_dis, nrow = 2, labels = c("A", "B"))
+dev.off()
