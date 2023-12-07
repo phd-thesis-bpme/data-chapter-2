@@ -118,9 +118,9 @@ Mean EDR for warblers (except KIWA): `r mean(fam_df_warbler$Tau)`, n = `r nrow(f
 ```{r detectability}
 # Set constants based off predictions here and in the cue rate output
 bith_cr <- c(0.28, 0.16, 0.48)
-bith_edr <- c(73.1, 40.4, 135.0)
+bith_edr <- c(73.6, 40.5, 134.4)
 kiwa_cr <- c(0.29, 0.18, 0.48)
-kiwa_edr <- c(75, 46.6, 124.8)
+kiwa_edr <- c(75.3, 45.9, 125.6)
 t = 5
 r = 100
 
