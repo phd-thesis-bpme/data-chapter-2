@@ -100,6 +100,8 @@ removal_plot <- single_vs_multi_plot + inset_element(modelled_difference_plot,
                                                      right = 1, 
                                                      top = 0.5)
 
+cr_differences <- to_plot
+
 ####### Distance Model ############################
 
 # Extract log_phi summary statistics from full Stan model runs
@@ -172,7 +174,15 @@ distance_plot <- single_vs_multi_plot + inset_element(modelled_difference_plot,
                                                      right = 1, 
                                                      top = 0.5)
 
+edr_differences <- to_plot
+
 ####### Output ####################################
+
+write.table(rem_summary, file = "data/generated/phi.csv", sep = ",", row.names = FALSE)
+write.table(dis_summary, file = "data/generated/tau.csv", sep = ",", row.names = FALSE)
+
+write.table(cr_differences, file = "data/generated/phi_differences.csv", sep = ",", row.names = FALSE)
+write.table(edr_differences, file = "data/generated/tau_differences.csv", sep = ",", row.names = FALSE)
 
 tiff("output/plots/1vs1.tiff",
      width = 6, height = 6, res = 600, units = "in")
