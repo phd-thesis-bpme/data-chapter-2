@@ -85,15 +85,11 @@ We also developed a Bayesian single species version of the QPAD Removal and Dist
 Finally, we ran these models with the full set of data points used in \cite{edwards_point_2023}, plus additional data for seven species that did not meet the initial sample size thresholds for NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken (\textit{Tympanuchus pallidicinctus}), Harris's Sparrow, Kirtland's Warbler, Tricoloured Blackbird (\textit{Agelaius tricolor}), and Spotted Owl (\textit{Strix occidentalis}). 
 All seven of these bird species are listed on Partners in Flight's watchlist for various threats \citep{will_handbook_2020}. 
 
-\subsection{Predictions}
-\begin{enumerate}
-	\item\label{pred1} For both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will change very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
-	This is because the species that were modelled in \citet{edwards_point_2023} had a sufficient number of data points to stand on their own, and so adding in species-level effects should have little effect on estimates. 
-	\item\label{pred2} Improvement in precision will be related to sample size, such that precision of estimates will improve the most for species with smaller sample size, while precision of estimates will improve the least for species with larger sample sizes.
-	\item\label{pred3} A multi-species model will have greater predictive capacity than a single-species model, particularly for species which are data-sparse.
-\end{enumerate}
-
-\par With the predictions above, we then expect to be able to generate estimates of cue rate and EDR for species with very little data, thus relaxing previous sample size requirements; additionally, we expect to be able to predict cue rate and EDR for species with no data by making use of the shrinkage effect offered by a multi-species model.
+\par We predicted that for both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will change very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
+This is because the species that were modelled in \citet{edwards_point_2023} had a sufficient number of data points to stand on their own, and so adding in species-level effects should have little effect on estimates. 
+Furthermore, we predicted that improvement in precision from a multi-species model will be related to sample size, such that precision of estimates will improve the most for species with smaller sample size, while precision of estimates will improve the least for species with larger sample sizes.
+Finally, we predicted that a multi-species model will have greater predictive capacity than a single-species model, particularly for species which are data-sparse.
+With the predictions above, we then expect to be able to generate estimates of cue rate and EDR for species with very little data, thus relaxing previous sample size requirements; additionally, we expect to be able to predict cue rate and EDR for species with no data by making use of the shrinkage effect offered by a multi-species model.
 
 \section{Methods}
 
