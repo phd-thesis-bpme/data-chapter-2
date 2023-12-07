@@ -269,7 +269,7 @@ write.table(lppd_summary_removal, file = "data/generated/lppd_summary_removal.cs
 write.table(lppd, file = "data/generated/lppd_distance.csv", sep = ",", row.names = FALSE)
 write.table(lppd_summary, file = "data/generated/lppd_summary_distance.csv", sep = ",", row.names = FALSE)
 
-tiff(filename = "output/plots/cv_plot.png",
+tiff(filename = "output/plots/cv_plot.tiff",
     width = 6, height = 6, units = "in", res = 600)
 ggarrange(lppd_diff_vs_n_rem, lppd_diff_vs_n_dis, nrow = 2, labels = c("A", "B"))
 dev.off()
