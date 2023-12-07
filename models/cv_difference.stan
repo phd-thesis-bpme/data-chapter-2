@@ -1,8 +1,8 @@
 data {
   int<lower=0> N;
   int<lower=0> n_species;
-  vector[N] difference; //response variable
-  int species[N];
+  array [N] real difference; //response variable
+  array [N] int species;
 }
 
 parameters {

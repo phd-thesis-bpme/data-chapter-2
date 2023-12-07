@@ -24,7 +24,7 @@ dis_lik <- function(abund = NULL,
     
     Pi[bands[i]] = 1 - sum(Pi)
     
-    loglik[i] <- dmultinom(x = abund[i,1:bands[i]], prob = Pi)
+    loglik[i] <- dmultinom(x = abund[i,1:bands[i]], prob = Pi, log = TRUE)
   }
   
   return(loglik)

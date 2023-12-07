@@ -90,6 +90,25 @@ for (f in 1:max(cv_folds_rem$cv_fold))
 
 lppd$Difference <- lppd$MS_LPPD - lppd$SS_LPPD
 
+# cv_model <- cmdstan_model(stan_file = "models/cv_difference.stan")
+# cv_model_data <- list(N = nrow(lppd),
+#                       n_species = length(unique(lppd$Species)),
+#                       difference = lppd$Difference,
+#                       species = removal_stan_data_cv$species)
+# 
+# cv_model_run <- cv_model$sample(
+#   data = cv_model_data,
+#   iter_warmup = 1000,
+#   iter_sampling = 500,
+#   chains = 4,
+#   parallel_chains = 4,
+#   refresh = 10
+# )
+# 
+# saveRDS(cv_model_run, file = "output/model_runs/cv_removal/cv_model_removal.RDS")
+# 
+# cv_model_summary <- cv_model_run$summary(c("nu", "overall_difference", "species_difference", "sigma"))
+
 lppd_summary <- data.frame(Species = unique(lppd$Species),
                            Mean_Difference = NA,
                            StdErr = NA,
@@ -125,13 +144,10 @@ preference <- data.frame(table(lppd_summary$Model_Preference))
     #coord_flip() +
     NULL)
 
-(lppd_diff_vs_n_rem <- ggplot(data = lppd_summary, aes(x = N, y = Mean_Difference)) +
+(lppd_diff_vs_n_rem <- ggplot(data = lppd_summary, aes(x = log(N), y = Mean_Difference)) +
     geom_point(aes(color = Model_Preference)) +
-    stat_smooth(method = "lm", 
-                formula = y ~ x, 
-                geom = "smooth") +  
-    NULL
-)
+    geom_hline(yintercept = 0) +
+    NULL)
 
 lppd_summary <- merge(lppd_summary, binomial[,c("Code", "Scientific_BT")],
                       by.x = "Species", by.y = "Code")
@@ -254,11 +270,9 @@ preference <- data.frame(table(lppd_summary$Model_Preference))
     #coord_flip() +
     NULL)
 
-(lppd_diff_vs_n_dis <- ggplot(data = lppd_summary, aes(x = N, y = Mean_Difference)) +
+(lppd_diff_vs_n_dis <- ggplot(data = lppd_summary, aes(x = log(N), y = Mean_Difference)) +
     geom_point(aes(color = Model_Preference)) +
-    stat_smooth(method = "lm", 
-                formula = y ~ x, 
-                geom = "smooth") +  
+    geom_hline(yintercept = 0) +
     NULL
 )
 

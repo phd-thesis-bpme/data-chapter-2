@@ -17,7 +17,7 @@ rem_lik <- function(abund = NULL,
     }
     Pi[1] = 1 - sum(Pi)
     
-    lp[i] <- dmultinom(x = abund[i,1:bands[i]], prob = Pi)
+    lp[i] <- dmultinom(x = abund[i,1:bands[i]], prob = Pi, log = TRUE)
   }
   
   return(lp)
