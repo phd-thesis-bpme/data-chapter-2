@@ -1,7 +1,7 @@
 
 data {
   int<lower = 0> n_samples;
-  real difference[n_samples];
+  array [n_samples] real difference;
 }
 
 // The parameters accepted by the model. Our model
