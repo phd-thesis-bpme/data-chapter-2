@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 5-distance-cv.R
 # Created October 2023
-# Last Updated October 2023
+# Last Updated November 2023
 
 ####### Import Libraries and External Files #######
 
@@ -22,7 +22,7 @@ cv_folds <- read.csv("data/generated/distance_cv_folds.csv")
 
 # Stan settings
 n_iter <- 500
-n_warmup <- 250
+n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
 threads_per_chain <- 7
