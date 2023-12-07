@@ -248,13 +248,13 @@ lppd_summary[which((lppd_summary$Mean_Difference - lppd_summary$StdErr > 0) &
 
 preference <- data.frame(table(lppd_summary$Model_Preference))
 
-(lppd_difference_plot <- ggplot(data = lppd_summary, aes(x = Species, y = Mean_Difference)) +
+(lppd_difference_plot_dis <- ggplot(data = lppd_summary, aes(x = Species, y = Mean_Difference)) +
     geom_errorbar(aes(ymin = Mean_Difference - StdErr, ymax = Mean_Difference + StdErr)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
     #coord_flip() +
     NULL)
 
-(lppd_diff_vs_n <- ggplot(data = lppd_summary, aes(x = N, y = Mean_Difference)) +
+(lppd_diff_vs_n_dis <- ggplot(data = lppd_summary, aes(x = N, y = Mean_Difference)) +
     geom_point(aes(color = Model_Preference)) +
     stat_smooth(method = "lm", 
                 formula = y ~ x, 
@@ -262,31 +262,14 @@ preference <- data.frame(table(lppd_summary$Model_Preference))
     NULL
 )
 
-
-
-
-
-
-
-
-
-
 ####### Output ####################################
 
-write.table(lppd, file = "data/generated/lppd_removal.csv", sep = ",", row.names = FALSE)
-write.table(lppd_summary, file = "data/generated/lppd_summary_removal.csv", sep = ",", row.names = FALSE)
+write.table(lppd_removal, file = "data/generated/lppd_removal.csv", sep = ",", row.names = FALSE)
+write.table(lppd_summary_removal, file = "data/generated/lppd_summary_removal.csv", sep = ",", row.names = FALSE)
+write.table(lppd, file = "data/generated/lppd_distance.csv", sep = ",", row.names = FALSE)
+write.table(lppd_summary, file = "data/generated/lppd_summary_distance.csv", sep = ",", row.names = FALSE)
 
-png(filename = "output/plots/cv_removal.png",
-    width = 20, height = 6, units = "in", res = 300)
-print(lppd_difference_plot)
-dev.off()
-
-png(filename = "output/plots/cv_removal_diff_vs_n.png",
-    width = 6, height = 4, units = "in", res = 300)
-print(lppd_diff_vs_n)
-dev.off()
-
-pdf(file = "output/plots/cv_removal_tree.pdf",
-    width = 30, height = 60)
-print(model_pref_tree)
+tiff(filename = "output/plots/cv_plot.png",
+    width = 6, height = 6, units = "in", res = 600)
+ggarrange(lppd_diff_vs_n_rem, lppd_diff_vs_n_dis, nrow = 2, labels = c("A", "B"))
 dev.off()
