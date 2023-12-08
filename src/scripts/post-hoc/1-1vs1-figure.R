@@ -188,3 +188,8 @@ tiff("output/plots/1vs1.tiff",
      width = 6, height = 6, res = 600, units = "in")
 ggarrange(removal_plot, distance_plot, nrow = 2, labels = c("A", "B"))
 dev.off()
+
+png("output/plots/1vs1.png",
+     width = 6, height = 6, res = 600, units = "in")
+ggarrange(removal_plot, distance_plot, nrow = 2, labels = c("A", "B"))
+dev.off()

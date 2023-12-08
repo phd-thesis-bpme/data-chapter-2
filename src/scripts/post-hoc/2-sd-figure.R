@@ -119,3 +119,8 @@ tiff("output/plots/sd_comp.tiff",
 ggarrange(sd_comp_removal, sd_comp_distance, ncol = 2, labels = c("A", "B"))
 dev.off()
 
+png("output/plots/sd_comp.png",
+     width = 6, height = 3, res = 600, units = "in")
+ggarrange(sd_comp_removal, sd_comp_distance, ncol = 2, labels = c("A", "B"))
+dev.off()
+

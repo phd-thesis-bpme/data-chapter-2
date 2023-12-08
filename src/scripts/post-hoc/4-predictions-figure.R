@@ -99,3 +99,8 @@ tiff(filename = "output/plots/predictions_figure.tiff",
      width = 6, height = 6, units = "in", res = 600)
 ggarrange(removal_plot, distance_plot, nrow = 2, labels = c("A", "B"))
 dev.off()
+
+png(filename = "output/plots/predictions_figure.png",
+     width = 6, height = 6, units = "in", res = 600)
+ggarrange(removal_plot, distance_plot, nrow = 2, labels = c("A", "B"))
+dev.off()
