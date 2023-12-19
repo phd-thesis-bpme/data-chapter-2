@@ -14,6 +14,7 @@ library(plyr)
 library(ggplot2)
 library(ggpubr)
 library(ggrepel)
+library(gginnards)
 library(patchwork)
 theme_set(theme_pubclean())
 bayesplot::color_scheme_set("red")
@@ -24,6 +25,9 @@ rem_model <- readRDS("output/model_runs/removal_predictions.RDS")
 load("data/generated/removal_stan_data_pred.rda")
 dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
 load("data/generated/distance_stan_data.rda")
+
+traits <- read.csv("data/raw/traits.csv")
+binomial <- read.csv("data/generated/binomial_names.csv")
 
 ####### Removal Model #############################
 
@@ -46,6 +50,12 @@ for (i in 1:nrow(species_n))
 
 # Get original single-species NA-POPS estimates
 napops_summary <- napops::coef_removal(species = rem_summary$Code, model = 1)
+rem_summary <- dplyr::left_join(x = rem_summary, y = binomial[, c("Code", "Scientific_BT")],
+                                by = "Code")
+rem_summary$Scientific_BT <- gsub(x = rem_summary$Scientific_BT, pattern = " ", replacement = "_")
+
+rem_summary <- dplyr::left_join(x = rem_summary, y = traits[, c("Code", "Migrant")],
+                                 by = "Code")
 
 sp <- c("LCTH", "LEPC", "HASP", "TRBL", "SPOW", "KIWA", "BITH")
 
@@ -53,11 +63,64 @@ to_plot <- rem_summary[which(rem_summary$Code %in% sp), ]
 
 species_vars <- to_plot$variable
 
+other_sp_df <- data.frame(Species = character(),
+                          mean = numeric(),
+                          Alpha = numeric())
+phylo <- removal_stan_data_pred$phylo_corr
+for (sv in species_vars)
+{
+  sci_name <- rem_summary[which(rem_summary$variable == sv), ]$Scientific_BT
+  migrant <- rem_summary[which(rem_summary$variable == sv), ]$Migrant
+  
+  alpha_df <- data.frame(Sci_Name = dimnames(phylo)[[1]],
+                         Alpha = phylo[sci_name, ])
+  
+
+  alpha_df <- merge(alpha_df, rem_summary[which(rem_summary$Migrant == migrant &
+                                                  (rem_summary$Code %in% sp) == FALSE), 
+                                          c("mean", "Scientific_BT")],
+                    by.x = "Sci_Name", by.y = "Scientific_BT")
+  alpha_df$mean <- exp(alpha_df$mean)
+  alpha_df$Species <- rep(sv, times = nrow(alpha_df))
+  
+  other_sp_df <- rbind(other_sp_df,
+                       alpha_df[, c("Species", "mean", "Alpha")])
+}
+
+other_sp_df <- other_sp_df[which(other_sp_df$Alpha > 0.001), ]
+
+rem_draws <- exp(rem_model$draws(species_vars))
+attributes(rem_draws)$dimnames$variable <- to_plot$Code
+
 (removal_plot <- bayesplot::mcmc_intervals(exp(rem_model$draws(species_vars))) + 
     xlab("Predicted Cue Rate") + 
     ylab("Species") +
-    scale_y_discrete(labels = (to_plot$Code)) +
+    #geom_point(data = test_df, aes(x = exp(cr), y = Species,  alpha = alpha), position= "jitter") +
+    #scale_y_discrete(labels = (to_plot$Code)) +
     coord_flip())
+
+sp_ordered <- rev(to_plot$Code)
+removal_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species,  alpha = Alpha), position=position_jitter(height=0.2)),
+                         removal_plot$layers)
+removal_plot <- removal_plot + scale_y_discrete(labels = rev(to_plot$Code))
+
+
+removal_plot
+                
+
+removal_plot <- removal_plot + scale_y_discrete(labels = (to_plot$Code))
+
+
+# Extract mean cue rates of "similar" species
+sp_similar <- binomial[which(binomial$Family %in% c("Passerellidae",
+                                                    "Strigidae",
+                                                    "Turdidae",
+                                                    "Mimidae",
+                                                    "Icteridae",
+                                                    "Parulidae",
+                                                    "Phasianidae"))]
+
+
 
 ####### Distance Model ############################
 
