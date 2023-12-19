@@ -50,10 +50,13 @@ for (i in 1:nrow(species_n))
 
 # Get original single-species NA-POPS estimates
 napops_summary <- napops::coef_removal(species = rem_summary$Code, model = 1)
+
+# Add binomial names
 rem_summary <- dplyr::left_join(x = rem_summary, y = binomial[, c("Code", "Scientific_BT")],
                                 by = "Code")
 rem_summary$Scientific_BT <- gsub(x = rem_summary$Scientific_BT, pattern = " ", replacement = "_")
 
+# Add traits
 rem_summary <- dplyr::left_join(x = rem_summary, y = traits[, c("Code", "Migrant")],
                                  by = "Code")
 
@@ -67,10 +70,10 @@ other_sp_df <- data.frame(Species = character(),
                           mean = numeric(),
                           Alpha = numeric())
 phylo <- removal_stan_data_pred$phylo_corr
-for (sv in species_vars)
+for (s in sp)
 {
-  sci_name <- rem_summary[which(rem_summary$variable == sv), ]$Scientific_BT
-  migrant <- rem_summary[which(rem_summary$variable == sv), ]$Migrant
+  sci_name <- rem_summary[which(rem_summary$Code == s), ]$Scientific_BT
+  migrant <- rem_summary[which(rem_summary$Code == s), ]$Migrant
   
   alpha_df <- data.frame(Sci_Name = dimnames(phylo)[[1]],
                          Alpha = phylo[sci_name, ])
@@ -81,7 +84,7 @@ for (sv in species_vars)
                                           c("mean", "Scientific_BT")],
                     by.x = "Sci_Name", by.y = "Scientific_BT")
   alpha_df$mean <- exp(alpha_df$mean)
-  alpha_df$Species <- rep(sv, times = nrow(alpha_df))
+  alpha_df$Species <- rep(s, times = nrow(alpha_df))
   
   other_sp_df <- rbind(other_sp_df,
                        alpha_df[, c("Species", "mean", "Alpha")])
@@ -92,35 +95,13 @@ other_sp_df <- other_sp_df[which(other_sp_df$Alpha > 0.001), ]
 rem_draws <- exp(rem_model$draws(species_vars))
 attributes(rem_draws)$dimnames$variable <- to_plot$Code
 
-(removal_plot <- bayesplot::mcmc_intervals(exp(rem_model$draws(species_vars))) + 
+(removal_plot <- bayesplot::mcmc_intervals(rem_draws) + 
     xlab("Predicted Cue Rate") + 
     ylab("Species") +
-    #geom_point(data = test_df, aes(x = exp(cr), y = Species,  alpha = alpha), position= "jitter") +
-    #scale_y_discrete(labels = (to_plot$Code)) +
     coord_flip())
 
-sp_ordered <- rev(to_plot$Code)
-removal_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species,  alpha = Alpha), position=position_jitter(height=0.2)),
+removal_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species, alpha = Alpha), size = 0.5, position=position_jitter(height=0.2)),
                          removal_plot$layers)
-removal_plot <- removal_plot + scale_y_discrete(labels = rev(to_plot$Code))
-
-
-removal_plot
-                
-
-removal_plot <- removal_plot + scale_y_discrete(labels = (to_plot$Code))
-
-
-# Extract mean cue rates of "similar" species
-sp_similar <- binomial[which(binomial$Family %in% c("Passerellidae",
-                                                    "Strigidae",
-                                                    "Turdidae",
-                                                    "Mimidae",
-                                                    "Icteridae",
-                                                    "Parulidae",
-                                                    "Phasianidae"))]
-
-
 
 ####### Distance Model ############################
 
@@ -144,17 +125,54 @@ for (i in 1:nrow(species_n))
 # Get original single-species NA-POPS estimates
 napops_summary <- napops::coef_distance(species = dis_summary$Code, model = 1)
 
+# Add binomial names
+dis_summary <- dplyr::left_join(x = dis_summary, y = binomial[, c("Code", "Scientific_BT")],
+                                by = "Code")
+dis_summary$Scientific_BT <- gsub(x = dis_summary$Scientific_BT, pattern = " ", replacement = "_")
+
+# Add traits
+dis_summary <- dplyr::left_join(x = dis_summary, y = traits[, c("Code", "Migrant", "Habitat",
+                                                                "Mass", "Pitch")],
+                                by = "Code")
+dis_summary$MigHab <- paste0(dis_summary$Migrant, "-", dis_summary$Habitat)
+
 sp <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
 
 to_plot <- dis_summary[which(dis_summary$Code %in% sp), ]
 
 species_vars <- to_plot$variable
 
-(distance_plot <- bayesplot::mcmc_intervals(exp(dis_model$draws(species_vars)) * 100) + 
+other_sp_df <- data.frame(Species = character(),
+                          mean = numeric())
+
+for (s in sp)
+{
+  trait <- dis_summary[which(dis_summary$Code == s), ]$MigHab
+  pitch <- dis_summary[which(dis_summary$Code == s), ]$Pitch
+  mass <- dis_summary[which(dis_summary$Code == s), ]$Mass
+  
+  
+  temp_df <- dis_summary[which(dis_summary$MigHab == trait &
+                                 (dis_summary$Code %in% sp) == FALSE &
+                                 (dis_summary$Mass >= mass*0.6 & dis_summary$Mass <= mass*1.4) &
+                                 (dis_summary$Pitch >= pitch*0.6 & dis_summary$Pitch <= pitch*1.4)), ]
+  
+  other_sp_df <- rbind(other_sp_df,
+                       data.frame(Species = rep(s, times = nrow(temp_df)),
+                                  mean = exp(temp_df$mean) * 100))
+}
+
+dis_draws <- exp(dis_model$draws(species_vars)) * 100
+attributes(dis_draws)$dimnames$variable <- to_plot$Code
+
+(distance_plot <- bayesplot::mcmc_intervals(dis_draws) + 
     xlab("Predicted EDR") + 
     ylab("Species") +
-    scale_y_discrete(labels = (to_plot$Code)) +
+   # scale_y_discrete(labels = (to_plot$Code)) +
     coord_flip())
+
+distance_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species), size = 0.5, position=position_jitter(height=0.4)),
+                         distance_plot$layers)
 
 ####### Output ####################################
 
