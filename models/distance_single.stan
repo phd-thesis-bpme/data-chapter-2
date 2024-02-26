@@ -49,7 +49,7 @@ data {
 }
 
 parameters {
-  vector<lower = -2, upper = 1.5>[n_species] log_tau;
+  vector[n_species] log_tau;
 }
 
 model {
