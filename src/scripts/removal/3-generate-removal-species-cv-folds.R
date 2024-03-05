@@ -5,9 +5,16 @@
 # Created March 2024
 # Last Updated March 2024
 
+####### Import Libraries and External Files #######
+
+library(ape)
+library(phytools)
+
 ####### Load Data #################################
 
 load("data/generated/removal_stan_data_cv.rda")
+phylo_tree <- ape::read.nexus(file = "data/raw/all_species.nex")
+traits <- read.csv("data/raw/traits.csv")
 
 ####### Set Constants #############################
 
@@ -15,10 +22,10 @@ k <- 5
 
 ####### Allocate CV Numbers #######################
 
-#' need to actually save the tree (consensus tree) to the removal_stan_data
-#' in order to use the cutree() function. probably what would be best is to use
-#' whatever consensus tree was used in the phylo_corr generation (although I think
-#' that may have been an average)
+tree <- consensus.edges(phylo_tree, method = "mean.edge") |>
+keep.tip(dimnames(removal_stan_data_cv$phylo_corr)[[1]])
+
+cut <- cutree((tree), k = k)
 
 #' Create a dataframe that is just the species (for each observation) and
 #' fold number
