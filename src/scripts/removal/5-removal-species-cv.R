@@ -17,7 +17,7 @@ cv_folds <- read.csv("data/generated/removal_cv_folds_species.csv")
 ####### Set Constants #############################
 
 # Stan settings
-n_iter <- 500
+n_iter <- 2000
 n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
@@ -61,7 +61,7 @@ for (i in 1:max(cv_folds$cv_fold))
   
   stan_cv_data$sp_all <- NULL
   
-  stan_run_ms <- ms_model$sample(
+  stan_run <- model$sample(
     data = stan_cv_data,
     iter_warmup = n_warmup,
     iter_sampling = n_iter,
@@ -70,25 +70,7 @@ for (i in 1:max(cv_folds$cv_fold))
     refresh = refresh,
     threads_per_chain = threads_per_chain
   )
-  stan_run_ms$save_object(file = paste0("output/model_runs/cv_removal/ms_fold_",
-                                        i,
-                                        ".RDS"))
-  
-  stan_cv_data$n_mig_strat <- NULL
-  stan_cv_data$mig_strat <- NULL
-  stan_cv_data$phylo_corr <- NULL
-  stan_cv_data$lambda <- NULL
-  
-  stan_run_ss <- ss_model$sample(
-    data = stan_cv_data,
-    iter_warmup = n_warmup,
-    iter_sampling = n_iter,
-    chains = n_chains,
-    parallel_chains = n_chains,
-    refresh = refresh,
-    threads_per_chain = threads_per_chain
-  )
-  stan_run_ss$save_object(file = paste0("output/model_runs/cv_removal/ss_fold_",
+  stan_run$save_object(file = paste0("output/model_runs/cv_removal/species/fold_",
                                         i,
                                         ".RDS"))
 }
