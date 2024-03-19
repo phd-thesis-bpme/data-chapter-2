@@ -8,24 +8,59 @@
 ####### Import Libraries and External Files #######
 
 library(ape)
-library(phytools)
 
 ####### Load Data #################################
 
 load("data/generated/removal_stan_data_cv.rda")
 phylo_tree <- ape::read.nexus(file = "data/raw/all_species.nex")
 traits <- read.csv("data/raw/traits.csv")
+binomial_names <- read.csv("data/generated/binomial_names.csv")
 
 ####### Set Constants #############################
 
 k <- 5
 
+# Shamelessly stolen from https://stackoverflow.com/questions/2547402/how-to-find-the-statistical-mode
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
 ####### Allocate CV Numbers #######################
 
-tree <- consensus.edges(phylo_tree, method = "mean.edge") |>
-keep.tip(dimnames(removal_stan_data_cv$phylo_corr)[[1]])
 
-cut <- cutree((tree), k = k)
+
+
+
+species_groups_df <- data.frame(Species = gsub(" ", "_", x = binomial_names$Scientific_BT))
+
+for (i in 1:length(phylo_tree))
+{
+  t <- cutree(as.hclust.phylo(phylo_tree[[i]]), k = k)
+  sp_names <- names(t)
+  temp <- data.frame(Species = sp_names, tree = unname(t))
+  names(temp)[2] <- paste0("tree_", i)
+  species_groups_df <- merge(species_groups_df, temp, by = "Species")
+}
+
+species_groups_df$Consensus <- NA
+
+for (i in 1:nrow(species_groups_df))
+{
+  species_groups_df$Consensus[i] <- Mode(as.vector(unname(species_groups_df[i, 2:2001])))
+}
+
+species_groups_df <- species_groups_df[, c("Species", "Consensus")]
+
+
+
+
+
+
+
+
+
+
 
 #' Create a dataframe that is just the species (for each observation) and
 #' fold number
