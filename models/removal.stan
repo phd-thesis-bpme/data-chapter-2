@@ -1,10 +1,10 @@
 functions {
-  real partial_sum_lpmf(int [, ] slice_abund_per_band,
+  real partial_sum_lpmf(array [, ] int slice_abund_per_band,
                         int start, int end,
                         int max_intervals,
-                        int [] bands_per_sample,
-                        int [, ] max_time,
-                        int [] species,
+                        array [] int bands_per_sample,
+                        array [, ] int max_time,
+                        array [] int species,
                         vector log_phi)
   {
     real lp = 0;
@@ -53,14 +53,14 @@ data {
   int<lower = 2> max_intervals;       // maximum number of intervals being considered
   int<lower = 1> n_species;           // total number of species being modelled
   int<lower = 1> grainsize;           // grainsize for reduce_sum() function
-  int species[n_samples];             // species being considered for each sample
-  int abund_per_band[n_samples, max_intervals];// abundance in time band j for sample i
-  int bands_per_sample[n_samples]; // number of time bands for sample i
-  int max_time[n_samples, max_intervals]; // max time duration for time band j
+  array [n_samples] int species;             // species being considered for each sample
+  array [n_samples, max_intervals] int abund_per_band;// abundance in time band j for sample i
+  array [n_samples] int bands_per_sample; // number of time bands for sample i
+  array [n_samples, max_intervals] int max_time; // max time duration for time band j
   corr_matrix[n_species] phylo_corr; // correlation matrix of phylogeny
   real<lower = 0> lambda;            //Pagel's lambda
   int<lower = 1> n_mig_strat;        //total number of migration strategies
-  int mig_strat[n_species];        //migration strategy for each species
+  array [n_species] int mig_strat;        //migration strategy for each species
 }
 
 transformed data {
