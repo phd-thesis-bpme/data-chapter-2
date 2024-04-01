@@ -56,7 +56,7 @@ removal_stan_data_cv$m_mig_strat <- NULL
 removal_stan_data_cv$mig_strat <- NULL
 
 stan_run_ss <- ss_model$sample(
-  data = dis_data2,
+  data = removal_stan_data_cv,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
