@@ -21,7 +21,7 @@ cv_folds <- read.csv("data/generated/distance_cv_folds.csv")
 ####### Set Constants #############################
 
 # Stan settings
-n_iter <- 500
+n_iter <- 2000
 n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
