@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 5-removal-cv.R
 # Created October 2023
-# Last Updated November 2023
+# Last Updated March 2024
 
 ####### Import Libraries and External Files #######
 
@@ -73,7 +73,7 @@ for (i in 1:max(cv_folds$cv_fold))
     refresh = refresh,
     threads_per_chain = threads_per_chain
   )
-  stan_run_ms$save_object(file = paste0("output/model_runs/cv_removal/ms_fold_",
+  stan_run_ms$save_object(file = paste0("output/model_runs/cv_removal/ms-vs-ss/ms_fold_",
                                         i,
                                         ".RDS"))
   
@@ -91,7 +91,7 @@ for (i in 1:max(cv_folds$cv_fold))
     refresh = refresh,
     threads_per_chain = threads_per_chain
   )
-  stan_run_ss$save_object(file = paste0("output/model_runs/cv_removal/ss_fold_",
+  stan_run_ss$save_object(file = paste0("output/model_runs/cv_removal/ms-vs-ss/ss_fold_",
                                         i,
                                         ".RDS"))
 }
