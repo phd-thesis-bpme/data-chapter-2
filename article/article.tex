@@ -26,9 +26,9 @@
 	\and
 	Hope, David\\
 	\and
-	Knight, Elly\\
+	Knight, Elly C.\\
 	\and
-	Michel, Nicole\\
+	Michel, Nicole L.\\
 	\and
 	Robinson, Barry\\
 	\and
@@ -45,7 +45,13 @@
 
 \begin{abstract}
 	
-	Species-specific detection probability is an important metric in conservation, but is often unaccounted for or does not exist on a species level. Despite having several estimates of detection probabilities for North American birds, there are still several species of rare and undersampled birds that do not have sufficient data to estimate detection probabilities. Here, we take advantage of similarities in detection probabilities across phylogeny to estimate detection probabilities in seven species of rare North American birds, using a hierarchical Bayesian implementation of previously-developed removal and distance models. For two species, Bicknell's Thrush and Kirtland's Warbler, we demonstrate the multi-species' model ability to predict detection probabilities given little to no data, and compare these predictions to previous estimates found in the literature. We also demonstrate the multi-species models' ability to provide more precise estimates of detectability for species where there is sufficient data. We recommend that this multi-species model be combined with survey-level covariates to then be used to augment previous estimates of detection probabilities in the NA-POPS database.
+	Accurate assessments of population status and trends rely on accounting for probability of detection, making it an important metric in conservation, yet it is often unaccounted for or unavailable on a species level. 
+	Although detection probability methods and estimates exist for many North American birds, probability estimates are most accurate for common, easy to detect species. 
+	There is therefore a need for methodology that provides detection estimates for species that are rare or undersampled, which generally do not have sufficient data for accurate estimates. 
+	Here, we take advantage of similarities in detection probabilities among phylogenetically related species and species with similar traits to estimate detection probabilities in seven species of rare North American birds, using a hierarchical Bayesian multi-species removal and distance models. 
+	For two species, Bicknell’s Thrush and Kirtland’s Warbler, we demonstrate our multi-species model’s ability to predict detection probabilities given little to no observation data, and compare these predictions to previous estimates found in the literature. 
+	We also demonstrate the multi-species models’ ability to provide more precise estimates of detectability for species where there is sufficient data. 
+	We recommend that this multi-species model be combined with survey-level covariates to augment previous estimates of detection probabilities in the NA-POPS database of detectability offsets for North American birds.
 
 \end{abstract}
 
@@ -58,37 +64,39 @@ Despite its importance, detectability often goes unaccounted for in studies; and
 
 \par The wealth of openly available bird observation data in North America means that estimates of detectability for birds are relatively easy to estimate, in comparison to most other taxonomic groups \citep{bennett_how_2023}. 
 The NA-POPS project is an effort to estimate detection probabilities that account for variability in detection processes through environmental and temporal covariates for as many of North America’s landbird species as possible \citep{edwards_point_2023}.
-To date, the project has estimated the two components of detectability--availability (the probability that a bird sings or gives a cue during the survey period) and perceptibility (the probability that an observer sees or hears a cueing bird)--for 319 species of birds, with an additional 19 species having estimates of either availability or perceptibility. This project expanded previous efforts by the Boreal Avian Modelling project \citep{cumming_toward_2010} to systematically estimate detectability in landbirds \citep{solymos_calibrating_2013, solymos_evaluating_2018}.
+To date, the project has estimated the two components of detectability--availability (the probability that a bird sings or gives a cue during the survey period) and perceptibility (the probability that an observer sees or hears a cueing bird)--for 319 species of birds, with an additional 19 species having estimates of either availability or perceptibility. 
+This project expanded previous efforts by the Boreal Avian Modelling project \citep{cumming_toward_2010} to systematically estimate detectability in landbirds \citep{solymos_calibrating_2013, solymos_evaluating_2018}.
 Both the NA-POPS project and previous estimates by Boreal Avian Modelling project use QPAD \citep{solymos_calibrating_2013}, which is a flexible method to estimate availability and perceptibility given a harmonized dataset with the necessary survey-specific data (i.e., distance to bird from observer and time to first detection; \citet{barker_ecological_2015}.
 
 \par Despite the efforts of the NA-POPS project, approximately 25\% of the species in the Partners in Flight’s 2016 Landbird Conservation Plan \citep{rosenberg_partners_2016} have insufficient data to directly estimate detectability \citep{edwards_point_2023}.
-This is because of sample size limitations that are recommended for removal and distance modelling, in that a modeller should have at least 75 data points for reasonable estimates \citep{buckland_introduction_2001, solymos_calibrating_2013}. 
+These species fall short of the threshold of 75 distinct observations recommended for removal and distance modelling \citep{buckland_introduction_2001, solymos_calibrating_2013}. 
 Many of the species that fell short of that threshold in the NA-POPS database are rare or undersampled species, that are either have low population sizes, or occur in rare or inaccessible habitats.
-Some examples of species not modelled include Kirtland’s Warbler (\textit{Setophaga kirtlandii}) and Bicknell’s Thrush (\textit{Catharus bicknelli}), both of which have low population sizes, and LeConte’s Thrasher (\textit{Toxostoma lecontei}) and Harris’s Sparrow (\textit{Zonotrichia querula}), both of which have rare habitat associations \citep{will_handbook_2020}. 
-Such species are often conservation concerns, and thus detectability information for them would be particularly important.
+%Some examples of species not modelled include Kirtland’s Warbler (\textit{Setophaga kirtlandii}) and Bicknell’s Thrush (\textit{Catharus bicknelli}), both of which have low population sizes, and LeConte’s Thrasher (\textit{Toxostoma lecontei}) and Harris’s Sparrow (\textit{Zonotrichia querula}), both of which have rare habitat associations \citep{will_handbook_2020}. 
+Species with small population sizes and rare habitats are also often considered vulnerable, and thus detectability information for them would be particularly important to inform their conservation.
 
 
-\par Detectability in birds has been shown to be at least partly driven by variation in traits.
-\cite{johnston_species_2014} showed in a selection of European landbirds that body mass and habitat association had an effect on detection distance, which influences perceptibility.
-In this case, a larger body size tended to be associated with larger detection distances, which makes sense considering larger body sizes are associated with louder and lower-pitched songs in birds \citep{bowman_adaptive_1979, fletcher_acoustics_1999, ryan_role_1985}.
-Habitat associations tend to influence the attenuation of sound, whereby sound diminishes quicker in a closed-forested habitat than more open habitat \citep{waide_tropical_1988, yip_sound_2017}.
-A study by \cite{solymos_phylogeny_2018} expanded on this effort by also considering the effects of species traits and phylogeny on both detection distance and cue rate, the latter of which influences the availability of birds.
-They found that cue rate is most related to phylogeny, and, to a lesser extent, whether a bird was a long-distance migrant or a resident species.
-They also found detection distance was related to species’ traits such as body mass, song pitch, habitat association, and migratory status and that after accounting for these traits, phylogeny explained very little.
+\par Detectability in birds has been shown to be at least partially driven by variation in species traits.
+\cite{johnston_species_2014} showed that detection distance - and consequently perceptibility - varied with body mass and habitat association in a selection of European landbirds.
+In this case, larger body size tended to be associated with longer detection distances, which makes sense considering larger body sizes are associated with louder and lower-pitched songs in birds \citep{bowman_adaptive_1979, fletcher_acoustics_1999, ryan_role_1985}.
+Moreover, vegetation structure influences the attenuation of sound, whereby sound diminishes quicker in a closed-forested habitat than more open habitats, thus leading to variation in detectability among species associated with different habitats \citep{waide_tropical_1988, yip_sound_2017}.
+\citet{solymos_phylogeny_2018} considered the effects of species traits and phylogeny on both detection distance and cue rate, the latter of which influences the availability of birds for detection.
+They found that cue rate is most related to phylogeny, and, to a lesser extent, migratory strategy (i.e., whether a bird was a long-distance migrant or a resident species).
+They also found that detection distance was related to species’ traits such as body mass, song pitch, habitat association, and that after accounting for these traits, phylogeny explained very little.
 
-\par One recommendation for future research that came out of \cite{solymos_phylogeny_2018} was to use these phylogenetic and trait relationships with detectability to predict components of detectability (i.e., availability through cue rate, and perceptibility through detection distance) in other birds.
-Indeed, by making use of shrinkage factors and partial pooling, as can be done in Bayesian hierarchical models \citep{gelman_what_2021}, and by accounting for phylogenetic relationships and the relative "relatedness" of different species, as can be done with Gaussian processes \citep{bernardo_regression_1998, mcelreath_continous_2020}, we can leverage the information provided by species with many data to inform estimates for species with much fewer (included potentially zero) data points.
+\par \citet{solymos_phylogeny_2018} recommended using these phylogenetic and trait relationships to predict components of detectability (i.e., availability through cue rate, and perceptibility through detection distance) more broadly.
+By leveraging the information provided by species with many data it may be possible to inform estimates for species with much fewer (including potentially zero) data points.
+This could be done in two ways: by making use of shrinkage factors and partial pooling, as done in Bayesian hierarchical models (Gelman and Vehtari 2021), and by accounting for phylogenetic relationships and the relative "relatedness" of different species, as done with Gaussian processes (Bernardo et al. 1998; McElreath 2020).
 
-\par The goal of this paper is to create a multi-species model of detectability that incorporates species traits and phylogeny, to both allow for the relaxation of the sample size requirements for estimating detectability, and to derive estimates of detectability for bird species without any data. 
-To do so, we developed a Bayesian hierarchical version of the QPAD Removal model initially derived in \cite{solymos_calibrating_2013}, that allows for information exchange between species based on phylogenetic distance and binned migratory status.
-Phylogenetic distance was coded as a correlation structure and used as a Gaussian random field in this model, and migratory status was coded similar to \cite{solymos_phylogeny_2018} where a species was considered either "migrant" or "resident".
-We also developed a Bayesian hierarchical version of the QPAD Distance model initially derived in \cite{solymos_calibrating_2013}, that allows for information exchange between species based only on the traits that came out as being significant in  \cite{solymos_phylogeny_2018}.
+\par The goal of this paper is to create a multi-species model of detectability that incorporates species traits and phylogeny, to both allow for the relaxation of the sample size requirements for estimating detectability, and to derive estimates of detectability for bird species without any data.
+To do so, we developed a Bayesian hierarchical version of the QPAD removal model initially derived in \citet{solymos_calibrating_2013}, that allows for information exchange between species based on phylogenetic distance and binned migratory status. 
+Phylogenetic distance was coded as a correlation structure and used as a Gaussian random field in this model, and migratory status was coded similarly to \citet{solymos_phylogeny_2018} in which a species was considered either "migrant" or "resident". 
+We also developed a Bayesian hierarchical version of the QPAD distance model initially derived in \citet{solymos_calibrating_2013} that allows for information exchange among species based only on the traits shown to be significant by \citet{solymos_phylogeny_2018}.
 These traits include migratory status (coded the same as removal models), habitat association (coded as either "open" or "closed"), song pitch, and body mass. 
-We also developed a Bayesian single species version of the QPAD Removal and Distance models (i.e., as opposed to the maximum likelihood models available in the \texttt{detect} R package; \cite{solymos_detect_2020}) to allow for direct comparison through cross validation.
-Finally, we ran these models with the full set of data points used in \cite{edwards_point_2023}, plus additional data for seven species that did not meet the initial sample size thresholds for NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken (\textit{Tympanuchus pallidicinctus}), Harris's Sparrow, Kirtland's Warbler, Tricoloured Blackbird (\textit{Agelaius tricolor}), and Spotted Owl (\textit{Strix occidentalis}). 
-All seven of these bird species are listed on Partners in Flight's watchlist for various threats \citep{will_handbook_2020}. 
+We also developed a Bayesian single species version of the QPAD removal and distance models (i.e., as opposed to the maximum likelihood models available in the \texttt{detect} R package; \citet{solymos_detect_2020} to allow for direct comparison through cross validation.
+Finally, we ran these models with the full set of data points used in \citet{edwards_point_2023}, plus additional data for seven species that did not meet the initial sample size thresholds for NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken (\textit{Tympanuchus pallidicinctus}), Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird (\textit{Agelaius tricolor}), and Spotted Owl (\textit{Strix occidentalis}). 
+All seven of these bird species are listed on Partners in Flight’s watchlist, indicating their conservation importance \citep{will_handbook_2020}. 
 
-\par We predicted that for both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will change very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
+\par We predicted that for both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will differ very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
 This is because the species that were modelled in \citet{edwards_point_2023} had a sufficient number of data points to stand on their own, and so adding in species-level effects should have little effect on estimates. 
 Furthermore, we predicted that improvement in precision from a multi-species model will be related to sample size, such that precision of estimates will improve the most for species with smaller sample size, while precision of estimates will improve the least for species with larger sample sizes.
 Finally, we predicted that a multi-species model will have greater predictive capacity than a single-species model, particularly for species which are data-sparse.
