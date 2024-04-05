@@ -110,13 +110,13 @@ Finally, we describe the experiments conducted to assess model performance and m
 
 \subsection{Bayesian Hierarchical Models}
 
-\par For any point count that employs removal sampling \citep{alldredge_time--detection_2007, farnsworth_removal_2002} and/or distance sampling \citep{buckland_introduction_2001, buckland_distance_2015}, let $Y_{sijk}$ be the observed count of species $s$ during sampling event $i$, occurring in time band $j \in [1,J]$ and/or distance band $k \in [1,K]$.
-That is, if we have a point count where removal sampling or distance sampling (but not both) is not used, then either $J = 1$ or $K = 1$, respectively; whereas, if we have a point count where both removal sampling and distance sampling is used, then both $J,K \geq 2$.
-The case where $J = K = 1$ is where neither removal sampling nor distance sampling is used, and so these data points are not appropriate for the modelling techniques described here.
+\par For any point count that employed removal sampling \citep{alldredge_time--detection_2007, farnsworth_removal_2002} and/or distance sampling \citep{buckland_introduction_2001, buckland_distance_2015}, let $Y_{sijk}$ be the observed count of species $s$ during sampling event $i$, occurring in time band $j \in [1,J]$ and/or distance band $k \in [1,K]$.
+That is, if we have a point count where removal sampling or distance sampling (but not both) was not used, then either $J = 1$ or $K = 1$, respectively; whereas, if we have a point count where both removal sampling and distance sampling was used, then both $J,K \geq 2$.
+The case where $J = K = 1$ is where neither removal sampling nor distance sampling was used, and so these data points are not appropriate for the modelling techniques described here.
 
 \subsubsection{Bayesian Hierarchical QPAD Removal Model}
 
-\par For removal modelling, we are only interested in the time bin in which the bird was recorded, and not the distance, and so we will sum counts from each sampling event $i$ over all distance bands. 
+\par For removal modelling, we were only interested in the time bin in which the bird was recorded, and not the distance, and so we will sum counts from each sampling event $i$ over all distance bands. 
 Thus, we will be considering counts $Y_{sij.} = \sum_{k=1}^{K}$. 
 From \citet{solymos_calibrating_2013}, we model $Y_{sij.}$ as
 $$Y_{sij.} \sim multinomial\left(Y_{si..}, \mathbf{\Pi}_{si.}\right).$$
@@ -134,7 +134,7 @@ We then have the following calculation of each component $\pi_{sij}$ of the mixi
 \end{equation*}
 
 \par We are most interested in estimating $\phi_s$, the cue rate for species $s$. 
-To allow for the partial pooling of estimates for each species to be based on a phylogenic relationship, we can use Gaussian processes, which effectively allow for "continuous" factors \citep{bernardo_regression_1998, mcelreath_continous_2020}. 
+To allow for the partial pooling of estimates for each species to be based on a phylogenetic relationship, we can use Gaussian processes, which effectively allow for "continuous" factors \citep{bernardo_regression_1998, mcelreath_continous_2020}. 
 Let $\mathbf{\Phi}$ be the vector of cue rates (of length $s$). 
 We then have:
 
@@ -149,7 +149,7 @@ $$\mathbf{\Sigma}_{[s \times s]} = \mathbf{D}_{[s \times s]}\lambda\sigma.$$
 We set $\lambda = 0.76$, consistent with previous results \cite{solymos_phylogeny_2018}. 
 We also estimated the extra variance term and used an exponential prior $\sigma \sim exp(5)$.
 
-\par Finally, the vector of mean cue rate $\mathbf{\mu}_{[s]}$ is a function of the species migratory strategy $\alpha_M$, where the migratory strategy $M$ could either be Resident or Migrant. 
+\par Finally, the vector of mean cue rate $\mathbf{\mu}_{[s]}$ is a function of the species migratory strategy $\alpha_M$, where the migratory strategy $M$ could either be resident or migrant. 
 We set priors on both migratory strategies to be $\alpha_M \sim N(-1, 0.01)$, because on the log scale we would expect cue rate to be negative. 
 
 \subsubsection{Bayesian Hierarchical QPAD Distance Model}
@@ -178,7 +178,7 @@ $$f(r,\tau) =  1 - \exp\left\{ -\dfrac{r^2}{\exp\left\{\tau^2\right\}} \right\} 
 To allow for the partial pooling of estimates for each species to be based on traits, we set up a mixed effects model as follows:
 $$\log \tau_s \sim N(\mu_s, \sigma).$$
 
-\par In this model, mean effective detection radius for species $s$ (i.e., $\mu_s$) is a function of the following traits as described in \cite{solymos_phylogeny_2018}: an overall intercept term $\alpha_0$; migratory strategy $\alpha_M$, where $M$ can be Migratory or Resident; habitat preference $\alpha_H$, where $H$ can be Open or Closed habitat; log body size $\beta_b$; and log song pitch $\beta_p$. 
+\par In this model, mean effective detection radius for species $s$ (i.e., $\mu_s$) is a function of the following traits as described in \cite{solymos_phylogeny_2018}: an overall intercept term $\alpha_0$; migratory strategy $\alpha_M$, where $M$ can be migratory or resident; habitat preference $\alpha_H$, where $H$ can be open or closed habitat; log body size $\beta_b$; and log song pitch $\beta_p$. 
 That is, we have
 $$ \mu_s = \alpha_0 + \alpha_{M_s} + \alpha_{H_s} + \beta_b \times \log BodySize_s + \beta_p \times \log SongPitch_s$$
 $$\alpha_0 \sim N(0.05, 0.1)$$
@@ -196,12 +196,12 @@ That is, $\log \phi_s \sim N(0,1) \forall s$, and $\log \tau_s \sim N(0,1) \fora
 \subsection{Data Collection}
 \subsubsection{Point Count Data}
 \par We used the same standardized database of point count data that was assembled through the NA-POPS project \cite{edwards_point_2023}. 
-This consists of $712138$ point counts conducted across $292$ projects in Canada and the United States, $422514$ of which used removal sampling and $522820$ of which used distance sampling.
+This consists of $712,138$ point counts conducted across $292$ projects in Canada and the United States, $422,514$ of which used removal sampling and $522,820$ of which used distance sampling.
 All of these point counts were recorded in the database in a standard way, using practices developed by the Boreal Avian Modelling project \citep{barker_ecological_2015}.
 
 \subsubsection{Phylogenetic Trees}
 \par We accessed 2000 pseudo-posterior trees from \citet{jetz_global_2012} for all species with sufficient data for removal modelling ($>75$ observations as per \cite{edwards_point_2023,solymos_evaluating_2018,buckland_introduction_2001}). 
-We also requested that the phylogenies include the following bird species with insufficient data from NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricoloured Blackbird, and Spotted Owl. 
+We also specified that the phylogenies include the following bird species with insufficient data from NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird, and Spotted Owl. 
 All seven of these bird species are listed on Partner's in Flight's watchlist for various threats \citep{will_handbook_2020}. 
 This resulted in 2000 pseudo-posterior trees that contained 323 species.
 
