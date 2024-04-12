@@ -56,10 +56,15 @@ rem_cv_df$Predicted_Exp <- exp(rem_cv_df$Predicted)
 rem_cv_df$Difference <- rem_cv_df$True_Exp - rem_cv_df$Predicted_Exp
 rem_cv_df$Abs_Diff <- abs(rem_cv_df$Difference)
 
-(removal_cv_plot <- ggplot(data = rem_cv_df, aes(x = True_Exp, y = Predicted_Exp)) +
+removal_cv_plot <- ggplot(data = rem_cv_df, aes(x = True_Exp, y = Predicted_Exp)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0) +
   xlim(0,0.8) + ylim(0,0.8) +
-  NULL)
+  NULL
 
 ####### Output ####################################
+
+png("output/plots/species_cv_plot.png",
+    width = 6, height = 6, res = 300, units = "in")
+print(removal_cv_plot)
+dev.off()
