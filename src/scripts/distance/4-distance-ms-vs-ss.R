@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 4-distance-ms-vs-ss.R
 # Created October 2023
-# Last Updated October 2023
+# Last Updated April 2024
 
 ####### Import Libraries and External Files #######
 
@@ -24,7 +24,7 @@ n_iter <- 2000
 n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
-threads_per_chain <- 7
+threads_per_chain <- 3
 
 ####### Data Wrangling ############################
 
@@ -49,6 +49,13 @@ inits <- generate_distance_inits(n_chains = n_chains,
                                  sp_list = setdiff(as.vector(dis_data$sp_all), pred_drops),
                                  napops_skip = NULL,
                                  param = "cp")
+
+dis_data$sp_list <- NULL
+dis_data$sp_all <- NULL
+dis_data$grainsize <- 1
+
+# Scale the maximum distances for computational ease
+dis_data$max_dist <- dis_data$max_dist / 100
 
 # Multi species model
 stan_run_ms <- ms_model$sample(
