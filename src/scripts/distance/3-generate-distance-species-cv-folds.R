@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 3-generate-distance-species-cv-folds.R
 # Created March 2024
-# Last Updated March 2024
+# Last Updated April 2024
 
 ####### Import Libraries and External Files #######
 
@@ -48,7 +48,7 @@ for (g in unique(species_groups_df$group))
     fold <- c(fold, rep(f, obs_per_fold))
   }
   
-  fold <- sample(fold[1:n_obs])
+  fold <- sample(fold, n_obs)
   
   species_groups_df[which(species_groups_df$group == g), "cv_fold"] <- fold
 }
