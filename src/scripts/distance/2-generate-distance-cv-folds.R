@@ -3,17 +3,11 @@
 # Multi-species QPAD Detectability
 # 2-generate-distance-cv-folds.R
 # Created October 2023
-# Last Updated October 2023
-
-####### Import Libraries and External Files #######
-
-library(dplyr)
-
-source("src/functions/subset-distance-data.R")
+# Last Updated April 2024
 
 ####### Load Data #################################
 
-load("data/generated/distance_stan_data.rda")
+load("data/generated/distance_stan_data_cv.rda")
 
 ####### Set Constants #############################
 
@@ -21,18 +15,9 @@ k <- 5
 
 ####### Allocate CV Numbers #######################
 
-#' First we must drop all species which are just not going to be involved
-#' in the cross validation at all. This will be the species for which we are
-#' generated predictions
-pred_drops <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
-dis_data <- subset_distance_data(distance_stan_data = distance_stan_data,
-                                 sps = setdiff(unique(distance_stan_data$sp_list),
-                                               pred_drops))
-rm(distance_stan_data) #clear up some mem
-
 #' Create a dataframe that is just the species (for each observation) and
 #' fold number
-cv_folds <- data.frame(Species = dis_data$sp_list,
+cv_folds <- data.frame(Species = distance_stan_data_cv$sp_list,
                       cv_fold = NA)
 
 for (sp in unique(cv_folds$Species))
