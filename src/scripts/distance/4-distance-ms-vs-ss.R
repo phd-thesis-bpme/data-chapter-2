@@ -8,14 +8,12 @@
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
-library(dplyr)
 
 source("src/functions/generate-distance-inits.R")
-source("src/functions/subset-distance-data.R")
 
 ####### Load Data #################################
 
-load("data/generated/distance_stan_data.rda")
+load("data/generated/distance_stan_data_cv.rda")
 
 ####### Set Constants #############################
 
@@ -28,15 +26,6 @@ threads_per_chain <- 3
 
 ####### Data Wrangling ############################
 
-#' First we must drop all species which are just not going to be involved
-#' in the cross validation at all. This will be the species for which we are
-#' generated predictions
-pred_drops <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
-dis_data <- subset_distance_data(distance_stan_data = distance_stan_data,
-                                 sps = setdiff(unique(distance_stan_data$sp_list),
-                                               pred_drops))
-rm(distance_stan_data)
-
 ms_model <- cmdstan_model(stan_file = "models/distance_cp.stan",
                           cpp_options = list(stan_threads = TRUE))
 
@@ -46,20 +35,20 @@ ss_model <- cmdstan_model(stan_file = "models/distance_single.stan",
 ####### Run Full Models ###########################
 
 inits <- generate_distance_inits(n_chains = n_chains,
-                                 sp_list = setdiff(as.vector(dis_data$sp_all), pred_drops),
+                                 sp_list = distance_stan_data_cv$sp_all,
                                  napops_skip = NULL,
                                  param = "cp")
 
-dis_data$sp_list <- NULL
-dis_data$sp_all <- NULL
-dis_data$grainsize <- 1
+distance_stan_data_cv$sp_list <- NULL
+distance_stan_data_cv$sp_all <- NULL
+distance_stan_data_cv$grainsize <- 1
 
 # Scale the maximum distances for computational ease
-dis_data$max_dist <- dis_data$max_dist / 100
+distance_stan_data_cv$max_dist <- distance_stan_data_cv$max_dist / 100
 
 # Multi species model
 stan_run_ms <- ms_model$sample(
-  data = dis_data,
+  data = distance_stan_data_cv,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
@@ -71,16 +60,15 @@ stan_run_ms <- ms_model$sample(
 stan_run_ms$save_object(file = paste0("output/model_runs/distance_ms.RDS"))
 
 # Single species model
-dis_data2 <- dis_data
-dis_data2$n_mig_strat <- NULL
-dis_data2$mig_strat <- NULL
-dis_data2$n_habitat <- NULL
-dis_data2$habitat <- NULL
-dis_data2$mass <- NULL
-dis_data2$pitch <- NULL
+distance_stan_data_cv$n_mig_strat <- NULL
+distance_stan_data_cv$mig_strat <- NULL
+distance_stan_data_cv$n_habitat <- NULL
+distance_stan_data_cv$habitat <- NULL
+distance_stan_data_cv$mass <- NULL
+distance_stan_data_cv$pitch <- NULL
 
 stan_run_ss <- ss_model$sample(
-  data = dis_data2,
+  data = distance_stan_data_cv,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
