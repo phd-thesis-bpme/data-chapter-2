@@ -46,6 +46,10 @@ distance_stan_data_cv$grainsize <- 1
 # Scale the maximum distances for computational ease
 distance_stan_data_cv$max_dist <- distance_stan_data_cv$max_dist / 100
 
+# Strip away center and scale attributes from mass and pitch for analysis
+distance_stan_data_cv$mass <- distance_stan_data_cv$mass[,1]
+distance_stan_data_cv$pitch <- distance_stan_data_cv$pitch[,1]
+
 # Multi species model
 stan_run_ms <- ms_model$sample(
   data = distance_stan_data_cv,
