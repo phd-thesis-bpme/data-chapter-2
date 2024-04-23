@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 6-removal-predictions.R
 # Created December 2022
-# Last Updated October 2023
+# Last Updated April 2024
 
 ####### Import Libraries and External Files #######
 
@@ -11,12 +11,12 @@ library(cmdstanr)
 
 ####### Load Data #################################
 
-load("data/generated/removal_stan_data.rda")
+load("data/generated/removal_stan_data_pred.rda")
 
 ####### Set Constants #############################
 
-removal_stan_data$grainsize <- 1
-removal_stan_data$lambda <- 0.79
+removal_stan_data_pred$grainsize <- 1
+removal_stan_data_pred$lambda <- 0.79
 
 # Stan settings
 n_iter <- 2000
@@ -25,8 +25,8 @@ n_chains <- 4
 refresh <- 10
 threads_per_chain <- 3
 
-removal_stan_data$sp_list <- NULL
-removal_stan_data$sp_all <- NULL
+removal_stan_data_pred$sp_list <- NULL
+removal_stan_data_pred$sp_all <- NULL
 
 ####### Run Model #################################
 
@@ -34,7 +34,7 @@ model_file <- cmdstan_model(stan_file = "models/removal.stan",
                             cpp_options = list(stan_threads = TRUE))
 
 stan_run <- model_file$sample(
-  data = removal_stan_data,
+  data = removal_stan_data_pred,
   iter_warmup = n_warmup,
   iter_sampling = n_iter,
   chains = n_chains,
