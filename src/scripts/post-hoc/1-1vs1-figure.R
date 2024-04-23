@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # posthoc/1-1vs1-figure.R
 # Created December 2023
-# Last Updated December 2023
+# Last Updated April 2024
 
 ####### Import Libraries and External Files #######
 
@@ -18,40 +18,50 @@ library(patchwork)
 theme_set(theme_pubclean())
 bayesplot::color_scheme_set("red")
 
+source("src/functions/subset-distance-data.R")
+
 ####### Read Data #################################
 
-rem_model <- readRDS("output/model_runs/removal_predictions.RDS")
-load("data/generated/removal_stan_data_pred.rda")
-dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
+rem_ms <- readRDS("output/model_runs/removal_ms.RDS")
+rem_ss <- readRDS("output/model_runs/removal_ss.RDS")
+load("data/generated/removal_stan_data_cv.rda")
+
+dis_ms <- readRDS("output/model_runs/distance_ms.RDS")
+dis_ss <- readRDS("output/model_runs/distance_ss.RDS")
 load("data/generated/distance_stan_data.rda")
 
 ####### Removal Model #############################
 
-# Extract log_phi summary statistics from full Stan model runs
-rem_summary <- rem_model$summary("log_phi")
+# Extract log_phi summary statistics from full Stan model runs and add species Codes
+rem_ms_summary <- rem_ms$summary("log_phi")
+rem_ms_summary$Code <- removal_stan_data_cv$sp_all
 
-# Add species names to these summaries
-rem_summary$Code <- removal_stan_data_pred$sp_all
+rem_ss_summary <- rem_ss$summary("log_phi")
+rem_ss_summary$Code <- removal_stan_data_cv$sp_all
 
 # Get data sample size for all species and add to summary
-species_n <- data.frame(table(removal_stan_data_pred$species))
+species_n <- data.frame(table(removal_stan_data_cv$species))
 names(species_n) <- c("index", "N")
-rem_summary$index <- seq(1, nrow(rem_summary))
-rem_summary$N <- 0
+
+rem_ms_summary$index <- seq(1, nrow(rem_ms_summary))
+rem_ms_summary$N <- 0
+rem_ss_summary$index <- seq(1, nrow(rem_ss_summary))
+rem_ss_summary$N <- 0
 for (i in 1:nrow(species_n))
 {
-  rem_summary[which(rem_summary$index == species_n$index[i]), "N"] <-
+  rem_ms_summary[which(rem_ms_summary$index == species_n$index[i]), "N"] <-
+    species_n$N[i]
+  
+  rem_ss_summary[which(rem_ss_summary$index == species_n$index[i]), "N"] <-
     species_n$N[i]
 }
 
-# Get original single-species NA-POPS estimates
-napops_summary <- napops::coef_removal(species = rem_summary$Code, model = 1)
-
 ####### 1-to-1 Plot ###############################
 
-to_plot <- merge(rem_summary[,c("Code", "mean", "N")], napops_summary[, c("Species", "Intercept")],
-                 by.x = "Code", by.y = "Species")
-names(to_plot) <- c("Species", "Multi", "N", "Single")
+to_plot <- data.frame(Species = rem_ms_summary$Code,
+                      Single = rem_ss_summary$mean,
+                      Multi = rem_ms_summary$mean,
+                      N = rem_ms_summary$N)
 to_plot$Label <- ""
 to_plot$Multi <- exp(to_plot$Multi)
 to_plot$Single <- exp(to_plot$Single)
@@ -60,7 +70,7 @@ to_plot$diff <- to_plot$Multi - to_plot$Single
 # Check for a 20% relative difference in cue rates
 for (i in 1:nrow(to_plot))
 {
-  if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.20)
+  if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.10)
   {
     to_plot$Label[i] <- to_plot$Species[i]
   }
@@ -104,38 +114,46 @@ cr_differences <- to_plot
 
 ####### Distance Model ############################
 
-# Extract log_phi summary statistics from full Stan model runs
-dis_summary <- dis_model$summary("log_tau")
+pred_drops <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
+distance_stan_data_cv <- distance_stan_data
 
-# Add species names to these summaries
-dis_summary$Code <- distance_stan_data$sp_all
+# Extract log_tau summary statistics from full Stan model runs and add species Codes
+dis_ms_summary <- dis_ms$summary("log_tau")
+dis_ms_summary$Code <- setdiff(distance_stan_data_cv$sp_all, pred_drops)
+
+dis_ss_summary <- dis_ss$summary("log_tau")
+dis_ss_summary$Code <- setdiff(distance_stan_data_cv$sp_all, pred_drops)
 
 # Get data sample size for all species and add to summary
-species_n <- data.frame(table(distance_stan_data$species))
+species_n <- data.frame(table(distance_stan_data_cv$species))
 names(species_n) <- c("index", "N")
-dis_summary$index <- seq(1, nrow(dis_summary))
-dis_summary$N <- 0
+
+dis_ms_summary$index <- seq(1, nrow(dis_ms_summary))
+dis_ms_summary$N <- 0
+dis_ss_summary$index <- seq(1, nrow(dis_ss_summary))
+dis_ss_summary$N <- 0
 for (i in 1:nrow(species_n))
 {
-  dis_summary[which(dis_summary$index == species_n$index[i]), "N"] <-
+  dis_ms_summary[which(dis_ms_summary$index == species_n$index[i]), "N"] <-
+    species_n$N[i]
+  
+  dis_ss_summary[which(dis_ss_summary$index == species_n$index[i]), "N"] <-
     species_n$N[i]
 }
 
-# Get original single-species NA-POPS estimates
-napops_summary <- napops::coef_distance(species = dis_summary$Code, model = 1)
-
-to_plot <- merge(dis_summary[,c("Code", "mean")], napops_summary[, c("Species", "Intercept")],
-                 by.x = "Code", by.y = "Species")
-names(to_plot) <- c("Species", "Multi", "Single")
+to_plot <- data.frame(Species = dis_ms_summary$Code,
+                      Single = dis_ss_summary$mean,
+                      Multi = dis_ms_summary$mean,
+                      N = dis_ms_summary$N)
 to_plot$Label <- ""
 to_plot$Multi <- exp(to_plot$Multi) * 100
-to_plot$Single <- exp(to_plot$Single)
+to_plot$Single <- exp(to_plot$Single) * 100
 to_plot$diff <- to_plot$Multi - to_plot$Single
 
-# Check for a 20% relative difference in EDR
+# Check for a 20% relative difference in cue rates
 for (i in 1:nrow(to_plot))
 {
-  if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.20)
+  if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.10)
   {
     to_plot$Label[i] <- to_plot$Species[i]
   }
@@ -144,8 +162,8 @@ for (i in 1:nrow(to_plot))
 (single_vs_multi_plot <- ggplot(data = to_plot, mapping = aes(x = Single, y = Multi)) +
     geom_point() +
     geom_abline(slope = 1) +
-    xlim(0,500) +
-    ylim(0,500) +
+    xlim(0,800) +
+    ylim(0,800) +
     geom_text_repel(box.padding = 0.5, max.overlaps = Inf, aes(label = Label)) +
     xlab("EDR (Single Species)") + 
     ylab("EDR (Multi Species)") +
