@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # posthoc/3-cv-figure.R
 # Created December 2023
-# Last Updated December 2023
+# Last Updated April 2024
 
 ####### Import Libraries and External Files #######
 
@@ -43,10 +43,10 @@ lppd <- data.frame(Species = cv_folds_rem$Species,
 for (f in 1:max(cv_folds_rem$cv_fold))
 {
   # Extract dataframe of phi from single species and multi species model
-  ss_mod <- readRDS(paste0("output/model_runs/cv_removal/ss_fold_",
+  ss_mod <- readRDS(paste0("output/model_runs/cv_removal/ms-vs-ss/ss_fold_",
                            f,
                            ".RDS"))
-  ms_mod <- readRDS(paste0("output/model_runs/cv_removal/ms_fold_",
+  ms_mod <- readRDS(paste0("output/model_runs/cv_removal/ms-vs-ss/ms_fold_",
                            f,
                            ".RDS"))
   
@@ -89,25 +89,6 @@ for (f in 1:max(cv_folds_rem$cv_fold))
 }
 
 lppd$Difference <- lppd$MS_LPPD - lppd$SS_LPPD
-
-# cv_model <- cmdstan_model(stan_file = "models/cv_difference.stan")
-# cv_model_data <- list(N = nrow(lppd),
-#                       n_species = length(unique(lppd$Species)),
-#                       difference = lppd$Difference,
-#                       species = removal_stan_data_cv$species)
-# 
-# cv_model_run <- cv_model$sample(
-#   data = cv_model_data,
-#   iter_warmup = 1000,
-#   iter_sampling = 500,
-#   chains = 4,
-#   parallel_chains = 4,
-#   refresh = 10
-# )
-# 
-# saveRDS(cv_model_run, file = "output/model_runs/cv_removal/cv_model_removal.RDS")
-# 
-# cv_model_summary <- cv_model_run$summary(c("nu", "overall_difference", "species_difference", "sigma"))
 
 lppd_summary <- data.frame(Species = unique(lppd$Species),
                            Mean_Difference = NA,
@@ -188,10 +169,10 @@ lppd <- data.frame(Species = cv_folds_dis$Species,
 for (f in 1:max(cv_folds_dis$cv_fold))
 {
   # Extract dataframe of tau from single species and multi species model
-  ss_mod <- readRDS(paste0("output/model_runs/cv_distance/ss_fold_",
+  ss_mod <- readRDS(paste0("output/model_runs/cv_distance/ms-vs-ss/ss_fold_",
                            f,
                            ".RDS"))
-  ms_mod <- readRDS(paste0("output/model_runs/cv_distance/ms_fold_",
+  ms_mod <- readRDS(paste0("output/model_runs/cv_distance/ms-vs-ss/ms_fold_",
                            f,
                            ".RDS"))
   

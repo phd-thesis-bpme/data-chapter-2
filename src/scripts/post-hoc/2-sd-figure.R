@@ -3,13 +3,12 @@
 # Multi-species QPAD Detectability
 # posthoc/2-sd-figure.R
 # Created December 2023
-# Last Updated December 2023
+# Last Updated April 2024
 
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
 library(bayesplot)
-library(napops)
 library(plyr)
 library(ggplot2)
 library(ggpubr)
@@ -20,52 +19,54 @@ bayesplot::color_scheme_set("red")
 
 ####### Read Data #################################
 
-rem_model <- readRDS("output/model_runs/removal_predictions.RDS")
-load("data/generated/removal_stan_data_pred.rda")
+rem_ms <- readRDS("output/model_runs/removal_ms.RDS")
+rem_ss <- readRDS("output/model_runs/removal_ss.RDS")
+load("data/generated/removal_stan_data_cv.rda")
+
 dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
 load("data/generated/distance_stan_data.rda")
 
 ####### Removal Model #############################
 
 # Extract log_phi summary statistics from full Stan model runs
-rem_summary <- rem_model$summary("log_phi")
+rem_summary_ms <- rem_ms$summary("log_phi")
+rem_summary_ss <- rem_ss$summary("log_phi")
 
 # Add species names to these summaries
-rem_summary$Code <- removal_stan_data_pred$sp_all
+rem_summary_ms$Code <- removal_stan_data_cv$sp_all
+rem_summary_ss$Code <- removal_stan_data_cv$sp_all
 
 # Get data sample size for all species and add to summary
-species_n <- data.frame(table(removal_stan_data_pred$species))
+species_n <- data.frame(table(removal_stan_data_cv$species))
 names(species_n) <- c("index", "N")
-rem_summary$index <- seq(1, nrow(rem_summary))
-rem_summary$N <- 0
+rem_summary_ms$index <- seq(1, nrow(rem_summary_ms))
+rem_summary_ss$index <- seq(1, nrow(rem_summary_ss))
+
+rem_summary_ms$N <- 0
+rem_summary_ss$N <- 0
+
 for (i in 1:nrow(species_n))
 {
-  rem_summary[which(rem_summary$index == species_n$index[i]), "N"] <-
+  rem_summary_ms[which(rem_summary_ms$index == species_n$index[i]), "N"] <-
+    species_n$N[i]
+  
+  rem_summary_ss[which(rem_summary_ss$index == species_n$index[i]), "N"] <-
     species_n$N[i]
 }
 
-# Get original single-species NA-POPS estimates
-napops_summary <- napops::coef_removal(species = rem_summary$Code, model = 1)
+to_plot <- data.frame(Species = rep(removal_stan_data_cv$sp_all, 2),
+                      N = rep(species_n$N, 2),
+                      SD = c(rem_summary_ms$sd, rem_summary_ss$sd),
+                      Model = c(rep("Multi", nrow(rem_summary_ms)),
+                                rep("Single", nrow(rem_summary_ss))))
 
-to_plot <- rem_summary[which(rem_summary$Code %in% napops_summary$Species), 
-                       c("Code", "N", "sd")]
-names(to_plot) <- c("Code", "N", "Multi")
-to_plot$SD_Single <- NA
-# Get original NA-POPS SDs
-for (i in 1:nrow(to_plot))
-{
-  to_plot$SD_Single[i] <- sqrt(napops::get_vcv(species = to_plot$Code[i],
-                                               model_type = "rem",
-                                               model_num = 1))
-}
-to_plot_long <- reshape2::melt(to_plot, id = c("Code", "N"), variable_name = "Model")
-(sd_comp_removal <- ggplot(data = to_plot_long, 
-                       aes(x = log(N), y = (value),
-                           group = variable, color = variable)) + 
+(sd_comp_removal <- ggplot(data = to_plot, 
+                       aes(x = log(N), y = SD,
+                           group = Model, color = Model)) + 
   geom_smooth() +
   xlab("log(Sample Size)") +
   ylab("Standard Deviation") +
-    theme(legend.position = "none") +
+  #theme(legend.position = "none") +
   NULL)
 
 ####### Distance Model #############################
