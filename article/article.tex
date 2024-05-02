@@ -88,25 +88,47 @@ By leveraging the information provided by species with many data it may be possi
 This could be done in two ways: by making use of shrinkage factors and partial pooling, as done in Bayesian hierarchical models (Gelman and Vehtari 2021), and by accounting for phylogenetic relationships and the relative "relatedness" of different species, as done with Gaussian processes (Bernardo et al. 1998; McElreath 2020).
 
 \par The goal of this paper is to create a multi-species model of detectability that incorporates species traits and phylogeny, to both allow for the relaxation of the sample size requirements for estimating detectability, and to derive estimates of detectability for bird species without any data.
-To do so, we developed a Bayesian hierarchical version of the QPAD removal model initially derived in \citet{solymos_calibrating_2013}, that allows for information exchange between species based on phylogenetic distance and binned migratory status. 
-Phylogenetic distance was coded as a correlation structure and used as a Gaussian random field in this model, and migratory status was coded similarly to \citet{solymos_phylogeny_2018} in which a species was considered either "migrant" or "resident". 
-We also developed a Bayesian hierarchical version of the QPAD distance model initially derived in \citet{solymos_calibrating_2013} that allows for information exchange among species based only on the traits shown to be significant by \citet{solymos_phylogeny_2018}.
-These traits include migratory status (coded the same as removal models), habitat association (coded as either "open" or "closed"), song pitch, and body mass. 
-We also developed a Bayesian single species version of the QPAD removal and distance models (i.e., as opposed to the maximum likelihood models available in the \texttt{detect} R package; \citet{solymos_detect_2020} to allow for direct comparison through cross validation.
-Finally, we ran these models with the full set of data points used in \citet{edwards_point_2023}, plus additional data for seven species that did not meet the initial sample size thresholds for NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken (\textit{Tympanuchus pallidicinctus}), Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird (\textit{Agelaius tricolor}), and Spotted Owl (\textit{Strix occidentalis}). 
-All seven of these bird species are listed on Partners in Flight’s watchlist, indicating their conservation importance \citep{will_handbook_2020}. 
+To achieve this goal, we wanted to satisfy the following objectives and predictions:
+\begin{enumerate}
+	\item Compare and contrast estimates of cue rate and EDR produced from a Bayesian hierarchical QPAD removal model and distance model, respectively, to estimates produced from single-species model which does not share information. 
+	We predicted that for both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will differ very little from those estimated from a single-species model where no information is shared \cite{edwards_point_2023}, for species where we have sufficient sample size.
+	\item Compare precision in estimates of cue rate and EDR produced from a Bayesian hierarchical QPAD removal model and distance model, respectively, to estimates produced from single-species model which does not share information. 
+	We predicted that estimates of cue rate and EDR will be more precise when produced by a Bayesian hierarchical QPAD model than with a single-species QPAD model, but this increased precision will be most evident with smaller sample sizes.
+	\item Assess the capacity for a multi-species model to produces estimates of cue rate or EDR for species that are data sparse.
+	We predicted that a multi-species model will be able to produce better fitting estimates of cue rate or EDR than a single species model, particularly for data sparse species.
+	\item Assess the capacity for a multi-species model to make out-of-sample predictions of cue rate or EDR for species which have no data.
+	We predicted that a multi-species model will be able to produce estimates of cue rate or EDR that fall within a reasonable range of estimates from related species.
+\end{enumerate}
 
-\par We predicted that for both the Bayesian hierarchical QPAD removal model and Bayesian hierarchical QPAD distance model, estimates of cue rate and EDR, respectively, will differ very little from those estimated from the original NA-POPS database \cite{edwards_point_2023}. 
-This is because the species that were modelled in \citet{edwards_point_2023} had a sufficient number of data points to stand on their own, and so adding in species-level effects should have little effect on estimates. 
-Furthermore, we predicted that improvement in precision from a multi-species model will be related to sample size, such that precision of estimates will improve the most for species with smaller sample size, while precision of estimates will improve the least for species with larger sample sizes.
-Finally, we predicted that a multi-species model will have greater predictive capacity than a single-species model, particularly for species which are data-sparse.
-With the predictions above, we then expect to be able to generate estimates of cue rate and EDR for species with very little data, thus relaxing previous sample size requirements; additionally, we expect to be able to predict cue rate and EDR for species with no data by making use of the shrinkage effect offered by a multi-species model.
+Given these comparisons, we provide a case study of predicting detectability components for seven species for which we had little to no data: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken (\textit{Tympanuchus pallidicinctus}), Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird (\textit{Agelaius tricolor}), and Spotted Owl (\textit{Strix occidentalis}). 	
+All seven of these bird species are listed on Partners in Flight’s watchlist, indicating their conservation importance \citep{will_handbook_2020}. 	
 
 \section{Methods}
 
 \par The following subsections outline the modelling techniques used in this study as well as the data that were collected. 
 We start by introducing the Bayesian hierarchical QPAD removal and distance models, and then describe the input.
 Finally, we describe the experiments conducted to assess model performance and model comparison, which then allow us to make predictions for the seven undersampled species of interest.
+
+\subsection{Data Collection}
+\subsubsection{Point Count Data}
+\par We used the same standardized database of point count data that was assembled through the NA-POPS project \cite{edwards_point_2023}. 
+This consists of $712,138$ point counts conducted across $292$ projects in Canada and the United States, $422,514$ of which used removal sampling \citep{alldredge_time--detection_2007, farnsworth_removal_2002} and $522,820$ of which used distance sampling \citep{buckland_introduction_2001, buckland_distance_2015}.
+All of these point counts were recorded in the database in a standard way, using practices developed by the Boreal Avian Modelling project \citep{barker_ecological_2015}.
+
+\subsubsection{Phylogenetic Trees}
+\par We accessed 2000 pseudo-posterior trees from \citet{jetz_global_2012} for all species with sufficient data for removal modelling ($>75$ observations as per \cite{edwards_point_2023,solymos_evaluating_2018,buckland_introduction_2001}). 
+We also requested that the phylogenies include the following bird species with insufficient removal and/or distance data: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird, and Spotted Owl. 
+All seven of these bird species are listed on Partner's in Flight's watchlist for various threats \citep{will_handbook_2020}. 
+This resulted in 2000 pseudo-posterior trees that contained 323 species.
+
+\par We generated a phylogenetic correlation matrix $\mathbf{D}$ using the same methods outlined in the Appendix of \citet{solymos_phylogeny_2018} that generate distances between species, and further processed using the R package "ape" \citet{paradis_ape_2019}.
+
+\subsubsection{Species Traits}
+\par Species traits (song pitch, migratory vs resident, open vs. closed habitat) were obtained from Birds of the World accounts of all the birds to model in this study \citep{billerman_birds_2022}. 
+Birds were classified as "closed habitat" if their primary habitat was forests, and "open habitat" if their primary habitat was grasslands or shrublands.
+Any bird species that has specific areas of their range that is only for breeding (i.e., not year-round throughout their range) was classified as "migratory".
+Body mass for each bird species was obtained from the Elton traits dataset \citep{wilman_eltontraits_2014}. 
+Where body mass was not available through the Elton traits dataset, the Birds of the World account \citep{billerman_birds_2022} was used instead.
 
 \subsection{Bayesian Hierarchical Models}
 
@@ -189,70 +211,69 @@ $$\sigma \sim exp(5)$$
 
 \subsection{Single Species Models}
 
-\par To directly compare the multi-species models described above to its single-species equivalent in a cross-validation (see below), we built two Bayesian single-species models in Stan.
+\par To directly compare the multi-species models described above to its single-species equivalent (see below), we built two Bayesian single-species models in Stan.
 The single species models used the same likelihood statements as above for the count data, except rather than cue rate and EDR being estimated with shared information, they are estimated independently from each other.
 That is, $\log \phi_s \sim N(0,1) \forall s$, and $\log \tau_s \sim N(0,1) \forall s$, thus making it equivalent to the Null model in \citet{edwards_point_2023}, just estimated in a Bayesian framework rather than maximum likelihood. 
 
-\subsection{Data Collection}
-\subsubsection{Point Count Data}
-\par We used the same standardized database of point count data that was assembled through the NA-POPS project \cite{edwards_point_2023}. 
-This consists of $712,138$ point counts conducted across $292$ projects in Canada and the United States, $422,514$ of which used removal sampling and $522,820$ of which used distance sampling.
-All of these point counts were recorded in the database in a standard way, using practices developed by the Boreal Avian Modelling project \citep{barker_ecological_2015}.
-
-\subsubsection{Phylogenetic Trees}
-\par We accessed 2000 pseudo-posterior trees from \citet{jetz_global_2012} for all species with sufficient data for removal modelling ($>75$ observations as per \cite{edwards_point_2023,solymos_evaluating_2018,buckland_introduction_2001}). 
-We also specified that the phylogenies include the following bird species with insufficient data from NA-POPS: LeConte's Thrasher, Bicknell's Thrush, Lesser Prairie-chicken, Harris's Sparrow, Kirtland's Warbler, Tricolored Blackbird, and Spotted Owl. 
-All seven of these bird species are listed on Partner's in Flight's watchlist for various threats \citep{will_handbook_2020}. 
-This resulted in 2000 pseudo-posterior trees that contained 323 species.
-
-\par We generated a phylogenetic correlation matrix $\mathbf{D}$ using the same methods outlined in the Appendix of \citet{solymos_phylogeny_2018} that generate distances between species, and further processed using the R package "ape" \citet{paradis_ape_2019}.
-
-\subsubsection{Species Traits}
-\par Species traits (song pitch, migratory vs resident, open vs. closed habitat) were obtained from Birds of the World accounts of all the birds to model in this study \citep{billerman_birds_2022}. 
-Body mass for each bird species was obtained from the Elton traits dataset \citep{wilman_eltontraits_2014}. 
-Where body mass was not available through the Elton traits dataset, the Birds of the World account \citep{billerman_birds_2022} was used instead.
-
 \subsection{Model Assessment}
-
-\par To test our prediction that there would be little change between estimates of species already modelled in NA-POPS, we ran the Bayesian hierarchical QPAD Removal and Distance models on the set of species for which there was sufficient data in the original NA-POPS analysis.
+\subsubsection{Objective 1: Single-Species vs. Multi-Species Estimates}
+\par To test our prediction that there would be little change between estimates of species with sufficient sizes, we ran the Bayesian hierarchical QPAD Removal and Distance models on the set of species for which there was sufficient data.
 In this case, we ran both models for 316 species of birds.
 Rufous Hummingbird (\textit{Selasphorus rufus}) was dropped from the distance modelling due to issues with divergent transitions \citep{betancourt_diagnosing_2016, leimkuhler_simulating_2005}.
-Tricoloured Blackbird had sufficient distance data, and so was included in the distance modelling, but not the removal modelling.
-We accessed the single-species estimates of cue rate and EDR from the NA-POPS Null models using the \texttt{napops} R package \citep{edwards_napops_2023, edwards_point_2023}.
-We then modelled the difference in estimated cue rates and EDRs as
+Tricolored Blackbird was only included in the distance model because there was sufficient distance sampling data.
+We also ran the single species removal and distance models for the same suite of birds.
+We then subtracted the estimate of the single-species cue rate or EDR from the estimate of the multi-species cue rate or EDR, and modelled the difference in estimated cue rates and EDRs $\Delta X$ as
 $$\Delta X \sim N(0,\sigma)$$
 $$\sigma \sim exp(1)$$
 
-where $\Delta X$ is calculated as the mean multi-species estimate of cue rate or EDR minus the mean single-species estimate of cue rate of EDR.
-If our prediction is true, we would expect to see a distribution of modelled differences centred about 0, indicating no real difference in estimates of cue rate or EDR between single-species and multi-species models, for species for which we have sufficient data.
+If our prediction is true, we would expect to see a distribution of modelled differences centred about 0, indicating no difference in estimates of cue rate or EDR between single-species and multi-species models, for species for which we have sufficient data.
 
-\par To test our prediction about improved precision, we simply plotted the species-specific estimates of standard deviations of cue rate and EDR, respectively, against the log sample size, for each of the single-species and multi-species model. 
+\subsubsection{Objective 2: Comparison of Precision}
+\par To test our prediction about improved precision, we plotted the species-specific estimates of standard deviations of cue rate and EDR, respectively, against the log sample size, for each of the single-species and multi-species model.
 We then fit a smooth LOESS curve through each of the model-specific points.
-If our prediction is true, we would expect to see a plot showing a higher standard deviation in single-species models than for multi-species models, but only up until a certain sample size when they should both be similar.
+If our prediction is true, we would expect to see a plot showing a higher standard deviation in single-species models than for multi-species models, until sample size is such that they would both be similar.
+
+\subsubsection{Objective 3: Assessment of Estimates for Data-sparse Species}
 
 \par To test our prediction about improved accuracy, we ran a k-fold cross-validation with 5 folds, stratified by species.
-That is, for each cross-validation run, we held out 20\% of the data for each species for both the multi-species and Bayesian single-species models. 
-We then derived multi-species estimates of cue rate and EDR and single-species estimates of cue rate and EDR, for each cross-validation run, and used these parameter estimates to calculate the estimated pointwise log posterior density of each of the held out data points. 
-We then calculated the difference in posterior predictive density for removal and distance models, by subtracting the pointwise posterior predictive density of the single-species model from the pointwise posterior predictive density of the multi-species model (i.e., multi-species minus single-species).
-Finally, we took the mean and standard error of the difference in pointwise log posterior density for each species to create a species-specific mean and standard error of difference in pointwise posterior density.
+That is, for each of the five cross-validation run, we held out 20\% of the data for each species for both the multi-species and single-species models. 
+We then derived multi-species estimates of cue rate and EDR and single-species estimates of cue rate and EDR, for each cross-validation run, and used these parameter estimates to calculate the estimated log pointwise posterior density (LPPD) of each of the held out data points. 
+We then calculated the difference in LPPD for removal and distance models, by subtracting the LPPD of the single-species model from the LPPD of the multi-species model (i.e., multi-species minus single-species).
+Finally, we took the mean and standard error of the difference in LPPD for each species to create a species-specific mean and standard error of difference in LPPD.
 With this, positive intervals (i.e., where mean $\pm$ standard error is all positive) would indicate that the multi-species model was preferred, and negative intervals would indicate that the single-species model was preferred.
-If our prediction is true, then we would expect to see majority positive values of the species-specific mean pointwise posterior density.
+If our prediction is true, then we would expect to see majority positive values of the species-specific mean LPPD.
 
+\subsubsection{Objective 4: Assessment of Out-of-sample Predictions}
+\par To test our prediction that a multi-species model would be able to predict cue rates or EDRs for species with no data, we ran a 10-fold leave-species-out cross validation.
+That is, for each of the ten cross-validation runs, we held out all data for 10\% of the species for both the multi-species and single-species models.
+To determine which species would be left out in each fold of the removal model, we first split the phylogenetic tree into 10 parts using the "cutree" function in base R, which preserves relatedness in the 10 parts of the split tree.
+Then, for each of the parts of the tree, we randomly assigned a number between 1 and 10 (drawn from a uniform distribution) to all migratory then all resident species.
+This ensured that for each fold, there would be a balance of related and unrelated species left out, as well as a relatively equal balance of migratory and resident species left out.
+To determine which species would be left out in each fold of the distance model, we randomly assigned a number between 1 and 10 (drawn from a uniform distribution) to each species within a migratory resident $\times$ habitat preference, which ensured that there would be a good balance of species left out for each group of species.
+by either phylogeny and migratory status (for removal modelling) or by migratory status and habitat preference (for distance modelling).
+Because Stan allows draws from a posterior distribution even with no data, we drew values from the posterior distribution of all of the held out species for each cross-validation fold, and used mean and standard deviation of those draws as the predicted cue rate or EDR.
+We then modelled the difference in those predicted cue rates or EDRs to the "true" cue rates or EDRs obtained from the multi-species models in Objective 1.
 
-\subsection{Predicting Detection Probabilities}
-\par To predict estimates of cue rate or EDR from the multi-species models, we adopted two possible approaches.
-If the NA-POPS database contained at least some point-count data for the species of interest, we simply added these data into the model.
-This is different from \citet{edwards_point_2023}, \citet{solymos_calibrating_2013}, and \citet{solymos_evaluating_2018}, where any species with less than 75 data points were removed from the analysis.
-For species that did not have any data in the NA-POPS database, we generated a row of traits data for the species and estimated its cue rate and EDR as parameters in the model.
-We then ran the multi-species models described above using these additional data points (and hence an updated phylogenetic correlation structure for the removal model) to generate estimates of cue rate and EDR for these new species.
+\subsection{Case Study: Predicting Detection Probabilities for Rare and Undersampled Species}
+\par We ran the multi-species removal and distance models again, this time with the minimal data available for seven species of undersampled landbirds, and generated estimates of cue rate and EDR for these seven species.
+For tricolored blackbird, we had sufficient data points for distance modelling for Objectives 1 - 4, and so we only generated estimates of cue rate here.
+For two of the species, Kirtland's Warbler and Bicknell's Thrush, we used the predicted cue rate and EDR to calculate availability and perceptibility, and hence detectability, for a given survey type, and compared these metrics to previous estimates of detectability obtained from other studies.
+As a reminder, following derivations in \citet{solymos_calibrating_2013}, detectability is the product of availability and perceptibility.
+Availability $p(t)$ is defined as the probability of a bird giving a cue during a survey run for $t$ minutes, and is calculated as
+$p(t) = 1 - e^{-t\phi}$
+where $\phi$ is the cue rate of the species.
+Perceptibility $q(r)$ is defined as the probability of an observer hearing or seeing a bird, given the bird gives a cue, with a survey radius of $r$ metres, and is calculated as
+$q(r) = \dfrac{\tau^2 \left\{1 - e^{-\dfrac{r^2}{\tau^2}}\right\}}{r^2}$
+where $\tau$ is the EDR of the species.
+For Kirtland's Warbler, we compared our estimates of detectability to those obtained in \citet{van_dyke_comparative_2022} which compared estimates of Kirtland's Warbler detectability among different jack pine stands and red pine stands.
+For Bicknell's Thrush, we compared our estimates of detectability to those obtained in \citet{aubry_bicknells_2018} which estimated detectability in a small portion of Bicknell's Thrush's breeding range.
 
 \subsection{Analysis}
 \par All analyses were performed in R version 4.2.2 \citep{r_core_team_r_2022}.
 Manipulation of phylogenetic trees, including finding a consensus tree for visualization and generating variance-covariance matrices based on the 2000 bootstrapped trees, was done using the \texttt{ape} R package \citep{paradis_ape_2019}.
 All Bayesian models were coded in the Stan Probabilistic Language \cite{stan_development_team_stan_2019}, and models were run using the \texttt{cmdstanr} R package \citep{gabry_cmdstanr_2022} and visualized using the \texttt{bayesplot} R package \citep{gabry_visualization_2019}.
 Each of the single-species models and multi-species models, as well as the models created to assess performance, were run using 1000 warmup iterations and 2000 sampling iterations, each on 4 chains for a total of 8000 draws per model run.
-To mitigate issues surrounding initial values being rejected in the distance model (see Discussion), we set the initial values of EDR to be the mean EDR from NA-POPS estimates; for species where EDR estimates did not exist in NA-POPS, we used the overall mean EDR as initial value.
-Cross-validation models were run with 1000 warmup iterations and 500 sampling iterations, each on 4 chains for a total of 2000 draws per model run.
+To mitigate issues surrounding initial values being rejected in the distance model (see Discussion), we set the initial values of EDR to be the mean EDR from NA-POPS \citep{edwards_point_2023} estimates; for species where EDR estimates did not exist in NA-POPS, we used the overall mean EDR as initial value.
 All of the models made use of Stan's reduce\_sum functionality, which allows for within-chain parallelization as well as the usual across-chain parallelization.
 This was particularly useful in our case as the multi-species removal model contained over 3 million data points and the multi-species distance model contained over 4 million data points, and so computational expense was a large concern.
 All models were run on one of two multi-core processing servers, one running Ubuntu 20.04.4 LTS and one running Ubuntu 20.04.6 LTS.
@@ -261,13 +282,6 @@ All models were run on one of two multi-core processing servers, one running Ubu
 
 
 \section{Results}
-\subsection{Parameter Estimates}
-
-\par We found much less support for a difference in cue rate between resident and migrant species than was found in \citet{solymos_evaluating_2018}. 
-Mean overall log cue rate in the multi-species model was -1.09 (95\% credible interval of [-1.24, -0.94]); both estimated effects for resident and migrant species were effectively 0 (Figure \ref{fig:params}A).
-We also found little support for migration strategy having any effect on EDR.
-There is some evidence that a resident species may have a slightly higher EDR than a migrant species, but the 95\% credible intervals of both effects overlapped with the 95\% credible interval of the overall estimated intercept (Figure \ref{fig:params}B).
-We did find similar support for change in EDR by body size and pitch, in that body size tended to have an increasing effect on EDR, and song pitch had a decreasing effect on EDR (Figure \ref{fig:params}B).
 
 \subsection{Comparison of Estimates between Single Species and Multi Species}
 
@@ -308,7 +322,8 @@ Among the seven species with greater than 20\% change in EDR, three species (Bai
 
 \subsection{Predictions of Cue Rate and EDR for Undersampled Species}
 
-\par We used the multi-species removal model and distance model to generate predictions of cue rate and EDR, respectively, for 7 species of undersampled birds from the original NA-POPS analysis (6 for distance modelling because Tricoloured Blackbird had sufficient distance sampling data).
+\par We used the multi-species removal model and distance model to generate predictions of cue rate and EDR, respectively, for seven species of undersampled birds from the original NA-POPS analysis (6 for distance modelling because Tricoloured Blackbird had sufficient distance sampling data).
+
 
 \par The multi-species removal model produced reasonable estimates of cue rates for all seven species considered here (Figure \ref{fig:predictions}A).
 Species where the sample size requirements were relaxed (i.e., all except Bicknell's Thrush and Kirtland's Warbler) had reasonable precision associated with the estimates.
@@ -328,12 +343,6 @@ Given the results of these comparisons, we predicted these components of detecta
 \par In both cases of QPAD removal modelling and QPAD distance modelling, we were able to generate estimates of detectability for species with no data, and precise estimates of detectability for data-sparse species.
 Overall, the shrinkage effect offered by the multi-species modelling approach allowed for more accurate estimates of cue rate and EDR to be derived in species with smaller sample sizes, without affected estimates in species with large sample sizes.
 The best model for predictive accuracy tended to depend on the species, but overall differences in the estimates were small enough that using a multi-species model should not produce extremely inaccurate estimates.
-
-\par Although this was not a primary goal of our study, when considering the species-level covariates, we found much less support than \citet{solymos_phylogeny_2018} for migration strategy having an effect on cue rate and EDR.
-Both the estimated effects for resident species and migratory species were effectively 0 in the removal model, with very little of the density above or below 0.025 from 0.
-These estimates varied slightly more in the distance model, but the 95\% credible interval still captured 0.
-One potential reason is that we had proportionally more resident species in our analysis (85 out of 316; 26.9\%) compared to \citet{solymos_phylogeny_2018} (23 out of 141; 16.3\%), and so the richer information provided by these additional species could have brought the effect down to 0.
-Habitat type, body mass, and song pitch, as expected, all had an overall effect on EDR, as was found in \citet{solymos_phylogeny_2018} and \cite{johnston_species_2014}.
 
 \subsection{Predicting Detectability for Data-sparse Species}
 
@@ -377,13 +386,7 @@ With that in mind, it would likely be important to consider how many "related" s
 \subsection{Comparisons of Predicted Detectability to Other Studies}
 
 \par Using the predictions of cue rate and EDR for Bicknell’s Thrush and Kirtland’s Warbler, we can calculate availability and perceptibility, and hence detectability, for a given survey type, and compare to previous estimates of detectability obtained from other studies.
-As a reminder, following derivations in \citet{solymos_calibrating_2013}, detectability is the product of availability and perceptibility.
-Availability $p(t)$ is defined as the probability of a bird giving a cue during a survey run for $t$ minutes, and is calculated as
-$p(t) = 1 - e^{-t\phi}$
-where $\phi$ is the cue rate of the species.
-Perceptibility $q(r)$ is defined as the probability of an observer hearing or seeing a bird, given the bird gives a cue, with a survey radius of $r$ metres, and is calculated as
-$q(r) = \dfrac{\tau^2 \left\{1 - e^{-\dfrac{r^2}{\tau^2}}\right\}}{r^2}$
-where $\tau$ is the EDR of the species.
+
 
 \par For Bicknell's Thrush, using the equations above, the predicted cue rate of 0.28, predicted EDR of 73.3 m, and an example survey design of 5 minutes recording all birds within 100 m, we estimate a detectability of 0.34.
 We can also use the lowest predicted cue rate and EDR and the highest predicted cue rate and EDR (based on the respectively credible intervals) to get a range of detectabilities from 0.09 through 0.70.
@@ -457,12 +460,6 @@ We suggest that this type of model where information about detectability is shar
 \bibliography{refs}
 
 \section{Figures}
-
-\begin{figure}[h]
-	\includegraphics{../output/plots/parameters_plot.png}
-	\caption{Posterior distributions with mean (points), 50\% credible intervals (bolded lines), and 95\% credible intervals (thin lines) of parameters estimated in the multi-species removal model (A) and the multi-species distance model (B).}
-	\label{fig:params}
-\end{figure}
 
 \begin{figure}[h]
 	\includegraphics{../output/plots/1vs1.png}

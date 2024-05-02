@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # 5-distance-cv.R
 # Created October 2023
-# Last Updated November 2023
+# Last Updated March 2024
 
 ####### Import Libraries and External Files #######
 
@@ -21,7 +21,7 @@ cv_folds <- read.csv("data/generated/distance_cv_folds.csv")
 ####### Set Constants #############################
 
 # Stan settings
-n_iter <- 500
+n_iter <- 2000
 n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
@@ -94,7 +94,7 @@ for (i in 1:max(cv_folds$cv_fold))
     threads_per_chain = threads_per_chain,
     init = inits
   )
-  stan_run_ms$save_object(file = paste0("output/model_runs/cv_distance/ms_fold_",
+  stan_run_ms$save_object(file = paste0("output/model_runs/cv_distance/ms-vs-ss/ms_fold_",
                                       i,
                                       ".RDS"))
   
@@ -115,7 +115,7 @@ for (i in 1:max(cv_folds$cv_fold))
     threads_per_chain = threads_per_chain,
     init = inits
   )
-  stan_run_ss$save_object(file = paste0("output/model_runs/cv_distance/ss_fold_",
+  stan_run_ss$save_object(file = paste0("output/model_runs/cv_distance/ms-vs-ss/ss_fold_",
                                         i,
                                         ".RDS"))
 }

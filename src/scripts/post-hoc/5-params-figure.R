@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # posthoc/5-params-figure.R
 # Created December 2023
-# Last Updated December 2023
+# Last Updated April 2024
 
 ####### Import Libraries and External Files #######
 
@@ -20,8 +20,8 @@ bayesplot::color_scheme_set("red")
 
 ####### Read Data #################################
 
-rem_model <- readRDS("output/model_runs/removal_predictions.RDS")
-dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
+rem_model <- readRDS("output/model_runs/removal_ms.RDS")
+dis_model <- readRDS("output/model_runs/distance_ms.RDS")
 
 ####### Removal Model #############################
 

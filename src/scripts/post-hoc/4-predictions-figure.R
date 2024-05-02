@@ -3,13 +3,12 @@
 # Multi-species QPAD Detectability
 # posthoc/4-predictions-figure.R
 # Created December 2023
-# Last Updated December 2023
+# Last Updated April 2024
 
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
 library(bayesplot)
-library(napops)
 library(plyr)
 library(ggplot2)
 library(ggpubr)
@@ -47,9 +46,6 @@ for (i in 1:nrow(species_n))
   rem_summary[which(rem_summary$index == species_n$index[i]), "N"] <-
     species_n$N[i]
 }
-
-# Get original single-species NA-POPS estimates
-napops_summary <- napops::coef_removal(species = rem_summary$Code, model = 1)
 
 # Add binomial names
 rem_summary <- dplyr::left_join(x = rem_summary, y = binomial[, c("Code", "Scientific_BT")],
