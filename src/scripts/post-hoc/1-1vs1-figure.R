@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # posthoc/1-1vs1-figure.R
 # Created December 2023
-# Last Updated April 2024
+# Last Updated May 2024
 
 ####### Import Libraries and External Files #######
 
@@ -18,8 +18,6 @@ library(patchwork)
 theme_set(theme_pubclean())
 bayesplot::color_scheme_set("red")
 
-source("src/functions/subset-distance-data.R")
-
 ####### Read Data #################################
 
 rem_ms <- readRDS("output/model_runs/removal_ms.RDS")
@@ -28,7 +26,7 @@ load("data/generated/removal_stan_data_cv.rda")
 
 dis_ms <- readRDS("output/model_runs/distance_ms.RDS")
 dis_ss <- readRDS("output/model_runs/distance_ss.RDS")
-load("data/generated/distance_stan_data.rda")
+load("data/generated/distance_stan_data_cv.rda")
 
 ####### Removal Model #############################
 
@@ -67,7 +65,7 @@ to_plot$Multi <- exp(to_plot$Multi)
 to_plot$Single <- exp(to_plot$Single)
 to_plot$diff <- to_plot$Multi - to_plot$Single
 
-# Check for a 20% relative difference in cue rates
+# Check for a 10% relative difference in cue rates
 for (i in 1:nrow(to_plot))
 {
   if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.10)
@@ -111,18 +109,16 @@ removal_plot <- single_vs_multi_plot + inset_element(modelled_difference_plot,
                                                      top = 0.5)
 
 cr_differences <- to_plot
+cr_diff_model <- diff_model_run$summary()
 
 ####### Distance Model ############################
 
-pred_drops <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
-distance_stan_data_cv <- distance_stan_data
-
 # Extract log_tau summary statistics from full Stan model runs and add species Codes
 dis_ms_summary <- dis_ms$summary("log_tau")
-dis_ms_summary$Code <- setdiff(distance_stan_data_cv$sp_all, pred_drops)
+dis_ms_summary$Code <- distance_stan_data_cv$sp_all
 
 dis_ss_summary <- dis_ss$summary("log_tau")
-dis_ss_summary$Code <- setdiff(distance_stan_data_cv$sp_all, pred_drops)
+dis_ss_summary$Code <- distance_stan_data_cv$sp_all
 
 # Get data sample size for all species and add to summary
 species_n <- data.frame(table(distance_stan_data_cv$species))
@@ -193,14 +189,20 @@ distance_plot <- single_vs_multi_plot + inset_element(modelled_difference_plot,
                                                      top = 0.5)
 
 edr_differences <- to_plot
+edr_diff_model <- diff_model_run$summary()
 
 ####### Output ####################################
 
-write.table(rem_summary, file = "data/generated/phi.csv", sep = ",", row.names = FALSE)
-write.table(dis_summary, file = "data/generated/tau.csv", sep = ",", row.names = FALSE)
+write.table(rem_ms_summary, file = "data/generated/phi_ms.csv", sep = ",", row.names = FALSE)
+write.table(rem_ss_summary, file = "data/generated/phi_ss.csv", sep = ",", row.names = FALSE)
+write.table(dis_ms_summary, file = "data/generated/tau_ms.csv", sep = ",", row.names = FALSE)
+write.table(dis_ss_summary, file = "data/generated/tau_ss.csv", sep = ",", row.names = FALSE)
 
 write.table(cr_differences, file = "data/generated/phi_differences.csv", sep = ",", row.names = FALSE)
+write.table(cr_diff_model, file = "data/generated/phi_difference_model.csv", sep = ",", row.names = FALSE)
 write.table(edr_differences, file = "data/generated/tau_differences.csv", sep = ",", row.names = FALSE)
+write.table(edr_diff_model, file = "data/generated/tau_difference_model.csv", sep = ",", row.names = FALSE)
+
 
 tiff("output/plots/1vs1.tiff",
      width = 6, height = 6, res = 600, units = "in")

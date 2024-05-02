@@ -23,8 +23,9 @@ rem_ms <- readRDS("output/model_runs/removal_ms.RDS")
 rem_ss <- readRDS("output/model_runs/removal_ss.RDS")
 load("data/generated/removal_stan_data_cv.rda")
 
-dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
-load("data/generated/distance_stan_data.rda")
+dis_ms <- readRDS("output/model_runs/distance_ms.RDS")
+dis_ss <- readRDS("output/model_runs/distance_ss.RDS")
+load("data/generated/distance_stan_data_cv.rda")
 
 ####### Removal Model #############################
 
@@ -66,50 +67,49 @@ to_plot <- data.frame(Species = rep(removal_stan_data_cv$sp_all, 2),
   geom_smooth() +
   xlab("log(Sample Size)") +
   ylab("Standard Deviation") +
-  #theme(legend.position = "none") +
+  theme(legend.position = "none") +
   NULL)
 
 ####### Distance Model #############################
 
-# Extract log_phi summary statistics from full Stan model runs
-dis_summary <- dis_model$summary("log_tau")
+# Extract log_tau summary statistics from full Stan model runs
+dis_summary_ms <- dis_ms$summary("log_tau")
+dis_summary_ss <- dis_ss$summary("log_tau")
 
-# Add species names to these summaries
-dis_summary$Code <- distance_stan_data$sp_all
+# Add the species names
+dis_summary_ms$Code <- distance_stan_data_cv$sp_all
+dis_summary_ss$Code <- distance_stan_data_cv$sp_all
 
 # Get data sample size for all species and add to summary
-species_n <- data.frame(table(distance_stan_data$species))
+species_n <- data.frame(table(distance_stan_data_cv$species))
 names(species_n) <- c("index", "N")
-dis_summary$index <- seq(1, nrow(dis_summary))
-dis_summary$N <- 0
+dis_summary_ms$index <- seq(1, nrow(dis_summary_ms))
+dis_summary_ss$index <- seq(1, nrow(dis_summary_ss))
+
+dis_summary_ms$N <- 0
+dis_summary_ss$N <- 0
+
 for (i in 1:nrow(species_n))
 {
-  dis_summary[which(dis_summary$index == species_n$index[i]), "N"] <-
+  dis_summary_ms[which(dis_summary_ms$index == species_n$index[i]), "N"] <-
+    species_n$N[i]
+  
+  dis_summary_ss[which(dis_summary_ss$index == species_n$index[i]), "N"] <-
     species_n$N[i]
 }
 
-# Get original single-species NA-POPS estimates
-napops_summary <- napops::coef_distance(species = dis_summary$Code, model = 1)
+to_plot <- data.frame(Species = rep(distance_stan_data_cv$sp_all, 2),
+                      N = rep(species_n$N, 2),
+                      SD = c(dis_summary_ms$sd, dis_summary_ss$sd),
+                      Model = c(rep("Multi", nrow(dis_summary_ms)),
+                                rep("Single", nrow(dis_summary_ss))))
 
-to_plot <- dis_summary[which(dis_summary$Code %in% napops_summary$Species), 
-                       c("Code", "N", "sd")]
-names(to_plot) <- c("Code", "N", "SD_Multi")
-to_plot$SD_Single <- NA
-# Get original NA-POPS SDs
-for (i in 1:nrow(to_plot))
-{
-  to_plot$SD_Single[i] <- sqrt(napops::get_vcv(species = to_plot$Code[i],
-                                               model_type = "dis",
-                                               model_num = 1))
-}
-to_plot_long <- reshape2::melt(to_plot, id = c("Code", "N"), variable_name = "Model")
-(sd_comp_distance <- ggplot(data = to_plot_long, 
-                           aes(x = log(N), y = (value),
-                               group = variable, color = variable)) + 
+(sd_comp_distance <- ggplot(data = to_plot, 
+                           aes(x = log(N), y = SD,
+                               group = Model, color = Model)) + 
     geom_smooth() +
     xlab("log(Sample Size)") +
     ylab("Standard Deviation") +
-    ylim(0,0.4) +
     theme(legend.position = "none") +
     NULL)
 

@@ -283,25 +283,23 @@ All models were run on one of two multi-core processing servers, one running Ubu
 
 \section{Results}
 
-\subsection{Comparison of Estimates between Single Species and Multi Species}
+\subsection{Single-Species vs. Multi-Species Estimates}
 
-\par We found very little evidence for an overall change in cue rate for a given species modelled by a single-species model vs a multi-species model (Figure \ref{fig:1vs1}A).
-Seven out of the 316 species considered for removal modelling had a percent change in cue rate of more than 20\%.
-These species were Willow Ptarmigan (\textit{Lagopus lagopus}), Rusty Blackbird (\textit{Euphagus carolinus}), Red-bellied Sapsucker (\textit{Sphyrapicus ruber}), Common Redpoll (\textit{Acanthis flammea}), Calliope Hummingbird (\textit{Selasphorus calliope}), Bohemian Waxwing (\textit{Bombycilla garrulus}), and Allen's Hummingbird (\textit{Selasphorus sasin}).
-All seven of these species were among the lowest cue rates in both the single-species and multi-species context (Figure \ref{fig:1vs1}A).
+\par We found slight evidence for an overall change in cue rate for a given species modelled by a single-species model vs a multi-species model.
+The mean modelled difference in cue rate was $-1.57 \times 10^{-3}$, indicating that estimates of cue rate from a multi-species model may be slightly less than estimates of cue rate from a single-species model.
+Ten out of the 316 species considered for removal modelling had a percent change in cue rate of more than 10\%.
+These species were: Willow Ptarmigan (\textit{Lagopus lagopus}), Rusty Blackbird (\textit{Euphagus carolinus}), Red-bellied Sapsucker (\textit{Sphyrapicus ruber}), Prairie Falcon (\textit{Falco mexicanus}), Nuttall's Woodpecker (\textit{Picoides nuttallii}), Northern Goshawk (\textit{Accipiter atricapillus}), Ferruginous Hawk (\textit{Buteo regalis}), Common Redpoll (\textit{Acanthis flammea}), Calliope Hummingbird (\textit{Selasphorus calliope}), and Bohemian Waxwing (\textit{Bombycilla garrulus})(Figure \ref{fig:1vs1}A).
 
-\par We found little evidence for a change in modelled EDR between single species and multi-species distance models (Figure \ref{fig:1vs1}B). 
-(NEEDS UPDATING) Seven out of the 317 species had a percent change in EDR of more than 20\% (Figure \ref{fig:1vs1}B).
-These species were Sharp-tailed Grouse (\textit{Tympanuchus phasianellus}), Sedge Wren (\textit{Cistothorus stellaris}), Ring-necked Pheasant (\textit{Phasianus colchicus}), Chimney Swift (\textit{Chaetura pelagica}), Chihuahuan Raven (\textit{Corvus cryptoleucus}), Boat-tailed Grackle (\textit{Quiscalus major}), and Baird's Sparrow (\textit{Ammodramus bairdii}).
+\par We found little evidence for a change in modelled EDR between single species and multi-species distance models. 
+The mean modelled difference in EDR was 0.97, but the 90\% credible interval overlapped zero.
+Two out of the 315 species had a percent change in EDR of more than 10\%.
+These species were Greater Prairie-chicken (\textit{Tympanuchus cupido}) and Chihuahuan Raven (\textit{Corvus cryptoleucus}) (Figure \ref{fig:1vs1}B).
 
 \subsection{Comparison of Precision between Single Species and Multi Species}
 
-\par We found some evidence that a multi-species removal model improved the precision of cue rate estimates compared to estimates from a single-species model (Figure \ref{fig:sd}A).
-This was particularly evident for species with sample sizes less than approximately $\exp\left\{7\right\} \approx 1097$, where the estimated LOESS curve for single-species standard deviation was always higher than the estimated LOESS curve for multi-species standard deviations.
-For sample sizes greater than 1097, standard deviations appeared similar in both the single-species and multi-species model, indicating no real improvement in precision.
-
-\par We found little evidence that a multi-species model improves the precision of EDR compared to that of a single-species model (Figure \ref{fig:sd}B).
-Both estimated LOESS curves for single-species standard deviations and multi-species standard deviations were roughly equal across all sample sizes, indicating no real improvement (or decrease) in precision.
+\par For both the removal and distance models, we found little evidence that a multi-species model improved the precision of estimates of cue rate or EDR, respectively.
+For removal modelling, the LOESS curves show some difference in sample sizes less than approximately $\exp\left\{7\right\} \approx 1097$, where the estimated LOESS curve for single-species standard deviation was slightly higher than the estimated LOESS curve for multi-species standard deviations (Figure \ref{fig:sd}A).
+For distance modelling, the curves were relatively equivalent throughout the range of sample sizes (Figure \ref{fig:sd}B).
 
 \subsection{Comparison of Predictive Accuracy between Single Species and Multi Species}
 
