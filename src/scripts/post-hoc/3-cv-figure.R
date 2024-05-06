@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # posthoc/3-cv-figure.R
 # Created December 2023
-# Last Updated April 2024
+# Last Updated May 2024
 
 ####### Import Libraries and External Files #######
 
@@ -17,13 +17,12 @@ theme_set(theme_pubclean())
 bayesplot::color_scheme_set("red")
 
 source("src/functions/rem-lik.R")
-source("src/functions/subset-distance-data.R")
 source("src/functions/dis-lik.R")
 
 ####### Read Data #################################
 
 load("data/generated/removal_stan_data_cv.rda")
-load("data/generated/distance_stan_data.rda")
+load("data/generated/distance_stan_data_cv.rda")
 cv_folds_rem <- read.csv("data/generated/removal_cv_folds.csv")
 cv_folds_dis <- read.csv("data/generated/distance_cv_folds.csv")
 phylo_tree <- ape::read.nexus(file = "data/raw/all_species.nex")
@@ -40,8 +39,8 @@ lppd <- data.frame(Species = cv_folds_rem$Species,
                    MS_LPPD = NA,
                    Difference = NA)
 
-for (f in 1:max(cv_folds_rem$cv_fold))
-{
+for (f in 1:max(cv_folds_rem$cv_fold)){
+  
   # Extract dataframe of phi from single species and multi species model
   ss_mod <- readRDS(paste0("output/model_runs/cv_removal/ms-vs-ss/ss_fold_",
                            f,

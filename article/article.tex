@@ -301,21 +301,25 @@ These species were Greater Prairie-chicken (\textit{Tympanuchus cupido}) and Chi
 For removal modelling, the LOESS curves show some difference in sample sizes less than approximately $\exp\left\{7\right\} \approx 1097$, where the estimated LOESS curve for single-species standard deviation was slightly higher than the estimated LOESS curve for multi-species standard deviations (Figure \ref{fig:sd}A).
 For distance modelling, the curves were relatively equivalent throughout the range of sample sizes (Figure \ref{fig:sd}B).
 
-\subsection{Comparison of Predictive Accuracy between Single Species and Multi Species}
+\subsection{Assessment of Model Preference for Data-sparse Species}
 
-\par The cross validation revealed that the multi-species removal model had better predictive capacity for more species (200 out of 316) than the single-species removal models (99 out of 316).
-Seventeen out of 316 species showed no better predictive capacity with either model.
-Mean overall difference in log predictive density was $4.78 \times 10^{-6}$, indicating a small overall preference for the multi-species model.
+\par The k-fold cross validation revealed that the multi-species removal model had better predictive performance for more species (200 out of 316) than the single-species removal model (94 out of 316).
+Twenty-two out of 316 species showed no preference between either model.
+Mean overall difference in species-wise mean LPPD was $2.65 \times 10^{-4}$, indicating a small overall preference for the multi-species model.
 As expected, multi-species models tended to have better predictive capacity when sample size was low, with a negligible difference as sample size increased (Figure \ref{fig:cv}A).
-There did not appear to be any patterns in model selection among phylogeny or traits (see Supplemental Figure 1 for full phylogenetic tree).
-Among the seven species with greater than 20\% change in cue rate, three species (Allen's Hummingbird, Bohemian Waxwing, and Rusty Blackbird) had the multi-species model chosen as the better model, three species (Common Redpoll, Red-bellied Sapsucker, and Willow Ptarmigan) had the single-species model chosen as the better model, and one species (Calliope Hummingbird) had neither model chosen as the better model.
+Among the ten species with greater than 10\% change in cue rate, three species (Bohemian Waxwing, Northern Goshawk, and Rusty Blackbird) had the multi-species model chosen as the better model, whereas the remaining seven species had the single-species model chosen as the better model.
 
-\par The cross validation revealed that the multi-species distance model also tended to have better predictive capacity for more species (156 out of 316) than the single-species distance models (140 out of 316), but to a lesser extent than the removal models.
+\par NEEDS UPDATING The cross validation revealed that the multi-species distance model also tended to have better predictive capacity for more species (156 out of 316) than the single-species distance models (140 out of 316), but to a lesser extent than the removal models.
 Twenty out of the 316 species showed no better predictive capacity with either model.
 Mean overall difference in log predictive density was $7.66 \times 10^{-10}$, indicating a small overall preference for the multi-species model.
 However, similar to the removal model cross-validation results, the overall difference in posterior predictive density was very small, with a mean difference of $1.85 \times 10^{-4}$.
 Similar to removal models, multi-species distance models tended to have better predictive capacity when sample size was low, with a negligible difference as sample size increased (Figure \ref{fig:cv}B).
 Among the seven species with greater than 20\% change in EDR, three species (Baird's Sparrow, Sedge Wren, and Sharp-tailed Grouse) had the multi-species model chosen as the better model, and four species (Boat-tailed Grackle, Chihuahuan Raven, Chimney Swift, and Ring-necked Pheasant) has the single-species model chosen as the better model.
+
+\subsection{Assessment of Out-of-sample Predictions}
+
+
+
 
 
 \subsection{Predictions of Cue Rate and EDR for Undersampled Species}

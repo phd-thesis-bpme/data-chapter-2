@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # posthoc/4-species-cv-figure.R
 # Created April 2024
-# Last Updated April 2024
+# Last Updated May 2024
 
 ####### Import Libraries and External Files #######
 
@@ -11,8 +11,6 @@ library(cmdstanr)
 library(ggplot2)
 library(ggpubr)
 theme_set(theme_pubclean())
-
-source("src/functions/subset-distance-data.R")
 
 ####### Set Constants #############################
 
@@ -29,7 +27,7 @@ for (i in 1:k)
 }
 rem_fold_nums <- read.csv("data/generated/removal_cv_folds_species.csv")
 
-load("data/generated/distance_stan_data.rda")
+load("data/generated/distance_stan_data_cv.rda")
 distance_all <- readRDS("output/model_runs/distance_ms.RDS")
 distance_folds <- vector(mode = "list", length = k)
 for (i in 1:k)
@@ -66,6 +64,7 @@ rem_cv_df$True_Exp <- exp(rem_cv_df$True)
 rem_cv_df$Predicted_Exp <- exp(rem_cv_df$Predicted)
 rem_cv_df$Difference <- rem_cv_df$True_Exp - rem_cv_df$Predicted_Exp
 rem_cv_df$Abs_Diff <- abs(rem_cv_df$Difference)
+rem_cv_df$Percent_Diff <- rem_cv_df$Difference / rem_cv_df$True_Exp
 
 removal_cv_plot <- ggplot(data = rem_cv_df, aes(x = True_Exp, y = Predicted_Exp)) +
   geom_point() +
