@@ -3,19 +3,17 @@
 # Multi-species QPAD Detectability
 # 5-distance-cv.R
 # Created October 2023
-# Last Updated March 2024
+# Last Updated May 2024
 
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
-library(dplyr)
 
 source("src/functions/generate-distance-inits.R")
-source("src/functions/subset-distance-data.R")
 
 ####### Load Data #################################
 
-load("data/generated/distance_stan_data.rda")
+load("data/generated/distance_stan_data_cv.rda")
 cv_folds <- read.csv("data/generated/distance_cv_folds.csv")
 
 ####### Set Constants #############################
@@ -25,18 +23,10 @@ n_iter <- 2000
 n_warmup <- 1000
 n_chains <- 4
 refresh <- 10
-threads_per_chain <- 7
+threads_per_chain <- 3
+dis_data <- distance_stan_data_cv # lazy
 
 ####### Data Wrangling ############################
-
-#' First we must drop all species which are just not going to be involved
-#' in the cross validation at all. This will be the species for which we are
-#' generated predictions
-pred_drops <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
-dis_data <- subset_distance_data(distance_stan_data = distance_stan_data,
-                                 sps = setdiff(unique(distance_stan_data$sp_list),
-                                               pred_drops))
-rm(distance_stan_data)
 
 ms_model <- cmdstan_model(stan_file = "models/distance_cp.stan",
                           cpp_options = list(stan_threads = TRUE))
@@ -61,8 +51,8 @@ for (i in 1:max(cv_folds$cv_fold))
                        mig_strat = dis_data$mig_strat,
                        n_habitat = dis_data$n_habitat,
                        habitat = dis_data$habitat,
-                       mass = dis_data$mass,
-                       pitch = dis_data$pitch,
+                       mass = dis_data$mass[,1],
+                       pitch = dis_data$pitch[,1],
                        sp_all = dis_data$sp_all)
   
   # Check to see if we can drop any training columns (i.e. if bands per sample is smaller)
@@ -79,7 +69,7 @@ for (i in 1:max(cv_folds$cv_fold))
   stan_cv_data$max_dist <- stan_cv_data$max_dist / 100
   
   inits <- generate_distance_inits(n_chains = n_chains,
-                                   sp_list = setdiff(as.vector(stan_cv_data$sp_all), pred_drops),
+                                   sp_list = stan_cv_data$sp_all,
                                    napops_skip = NULL,
                                    param = "cp")
   stan_cv_data$sp_all <- NULL
