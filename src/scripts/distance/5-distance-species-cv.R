@@ -65,7 +65,7 @@ for (i in 1:max(cv_folds$cv_fold))
   stan_cv_data$max_dist <- stan_cv_data$max_dist / 100
   
   inits <- generate_distance_inits(n_chains = n_chains,
-                                   sp_list = setdiff(as.vector(stan_cv_data$sp_all), pred_drops),
+                                   sp_list = stan_cv_data$sp_all,
                                    napops_skip = NULL,
                                    param = "cp")
   stan_cv_data$sp_all <- NULL
