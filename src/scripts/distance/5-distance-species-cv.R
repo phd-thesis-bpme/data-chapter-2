@@ -3,19 +3,17 @@
 # Multi-species QPAD Detectability
 # 5-distance-species-cv.R
 # Created March 2024
-# Last Updated March 2024
+# Last Updated May 2024
 
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
-library(dplyr)
 
 source("src/functions/generate-distance-inits.R")
-source("src/functions/subset-distance-data.R")
 
 ####### Load Data #################################
 
-load("data/generated/distance_stan_data.rda")
+load("data/generated/distance_stan_data_cv.rda")
 cv_folds <- read.csv("data/generated/distance_cv_folds_species.csv")
 
 ####### Set Constants #############################
@@ -29,15 +27,6 @@ threads_per_chain <- 7
 
 ####### Data Wrangling ############################
 
-#' First we must drop all species which are just not going to be involved
-#' in the cross validation at all. This will be the species for which we are
-#' generated predictions
-pred_drops <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
-dis_data <- subset_distance_data(distance_stan_data = distance_stan_data,
-                                 sps = setdiff(unique(distance_stan_data$sp_list),
-                                               pred_drops))
-rm(distance_stan_data)
-
 model <- cmdstan_model(stan_file = "models/distance_cp.stan",
                           cpp_options = list(stan_threads = TRUE))
 
@@ -47,20 +36,20 @@ for (i in 1:max(cv_folds$cv_fold))
 {
   indices_to_drop <- which(cv_folds$cv_fold == i)
   
-  stan_cv_data <- list(n_samples = dis_data$n_samples - length(indices_to_drop),
-                       n_species = dis_data$n_species,
-                       max_intervals = dis_data$max_intervals,
-                       species = dis_data$species[-indices_to_drop],
-                       abund_per_band = dis_data$abund_per_band[-indices_to_drop, ],
-                       bands_per_sample = dis_data$bands_per_sample[-indices_to_drop],
-                       max_dist = dis_data$max_dist[-indices_to_drop, ],
-                       n_mig_strat = dis_data$n_mig_strat,
-                       mig_strat = dis_data$mig_strat,
-                       n_habitat = dis_data$n_habitat,
-                       habitat = dis_data$habitat,
-                       mass = dis_data$mass,
-                       pitch = dis_data$pitch,
-                       sp_all = dis_data$sp_all)
+  stan_cv_data <- list(n_samples = distance_stan_data_cv$n_samples - length(indices_to_drop),
+                       n_species = distance_stan_data_cv$n_species,
+                       max_intervals = distance_stan_data_cv$max_intervals,
+                       species = distance_stan_data_cv$species[-indices_to_drop],
+                       abund_per_band = distance_stan_data_cv$abund_per_band[-indices_to_drop, ],
+                       bands_per_sample = distance_stan_data_cv$bands_per_sample[-indices_to_drop],
+                       max_dist = distance_stan_data_cv$max_dist[-indices_to_drop, ],
+                       n_mig_strat = distance_stan_data_cv$n_mig_strat,
+                       mig_strat = distance_stan_data_cv$mig_strat,
+                       n_habitat = distance_stan_data_cv$n_habitat,
+                       habitat = distance_stan_data_cv$habitat,
+                       mass = distance_stan_data_cv$mass,
+                       pitch = distance_stan_data_cv$pitch,
+                       sp_all = distance_stan_data_cv$sp_all)
   
   # Check to see if we can drop any training columns (i.e. if bands per sample is smaller)
   if (max(stan_cv_data$bands_per_sample) < stan_cv_data$max_intervals)
@@ -80,6 +69,10 @@ for (i in 1:max(cv_folds$cv_fold))
                                    napops_skip = NULL,
                                    param = "cp")
   stan_cv_data$sp_all <- NULL
+  
+  # Strip away center and scale attributes from mass and pitch for analysis
+  stan_cv_data$mass <- stan_cv_data$mass[,1]
+  stan_cv_data$pitch <- stan_cv_data$pitch[,1]
   
   stan_run <- model$sample(
     data = stan_cv_data,
