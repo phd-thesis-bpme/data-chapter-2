@@ -74,11 +74,8 @@ removal_cv_plot <- ggplot(data = rem_cv_df, aes(x = True_Exp, y = Predicted_Exp)
 
 ####### Distance Model #################################
 
-distance_stan_data <- subset_distance_data(distance_stan_data = distance_stan_data,
-                                 sps = setdiff(unique(distance_stan_data$sp_list),
-                                               c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")))
 tau_all <- distance_all$summary("log_tau")
-tau_all$Species <- unique(distance_stan_data$sp_list)
+tau_all$Species <- unique(distance_stan_data_cv$sp_list)
 
 dis_cv_df <- dis_fold_nums[!duplicated(dis_fold_nums$Species), ]
 dis_cv_df <- merge(dis_cv_df, tau_all[, c("mean", "Species")],
@@ -89,7 +86,7 @@ names(dis_cv_df)[3] <- "True"
 for (i in 1:k)
 {
   tau_fold <- distance_folds[[i]]$summary("log_tau")
-  tau_fold$Species <- unique(distance_stan_data$sp_list)
+  tau_fold$Species <- unique(distance_stan_data_cv$sp_list)
   
   sps <- dis_cv_df[which(dis_cv_df$cv_fold == i), "Species"]
   

@@ -23,7 +23,7 @@ bayesplot::color_scheme_set("red")
 rem_model <- readRDS("output/model_runs/removal_predictions.RDS")
 load("data/generated/removal_stan_data_pred.rda")
 dis_model <- readRDS("output/model_runs/distance_predictions.RDS")
-load("data/generated/distance_stan_data.rda")
+load("data/generated/distance_stan_data_pred.rda")
 
 traits <- read.csv("data/raw/traits.csv")
 binomial <- read.csv("data/generated/binomial_names.csv")
@@ -105,10 +105,10 @@ removal_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Specie
 dis_summary <- dis_model$summary("log_tau")
 
 # Add species names to these summaries
-dis_summary$Code <- distance_stan_data$sp_all
+dis_summary$Code <- distance_stan_data_pred$sp_all
 
 # Get data sample size for all species and add to summary
-species_n <- data.frame(table(distance_stan_data$species))
+species_n <- data.frame(table(distance_stan_data_pred$species))
 names(species_n) <- c("index", "N")
 dis_summary$index <- seq(1, nrow(dis_summary))
 dis_summary$N <- 0
@@ -117,9 +117,6 @@ for (i in 1:nrow(species_n))
   dis_summary[which(dis_summary$index == species_n$index[i]), "N"] <-
     species_n$N[i]
 }
-
-# Get original single-species NA-POPS estimates
-napops_summary <- napops::coef_distance(species = dis_summary$Code, model = 1)
 
 # Add binomial names
 dis_summary <- dplyr::left_join(x = dis_summary, y = binomial[, c("Code", "Scientific_BT")],
@@ -147,7 +144,6 @@ for (s in sp)
   pitch <- dis_summary[which(dis_summary$Code == s), ]$Pitch
   mass <- dis_summary[which(dis_summary$Code == s), ]$Mass
   
-  
   temp_df <- dis_summary[which(dis_summary$MigHab == trait &
                                  (dis_summary$Code %in% sp) == FALSE &
                                  (dis_summary$Mass >= mass*0.6 & dis_summary$Mass <= mass*1.4) &
@@ -164,7 +160,6 @@ attributes(dis_draws)$dimnames$variable <- to_plot$Code
 (distance_plot <- bayesplot::mcmc_intervals(dis_draws) + 
     xlab("Predicted EDR") + 
     ylab("Species") +
-   # scale_y_discrete(labels = (to_plot$Code)) +
     coord_flip())
 
 distance_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species), size = 0.5, position=position_jitter(height=0.4)),
