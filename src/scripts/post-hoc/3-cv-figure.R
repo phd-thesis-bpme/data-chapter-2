@@ -148,15 +148,6 @@ lppd_summary_removal <- lppd_summary
 
 ####### Distance Model ############################
 
-#' First we must drop all species which are just not going to be involved
-#' in the cross validation at all. This will be the species for which we are
-#' generated predictions
-pred_drops <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
-dis_data <- subset_distance_data(distance_stan_data = distance_stan_data,
-                                 sps = setdiff(unique(distance_stan_data$sp_list),
-                                               pred_drops))
-rm(distance_stan_data)
-
 #' Create dataframe that will connect species, data point,
 #' and lppd
 lppd <- data.frame(Species = cv_folds_dis$Species,
@@ -180,11 +171,11 @@ for (f in 1:max(cv_folds_dis$cv_fold))
   
   # Subset the data to just the test set
   data_indices <- which(lppd$CV_Fold == f)
-  abund <- dis_data$abund_per_band[data_indices, ]
-  bands <- dis_data$bands_per_sample[data_indices]
-  max_dist <- dis_data$max_dist[data_indices, ] / 100
-  species <- dis_data$species[data_indices]
-  max_intervals <- dis_data$max_intervals
+  abund <- distance_stan_data_cv$abund_per_band[data_indices, ]
+  bands <- distance_stan_data_cv$bands_per_sample[data_indices]
+  max_dist <- distance_stan_data_cv$max_dist[data_indices, ] / 100
+  species <- distance_stan_data_cv$species[data_indices]
+  max_intervals <- distance_stan_data_cv$max_intervals
   
   tau_ss <- exp(ss_tau_summary$mean[species])
   tau_ms <- exp(ms_tau_summary$mean[species])
@@ -220,7 +211,7 @@ lppd_summary <- data.frame(Species = unique(lppd$Species),
                            StdErr = NA,
                            Model_Preference = NA)
 
-sp_sample_size <- data.frame(table(dis_data$sp_list))
+sp_sample_size <- data.frame(table(distance_stan_data_cv$sp_list))
 names(sp_sample_size) <- c("Species", "N")
 lppd_summary <- dplyr::left_join(lppd_summary, sp_sample_size, by = "Species")
 
