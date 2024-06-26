@@ -1,13 +1,13 @@
 
 data {
   int<lower = 0> n_samples;
-  array [n_samples] real difference;
+  vector [n_samples] single;
+  vector [n_samples] multi;
 }
 
-// The parameters accepted by the model. Our model
-// accepts two parameters 'mu' and 'sigma'.
 parameters {
-  real mu;
+  real intercept;
+  real slope;
   real<lower=0> sigma;
 }
 
@@ -15,6 +15,9 @@ parameters {
 // 'y' to be normally distributed with mean 'mu'
 // and standard deviation 'sigma'.
 model {
-  difference ~ normal(mu, sigma);
+  multi ~ normal(intercept + slope * single, sigma);
+  intercept ~ normal(0,1);
+  slope ~ normal(1,1);
+  sigma ~ exponential(1);
 }
 

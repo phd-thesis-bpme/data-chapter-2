@@ -1,9 +1,9 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# posthoc/3-cv-figure.R
+# posthoc/3-kfold-cv-figure.R
 # Created December 2023
-# Last Updated May 2024
+# Last Updated June 2024
 
 ####### Import Libraries and External Files #######
 
@@ -127,6 +127,9 @@ preference <- data.frame(table(lppd_summary$Model_Preference))
 (lppd_diff_vs_n_rem <- ggplot(data = lppd_summary, aes(x = log(N), y = Mean_Difference)) +
     geom_point(aes(color = Model_Preference)) +
     geom_hline(yintercept = 0) +
+    xlab("Log(Sample Size)") +
+    ylab("Mean LPPD Difference") +
+    theme(legend.position = "none") +
     NULL)
 
 lppd_summary <- merge(lppd_summary, binomial[,c("Code", "Scientific_BT")],
@@ -244,6 +247,9 @@ preference <- data.frame(table(lppd_summary$Model_Preference))
 (lppd_diff_vs_n_dis <- ggplot(data = lppd_summary, aes(x = log(N), y = Mean_Difference)) +
     geom_point(aes(color = Model_Preference)) +
     geom_hline(yintercept = 0) +
+    xlab("Log(Sample Size)") +
+    ylab("Mean LPPD Difference") +
+    theme(legend.position = "none") +
     NULL
 )
 
@@ -254,12 +260,13 @@ write.table(lppd_summary_removal, file = "data/generated/lppd_summary_removal.cs
 write.table(lppd, file = "data/generated/lppd_distance.csv", sep = ",", row.names = FALSE)
 write.table(lppd_summary, file = "data/generated/lppd_summary_distance.csv", sep = ",", row.names = FALSE)
 
-tiff(filename = "output/plots/cv_plot.tiff",
+tiff(filename = "output/plots/kfold_cv_plot.tiff",
     width = 6, height = 6, units = "in", res = 600)
 ggarrange(lppd_diff_vs_n_rem, lppd_diff_vs_n_dis, nrow = 2, labels = c("A", "B"))
 dev.off()
 
-png(filename = "output/plots/cv_plot.png",
+png(filename = "output/plots/kfold_cv_plot.png",
      width = 6, height = 6, units = "in", res = 600)
 ggarrange(lppd_diff_vs_n_rem, lppd_diff_vs_n_dis, nrow = 2, labels = c("A", "B"))
 dev.off()
+

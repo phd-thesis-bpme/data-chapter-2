@@ -250,9 +250,9 @@ To determine which species would be left out in each fold of the removal model, 
 Then, for each of the parts of the tree, we randomly assigned a number between 1 and 10 (drawn from a uniform distribution) to all migratory then all resident species.
 This ensured that for each fold, there would be a balance of related and unrelated species left out, as well as a relatively equal balance of migratory and resident species left out.
 To determine which species would be left out in each fold of the distance model, we randomly assigned a number between 1 and 10 (drawn from a uniform distribution) to each species within a migratory resident $\times$ habitat preference, which ensured that there would be a good balance of species left out for each group of species.
-by either phylogeny and migratory status (for removal modelling) or by migratory status and habitat preference (for distance modelling).
-Because Stan allows draws from a posterior distribution even with no data, we drew values from the posterior distribution of all of the held out species for each cross-validation fold, and used mean and standard deviation of those draws as the predicted cue rate or EDR.
+Because Stan allows draws from a posterior distribution even with no data, we drew values from the posterior distribution of all the held out species for each cross-validation fold, and used mean and standard deviation of those draws as the predicted cue rate or EDR.
 We then modelled the difference in those predicted cue rates or EDRs to the "true" cue rates or EDRs obtained from the multi-species models in Objective 1.
+If our prediction is true, then we would expect to have predicted cue rates and EDRs be similar to true cue rates and EDRs obtained from modelling with data.
 
 \subsection{Case Study: Predicting Detection Probabilities for Rare and Undersampled Species}
 \par We ran the multi-species removal and distance models again, this time with the minimal data available for seven species of undersampled landbirds, and generated estimates of cue rate and EDR for these seven species.
@@ -286,7 +286,7 @@ All models were run on one of two multi-core processing servers, one running Ubu
 \subsection{Single-Species vs. Multi-Species Estimates}
 
 \par We found slight evidence for an overall change in cue rate for a given species modelled by a single-species model vs a multi-species model.
-The mean modelled difference in cue rate was $-1.57 \times 10^{-3}$, indicating that estimates of cue rate from a multi-species model may be slightly less than estimates of cue rate from a single-species model.
+The mean modelled difference in cue rate was $-1.56 \times 10^{-3}$, indicating that estimates of cue rate from a multi-species model may be slightly less than estimates of cue rate from a single-species model.
 Ten out of the 316 species considered for removal modelling had a percent change in cue rate of more than 10\%.
 These species were: Willow Ptarmigan (\textit{Lagopus lagopus}), Rusty Blackbird (\textit{Euphagus carolinus}), Red-bellied Sapsucker (\textit{Sphyrapicus ruber}), Prairie Falcon (\textit{Falco mexicanus}), Nuttall's Woodpecker (\textit{Picoides nuttallii}), Northern Goshawk (\textit{Accipiter atricapillus}), Ferruginous Hawk (\textit{Buteo regalis}), Common Redpoll (\textit{Acanthis flammea}), Calliope Hummingbird (\textit{Selasphorus calliope}), and Bohemian Waxwing (\textit{Bombycilla garrulus})(Figure \ref{fig:1vs1}A).
 
@@ -309,12 +309,11 @@ Mean overall difference in species-wise mean LPPD was $2.65 \times 10^{-4}$, ind
 As expected, multi-species models tended to have better predictive capacity when sample size was low, with a negligible difference as sample size increased (Figure \ref{fig:cv}A).
 Among the ten species with greater than 10\% change in cue rate, three species (Bohemian Waxwing, Northern Goshawk, and Rusty Blackbird) had the multi-species model chosen as the better model, whereas the remaining seven species had the single-species model chosen as the better model.
 
-\par NEEDS UPDATING The cross validation revealed that the multi-species distance model also tended to have better predictive capacity for more species (156 out of 316) than the single-species distance models (140 out of 316), but to a lesser extent than the removal models.
-Twenty out of the 316 species showed no better predictive capacity with either model.
-Mean overall difference in log predictive density was $7.66 \times 10^{-10}$, indicating a small overall preference for the multi-species model.
-However, similar to the removal model cross-validation results, the overall difference in posterior predictive density was very small, with a mean difference of $1.85 \times 10^{-4}$.
+\par The k-fold cross validation revealed that the multi-species distance model also tended to have better predictive capacity for more species (166 out of 315) than the single-species distance models (130 out of 315), but to a lesser extent than the removal models.
+Nineteen out of the 316 species showed no better predictive capacity with either model.
+Mean overall difference in species-wise mean LPPD was $2.75 \times 10^{-5}$, indicating a small overall preference for the multi-species model.
 Similar to removal models, multi-species distance models tended to have better predictive capacity when sample size was low, with a negligible difference as sample size increased (Figure \ref{fig:cv}B).
-Among the seven species with greater than 20\% change in EDR, three species (Baird's Sparrow, Sedge Wren, and Sharp-tailed Grouse) had the multi-species model chosen as the better model, and four species (Boat-tailed Grackle, Chihuahuan Raven, Chimney Swift, and Ring-necked Pheasant) has the single-species model chosen as the better model.
+Among the two species with greater than 10\% change in EDR, Chihuahuan Raven had the single-species model chosen as the preferred model, and Greater Prairie-chicken had no preference.
 
 \subsection{Assessment of Out-of-sample Predictions}
 

@@ -14,7 +14,7 @@ library(plyr)
 library(ggplot2)
 library(ggpubr)
 library(ggrepel)
-library(patchwork)
+#library(patchwork)
 theme_set(theme_pubclean())
 bayesplot::color_scheme_set("red")
 
@@ -54,8 +54,6 @@ for (i in 1:nrow(species_n))
     species_n$N[i]
 }
 
-####### 1-to-1 Plot ###############################
-
 to_plot <- data.frame(Species = rem_ms_summary$Code,
                       Single = rem_ss_summary$mean,
                       Multi = rem_ms_summary$mean,
@@ -74,20 +72,10 @@ for (i in 1:nrow(to_plot))
   }
 }
 
-(single_vs_multi_plot <- ggplot(data = to_plot, mapping = aes(x = Single, y = Multi)) +
-    geom_point() +
-    geom_abline(slope = 1) +
-    xlim(0,1) +
-    ylim(0,1) +
-    geom_text_repel(box.padding = 0.5, max.overlaps = Inf, aes(label = Label)) +
-    xlab("Cue Rate (Single Species)") + 
-    ylab("Cue Rate (Multi Species)") +
-    NULL)
-
 diff_model_data <- list(n_samples = nrow(to_plot),
-                        difference = to_plot$diff,
-                        N = to_plot$N)
-diff_model <- cmdstan_model(stan_file = "models/difference.stan")
+                        single = to_plot$Single,
+                        multi = to_plot$Multi)
+diff_model <- cmdstan_model(stan_file = "models/single-vs-multi.stan")
 
 diff_model_run <- diff_model$sample(
   data = diff_model_data,
@@ -98,15 +86,21 @@ diff_model_run <- diff_model$sample(
   refresh = 10
 )
 
-(modelled_difference_plot <- bayesplot::mcmc_areas(diff_model_run$draws(c("mu")),
-                                                   prob = 0.95) +
-    xlab("Modelled Difference"))
+rem_diff_model_draws <- diff_model_run$draws(format = "df")
 
-removal_plot <- single_vs_multi_plot + inset_element(modelled_difference_plot,
-                                                     left = 0.6, 
-                                                     bottom = 0, 
-                                                     right = 1, 
-                                                     top = 0.5)
+(removal_plot <- ggplot(data = to_plot, mapping = aes(x = Single, y = Multi)) +
+    geom_point(alpha = 0.5) +
+    geom_abline(intercept = rem_diff_model_draws$intercept, slope = rem_diff_model_draws$slope,
+                color = "grey", alpha = 0.1) +
+    geom_abline(intercept = mean(rem_diff_model_draws$intercept), slope = mean(rem_diff_model_draws$slope),
+                color = "black") +
+    geom_abline(slope = 1, color = "red", linetype = 2) +
+    xlim(0,1) +
+    ylim(0,1) +
+    geom_text_repel(box.padding = 0.5, max.overlaps = Inf, aes(label = Label)) +
+    xlab("Cue Rate (Single Species)") + 
+    ylab("Cue Rate (Multi Species)") +
+    NULL)
 
 cr_differences <- to_plot
 cr_diff_model <- diff_model_run$summary()
@@ -146,7 +140,7 @@ to_plot$Multi <- exp(to_plot$Multi) * 100
 to_plot$Single <- exp(to_plot$Single) * 100
 to_plot$diff <- to_plot$Multi - to_plot$Single
 
-# Check for a 20% relative difference in cue rates
+# Check for a 10% relative difference in cue rates
 for (i in 1:nrow(to_plot))
 {
   if ((abs(to_plot$diff[i]) / to_plot$Single[i]) > 0.10)
@@ -155,19 +149,10 @@ for (i in 1:nrow(to_plot))
   }
 }
 
-(single_vs_multi_plot <- ggplot(data = to_plot, mapping = aes(x = Single, y = Multi)) +
-    geom_point() +
-    geom_abline(slope = 1) +
-    xlim(0,800) +
-    ylim(0,800) +
-    geom_text_repel(box.padding = 0.5, max.overlaps = Inf, aes(label = Label)) +
-    xlab("EDR (Single Species)") + 
-    ylab("EDR (Multi Species)") +
-    NULL)
-
 diff_model_data <- list(n_samples = nrow(to_plot),
-                        difference = to_plot$diff)
-diff_model <- cmdstan_model(stan_file = "models/difference.stan")
+                        single = to_plot$Single,
+                        multi = to_plot$Multi)
+diff_model <- cmdstan_model(stan_file = "models/single-vs-multi.stan")
 
 diff_model_run <- diff_model$sample(
   data = diff_model_data,
@@ -178,15 +163,22 @@ diff_model_run <- diff_model$sample(
   refresh = 10
 )
 
-(modelled_difference_plot <- bayesplot::mcmc_areas(diff_model_run$draws(c("mu")),
-                                                   prob = 0.95) +
-    xlab("Modelled Difference"))
+dis_diff_model_draws <- diff_model_run$draws(format = "df")
 
-distance_plot <- single_vs_multi_plot + inset_element(modelled_difference_plot,
-                                                     left = 0.6, 
-                                                     bottom = 0, 
-                                                     right = 1, 
-                                                     top = 0.5)
+(distance_plot <- ggplot(data = to_plot, mapping = aes(x = Single, y = Multi)) +
+    geom_point(alpha = 0.5) +
+    geom_abline(intercept = dis_diff_model_draws$intercept, slope = dis_diff_model_draws$slope,
+                color = "grey", alpha = 0.1) +
+    geom_abline(intercept = mean(dis_diff_model_draws$intercept), slope = mean(dis_diff_model_draws$slope),
+                color = "black") +
+    geom_abline(slope = 1, color = "red", linetype = 2) +
+    xlim(0,800) +
+    ylim(0,800) +
+    geom_text_repel(box.padding = 0.5, max.overlaps = Inf, aes(label = Label)) +
+    xlab("EDR (Single Species)") + 
+    ylab("EDR (Multi Species)") +
+    NULL)
+
 
 edr_differences <- to_plot
 edr_diff_model <- diff_model_run$summary()

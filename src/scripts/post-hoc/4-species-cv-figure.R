@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # posthoc/4-species-cv-figure.R
 # Created April 2024
-# Last Updated May 2024
+# Last Updated June 2024
 
 ####### Import Libraries and External Files #######
 
@@ -66,10 +66,29 @@ rem_cv_df$Difference <- rem_cv_df$True_Exp - rem_cv_df$Predicted_Exp
 rem_cv_df$Abs_Diff <- abs(rem_cv_df$Difference)
 rem_cv_df$Percent_Diff <- rem_cv_df$Difference / rem_cv_df$True_Exp
 
+rem_model_data <- list(n_samples = nrow(rem_cv_df),
+                       true_values = rem_cv_df$True_Exp,
+                       predicted_values = rem_cv_df$Predicted_Exp)
+
+rem_cv_model <- cmdstan_model(stan_file = "models/predicted-vs-true.stan")
+rem_cv_model_run <- rem_cv_model$sample(data = rem_model_data,
+                                          iter_warmup = 1000,
+                                          iter_sampling = 2000,
+                                          chains = 4,
+                                          parallel_chains = 4,
+                                          refresh = 10)
+rem_cv_model_draws <- rem_cv_model_run$draws(format = "df")
+
 removal_cv_plot <- ggplot(data = rem_cv_df, aes(x = True_Exp, y = Predicted_Exp)) +
+  geom_abline(intercept = rem_cv_model_draws$intercept, slope = rem_cv_model_draws$slope,
+              color = "grey", alpha = 0.1) +
+  geom_abline(intercept = mean(rem_cv_model_draws$intercept), slope = mean(rem_cv_model_draws$slope),
+              color = "black") +
+  geom_abline(slope = 1, color = "red", linetype = 2) +
   geom_point() +
-  geom_abline(slope = 1, intercept = 0) +
   xlim(0,0.8) + ylim(0,0.8) +
+  xlab("Cue Rate (Full Data)") +
+  ylab("Cue Rate (No Data)") +
   NULL
 
 ####### Distance Model #################################
@@ -101,16 +120,39 @@ dis_cv_df$Predicted_Exp <- exp(dis_cv_df$Predicted) * 100
 dis_cv_df$Difference <- dis_cv_df$True_Exp - dis_cv_df$Predicted_Exp
 dis_cv_df$Abs_Diff <- abs(dis_cv_df$Difference)
 
-dis_cv_df <- dis_cv_df[-which(is.na(dis_cv_df$Predicted)),]
+dis_model_data <- list(n_samples = nrow(dis_cv_df),
+                       true_values = dis_cv_df$True_Exp,
+                       predicted_values = dis_cv_df$Predicted_Exp)
+
+dis_cv_model <- cmdstan_model(stan_file = "models/predicted-vs-true.stan")
+dis_cv_model_run <- dis_cv_model$sample(data = dis_model_data,
+                                        iter_warmup = 1000,
+                                        iter_sampling = 2000,
+                                        chains = 4,
+                                        parallel_chains = 4,
+                                        refresh = 10)
+dis_cv_model_draws <- dis_cv_model_run$draws(format = "df")
 
 distance_cv_plot <- ggplot(data = dis_cv_df, aes(x = True_Exp, y = Predicted_Exp)) +
+  geom_abline(intercept = dis_cv_model_draws$intercept, slope = dis_cv_model_draws$slope,
+              color = "grey", alpha = 0.1) +
+  geom_abline(intercept = mean(dis_cv_model_draws$intercept), slope = mean(dis_cv_model_draws$slope),
+              color = "black") +
+  geom_abline(slope = 1, color = "red", linetype = 2) +
   geom_point() +
-  geom_abline(slope = 1, intercept = 0) +
+  xlim(0,500) + ylim(0,500) +
+  xlab("EDR (Full Data)") +
+  ylab("EDR (No Data)") +
   NULL
 
 ####### Output ####################################
 
+tiff("output/plots/species_cv_plot.tiff",
+    width = 6, height = 3, res = 300, units = "in")
+ggarrange(removal_cv_plot, distance_cv_plot, ncol = 2, labels = c("A", "B"))
+dev.off()
+
 png("output/plots/species_cv_plot.png",
-    width = 6, height = 6, res = 300, units = "in")
-print(removal_cv_plot)
+    width = 6, height = 3, res = 300, units = "in")
+ggarrange(removal_cv_plot, distance_cv_plot, ncol = 2, labels = c("A", "B"))
 dev.off()

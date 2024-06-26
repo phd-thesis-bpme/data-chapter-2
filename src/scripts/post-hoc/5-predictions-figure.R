@@ -1,7 +1,7 @@
 ####### Script Information ########################
 # Brandon P.M. Edwards
 # Multi-species QPAD Detectability
-# posthoc/4-predictions-figure.R
+# posthoc/5-predictions-figure.R
 # Created December 2023
 # Last Updated April 2024
 
@@ -14,7 +14,6 @@ library(ggplot2)
 library(ggpubr)
 library(ggrepel)
 library(gginnards)
-library(patchwork)
 theme_set(theme_pubclean())
 bayesplot::color_scheme_set("red")
 
@@ -94,6 +93,7 @@ attributes(rem_draws)$dimnames$variable <- to_plot$Code
 (removal_plot <- bayesplot::mcmc_intervals(rem_draws) + 
     xlab("Predicted Cue Rate") + 
     ylab("Species") +
+    xlim(0,1)+
     coord_flip())
 
 removal_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species, alpha = Alpha), size = 0.5, position=position_jitter(height=0.2)),
@@ -160,6 +160,7 @@ attributes(dis_draws)$dimnames$variable <- to_plot$Code
 (distance_plot <- bayesplot::mcmc_intervals(dis_draws) + 
     xlab("Predicted EDR") + 
     ylab("Species") +
+    xlim(0,600) +
     coord_flip())
 
 distance_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species), size = 0.5, position=position_jitter(height=0.4)),
