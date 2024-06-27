@@ -36,6 +36,8 @@ for (i in 1:k)
 }
 dis_fold_nums <- read.csv("data/generated/distance_cv_folds_species.csv")
 
+traits <- read.csv("data/raw/traits.csv")
+
 ####### Removal Model #################################
 
 phi_all <- removal_all$summary("log_phi")
@@ -78,14 +80,15 @@ rem_cv_model_run <- rem_cv_model$sample(data = rem_model_data,
                                           parallel_chains = 4,
                                           refresh = 10)
 rem_cv_model_draws <- rem_cv_model_run$draws(format = "df")
+rem_cv_model_summary <- rem_cv_model_run$summary()
 
 removal_cv_plot <- ggplot(data = rem_cv_df, aes(x = True_Exp, y = Predicted_Exp)) +
   geom_abline(intercept = rem_cv_model_draws$intercept, slope = rem_cv_model_draws$slope,
               color = "grey", alpha = 0.1) +
   geom_abline(intercept = mean(rem_cv_model_draws$intercept), slope = mean(rem_cv_model_draws$slope),
               color = "black") +
-  geom_abline(slope = 1, color = "red", linetype = 2) +
   geom_point() +
+  geom_abline(slope = 1, color = "red", linetype = 2) +
   xlim(0,0.8) + ylim(0,0.8) +
   xlab("Cue Rate (Full Data)") +
   ylab("Cue Rate (No Data)") +
@@ -132,20 +135,48 @@ dis_cv_model_run <- dis_cv_model$sample(data = dis_model_data,
                                         parallel_chains = 4,
                                         refresh = 10)
 dis_cv_model_draws <- dis_cv_model_run$draws(format = "df")
+dis_cv_model_summary <- dis_cv_model_run$summary()
 
 distance_cv_plot <- ggplot(data = dis_cv_df, aes(x = True_Exp, y = Predicted_Exp)) +
   geom_abline(intercept = dis_cv_model_draws$intercept, slope = dis_cv_model_draws$slope,
               color = "grey", alpha = 0.1) +
   geom_abline(intercept = mean(dis_cv_model_draws$intercept), slope = mean(dis_cv_model_draws$slope),
               color = "black") +
-  geom_abline(slope = 1, color = "red", linetype = 2) +
   geom_point() +
+  geom_abline(slope = 1, color = "red", linetype = 2) +
   xlim(0,500) + ylim(0,500) +
   xlab("EDR (Full Data)") +
   ylab("EDR (No Data)") +
   NULL
 
+dis_cv_df <- merge(dis_cv_df, traits[, c("Code", "Migrant", "Habitat")],
+                   by.x = "Species", by.y = "Code")
+dis_cv_df$Migrant <- ifelse(dis_cv_df$Migrant == 1,
+                            "Migrant",
+                            "Resident")
+dis_cv_df$Habitat <- ifelse(dis_cv_df$Habitat == 1,
+                            "Closed",
+                            "Open")
+dis_cv_df$Trait_Group <- paste0(dis_cv_df$Habitat, "-", dis_cv_df$Migrant)
+
+distance_cv_traits_plot <- ggplot(data = dis_cv_df, aes(x = True_Exp, y = Predicted_Exp)) +
+  geom_abline(intercept = dis_cv_model_draws$intercept, slope = dis_cv_model_draws$slope,
+              color = "grey", alpha = 0.1) +
+  geom_abline(intercept = mean(dis_cv_model_draws$intercept), slope = mean(dis_cv_model_draws$slope),
+              color = "black") +
+  geom_point(aes(color = Trait_Group)) +
+  geom_abline(slope = 1, color = "red", linetype = 2) +
+  xlim(60,150) + ylim(60,150) +
+  theme(legend.position = "right") +
+  NULL
+
+
 ####### Output ####################################
+
+write.table(rem_cv_model_summary, file = "data/generated/rem_species_cv_model.csv",
+            sep = ",", row.names = FALSE)
+write.table(dis_cv_model_summary, file = "data/generated/dis_species_cv_model.csv",
+            sep = ",", row.names = FALSE)
 
 tiff("output/plots/species_cv_plot.tiff",
     width = 6, height = 3, res = 300, units = "in")
@@ -155,4 +186,14 @@ dev.off()
 png("output/plots/species_cv_plot.png",
     width = 6, height = 3, res = 300, units = "in")
 ggarrange(removal_cv_plot, distance_cv_plot, ncol = 2, labels = c("A", "B"))
+dev.off()
+
+tiff("output/plots/species_cv_distance_traits.tiff",
+     width = 5, height = 3, res = 300, units = "in")
+print(distance_cv_traits_plot)
+dev.off()
+
+png("output/plots/species_cv_distance_traits.png",
+    width = 5, height = 3, res = 300, units = "in")
+print(distance_cv_traits_plot)
 dev.off()
