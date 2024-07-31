@@ -20,7 +20,7 @@
 \author{
 	Edwards, Brandon P.M.\\
 	\and
-	Gahbauer, Marcel\\
+	Gahbauer, Marcel A.\\
 	\and
 	Grinde, Alexis\\
 	\and
@@ -30,7 +30,7 @@
 	\and
 	Michel, Nicole L.\\
 	\and
-	Robinson, Barry\\
+	Robinson, Barry G.\\
 	\and
 	Solymos, Peter\\
 	\and
@@ -45,39 +45,40 @@
 
 \begin{abstract}
 	
-	Accurate assessments of population status and trends rely on accounting for probability of detection, making it an important metric in conservation, yet it is often unaccounted for or unavailable on a species level. 
-	Although detection probability methods and estimates exist for many North American birds, probability estimates are most accurate for common, easy to detect species. 
-	There is therefore a need for methodology that provides detection estimates for species that are rare or undersampled, which generally do not have sufficient data for accurate estimates. 
+	Accurate assessments of population status and trends rely on accounting for probability of detection.
+	However, probability of detection is often unaccounted for or unavailable on a species level. 
+	Although methods to estimate detection probability have been developed and implemented for many North American birds, estimates are most accurate for common, easy to detect species. 
+	There is therefore a need for methodology that provides detection estimates for species that are rare or undersampled, which generally lack sufficient data for accurate estimates. 
 	Here, we take advantage of similarities in detection probabilities among phylogenetically related species and species with similar traits to estimate detection probabilities in seven species of rare North American birds, using a hierarchical Bayesian multi-species removal and distance models. 
-	We first show that a multi-species model of detectability can improve precision of detectability estimates for species with low sample size, and even with species up to 1000 data points.
-	However, when there is no data available for a species, the multi-species models presented here tend to be overly conservative in predicting detectability.
-	Thus, we recommend using these models to 1) provide more precise estimates of detectability for species where there are sufficient data, 2) generate estimates of detectability for species for which we have sparse (but non-zero) data, and 3) augment previous estimates of detection probabilities in the NA-POPS database of detectability offsets for North American birds by combining this model with survey-level covariates.
+	We show that a multi-species model can improve precision of detectability estimates for species with low sample size, and even with species up to 1000 observations.
+	However, when there are no data available for a species, the multi-species models presented here tend to be overly conservative in predicting detectability. 
+	Thus, we recommend using these models to 1) provide more precise estimates of detectability for species where there are sufficient data, 2) generate estimates of detectability for species for which we have sparse (but non-zero) data, and 3) improve upon previous estimates of detection probabilities for North American birds by combining this model with survey-level covariates.
 
 \end{abstract}
 
 \section{Introduction}
 
-\par Accurate and precise estimates of detection probability (or detectability) are important both for estimating accurate population sizes, as well as for making effective conservation decisions.
+\par Accurate and precise estimates of detection probability (or detectability) are important for estimating accurate population sizes and making effective conservation decisions.
 In conservation management, prior knowledge of detectability can be used as a metric of sensitivity to evaluate when and how to monitor a system for a species, or when to act on current information \citep{canessa_when_2015, bennett_when_2018}. 
-When estimating population size, detectability often comes into play as a way to convert observed counts into densities or estimates of true abundance \citep{solymos_calibrating_2013, johnson_defense_2008}.
-Despite its importance, detectability often goes unaccounted for in studies; and for many species, the ancillary data needed to estimate detectability does not exist \citep{bennett_how_2024}.
+When estimating population size, detectability is often used to convert observed counts (i.e., relative abundance) into densities or estimates of true abundance \citep{solymos_calibrating_2013, johnson_defense_2008}.
+Despite its importance, detectability is frequently unaccounted for in studies; and for many species, the ancillary data needed to estimate detectability do not exist \citep{bennett_how_2024}.
 
 \par The wealth of openly available bird observation data in North America means that estimates of detectability for birds are relatively easy to estimate, in comparison to most other taxonomic groups \citep{bennett_how_2024}. 
-The NA-POPS project is an effort to estimate detection probabilities that account for variability in detection processes through environmental and temporal covariates for as many of North America’s landbird species as possible \citep{edwards_point_2023}.
+The NA-POPS project is an effort to estimate detection probabilities that accounts for variability in detection processes through the use of environmental and temporal covariates for as many of North America’s landbird species as possible \citep{edwards_point_2023}.
 To date, the project has estimated the two components of detectability--availability (the probability that a bird sings or gives a cue during the survey period) and perceptibility (the probability that an observer sees or hears a cueing bird)--for 319 species of birds, with an additional 19 species having estimates of either availability or perceptibility. 
 This project expanded previous efforts by the Boreal Avian Modelling project \citep{cumming_toward_2010} to systematically estimate detectability in landbirds \citep{solymos_calibrating_2013, solymos_evaluating_2018}.
-Both the NA-POPS project and previous estimates by Boreal Avian Modelling project use QPAD \citep{solymos_calibrating_2013}, which is a flexible method to estimate availability and perceptibility given a harmonized dataset with the necessary survey-specific data (i.e., distance to bird from observer and time to first detection; \citep{barker_ecological_2015}).
+Both the NA-POPS project and previous estimates by Boreal Avian Modelling project use the QPAD approach \citep{solymos_calibrating_2013}, which is a flexible method to estimate availability and perceptibility given a harmonized dataset with the necessary survey-specific data (i.e., distance to bird from observer and time to first detection; \citep{barker_ecological_2015}).
 
 \par Despite the efforts of the NA-POPS project, approximately 25\% of the species in the Partners in Flight’s 2016 Landbird Conservation Plan \citep{rosenberg_partners_2016} have insufficient data to directly estimate detectability \citep{edwards_point_2023}.
-These species fall short of the threshold of 75 distinct observations recommended for removal and distance modelling \citep{buckland_introduction_2001, solymos_calibrating_2013}. 
-Many of the species that fell short of that threshold in the NA-POPS database are rare or undersampled species, that either have low population sizes, or occur in rare or inaccessible habitats.
+The data for these species fall short of the threshold of 75 distinct observations recommended for removal and distance modelling \citep{buckland_introduction_2001, solymos_calibrating_2013}. 
+Many of these are rare or undersampled species, that either have low population sizes, or occur in rare or inaccessible habitats.
 %Some examples of species not modelled include Kirtland’s Warbler (\textit{Setophaga kirtlandii}) and Bicknell’s Thrush (\textit{Catharus bicknelli}), both of which have low population sizes, and LeConte’s Thrasher (\textit{Toxostoma lecontei}) and Harris’s Sparrow (\textit{Zonotrichia querula}), both of which have rare habitat associations \citep{will_handbook_2020}. 
 Species with small population sizes and rare habitats are also often considered vulnerable, and thus detectability information for them would be particularly important to inform their conservation.
 
 
 \par Detectability in birds has been shown to be at least partially driven by variation in species traits.
-\cite{johnston_species_2014} showed that detection distance - and consequently perceptibility - varied with body mass and habitat association in a selection of European landbirds.
-In this case, larger body size tended to be associated with longer detection distances, which makes sense considering larger body sizes are associated with louder and lower-pitched songs in birds \citep{bowman_adaptive_1979, fletcher_acoustics_1999, ryan_role_1985}.
+\citet{johnston_species_2014} showed that detection distance - and consequently perceptibility - varied with body mass and habitat association in a selection of European landbirds.
+In this case, larger body size tended to be associated with longer detection distances, which makes sense considering that larger body sizes are typically associated with louder and lower-pitched songs in birds \citep{bowman_adaptive_1979, fletcher_acoustics_1999, ryan_role_1985}.
 Moreover, vegetation structure influences the attenuation of sound, whereby sound diminishes quicker in a closed-forested habitat than more open habitats, thus leading to variation in detectability among species associated with different habitats \citep{waide_tropical_1988, yip_sound_2017}.
 \citet{solymos_phylogeny_2018} considered the effects of species traits and phylogeny on both detection distance and cue rate, the latter of which influences the availability of birds for detection.
 They found that cue rate is most related to phylogeny, and, to a lesser extent, migratory strategy (i.e., whether a bird was a long-distance migrant or a resident species).
