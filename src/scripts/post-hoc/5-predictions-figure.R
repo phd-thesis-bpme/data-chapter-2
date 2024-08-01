@@ -3,19 +3,16 @@
 # Multi-species QPAD Detectability
 # posthoc/5-predictions-figure.R
 # Created December 2023
-# Last Updated April 2024
+# Last Updated August 2024
 
 ####### Import Libraries and External Files #######
 
 library(cmdstanr)
-library(bayesplot)
 library(plyr)
 library(ggplot2)
 library(ggpubr)
 library(ggrepel)
-library(gginnards)
 theme_set(theme_pubclean())
-bayesplot::color_scheme_set("red")
 
 ####### Read Data #################################
 
@@ -55,9 +52,10 @@ rem_summary$Scientific_BT <- gsub(x = rem_summary$Scientific_BT, pattern = " ", 
 rem_summary <- dplyr::left_join(x = rem_summary, y = traits[, c("Code", "Migrant")],
                                  by = "Code")
 
-sp <- c("LCTH", "LEPC", "HASP", "TRBL", "SPOW", "KIWA", "BITH")
+sp <- c("LEPC", "SPOW", "BITH", "LCTH", 'HASP', 'TRBL', 'KIWA')
 
 to_plot <- rem_summary[which(rem_summary$Code %in% sp), ]
+to_plot <- to_plot[match(sp, to_plot$Code), ]
 
 species_vars <- to_plot$variable
 
@@ -87,17 +85,17 @@ for (s in sp)
 
 other_sp_df <- other_sp_df[which(other_sp_df$Alpha > 0.001), ]
 
-rem_draws <- exp(rem_model$draws(species_vars))
-attributes(rem_draws)$dimnames$variable <- to_plot$Code
+to_plot$Code <- factor(to_plot$Code, levels = sp)
 
-(removal_plot <- bayesplot::mcmc_intervals(rem_draws) + 
-    xlab("Predicted Cue Rate") + 
-    ylab("Species") +
-    xlim(0,1)+
-    coord_flip())
-
-removal_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species, alpha = Alpha), size = 0.5, position=position_jitter(height=0.2)),
-                         removal_plot$layers)
+removal_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean))) +
+  geom_point(data = other_sp_df, aes(y = mean, x= Species, alpha = Alpha), size = 0.5, position=position_jitter(width = 0.2)) +
+  geom_point(size = 4, color = "darkred") +
+  geom_errorbar(aes(ymin = exp(q5), ymax = exp(q95)), width=.1, color = "darkred") +
+  ylim(0,1) +
+  xlab("Predicted Cue Rate") + 
+  ylab("Species") +
+  theme(legend.position = "none") +
+  NULL
 
 ####### Distance Model ############################
 
@@ -129,9 +127,10 @@ dis_summary <- dplyr::left_join(x = dis_summary, y = traits[, c("Code", "Migrant
                                 by = "Code")
 dis_summary$MigHab <- paste0(dis_summary$Migrant, "-", dis_summary$Habitat)
 
-sp <- c("LCTH", "LEPC", "HASP", "SPOW", "KIWA", "BITH")
+sp <- c("LEPC", "SPOW", "BITH", "LCTH", 'HASP', 'KIWA')
 
 to_plot <- dis_summary[which(dis_summary$Code %in% sp), ]
+to_plot <- to_plot[match(sp, to_plot$Code), ]
 
 species_vars <- to_plot$variable
 
@@ -154,17 +153,17 @@ for (s in sp)
                                   mean = exp(temp_df$mean) * 100))
 }
 
-dis_draws <- exp(dis_model$draws(species_vars)) * 100
-attributes(dis_draws)$dimnames$variable <- to_plot$Code
+to_plot$Code <- factor(to_plot$Code, levels = sp)
 
-(distance_plot <- bayesplot::mcmc_intervals(dis_draws) + 
-    xlab("Predicted EDR") + 
-    ylab("Species") +
-    xlim(0,600) +
-    coord_flip())
-
-distance_plot$layers <- c(geom_point(data = other_sp_df, aes(x = mean, y = Species), size = 0.5, position=position_jitter(height=0.4)),
-                         distance_plot$layers)
+distance_plot <- ggplot(data = to_plot, aes(x = Code, y = exp(mean) * 100)) +
+  geom_point(data = other_sp_df, aes(y = mean, x= Species), size = 0.5, position=position_jitter(width = 0.2)) +
+  geom_point(size = 4, color = "darkred") +
+  geom_errorbar(aes(ymin = exp(q5) * 100, ymax = exp(q95) * 100), width=.1, color = "darkred") +
+  xlab("Predicted EDR") + 
+  ylab("Species") +
+  ylim(0,600) +
+  theme(legend.position = "none") +
+  NULL
 
 ####### Output ####################################
 
