@@ -3,7 +3,7 @@
 # Multi-species QPAD Detectability
 # posthoc/1-1vs1-figure.R
 # Created December 2023
-# Last Updated June 2024
+# Last Updated August 2024
 
 ####### Import Libraries and External Files #######
 
@@ -97,7 +97,6 @@ rem_diff_model_draws <- diff_model_run$draws(format = "df")
     geom_abline(slope = 1, color = "red", linetype = 2) +
     xlim(0,1) +
     ylim(0,1) +
-    geom_text_repel(box.padding = 0.5, max.overlaps = Inf, aes(label = Label)) +
     xlab("Cue Rate (Single Species)") + 
     ylab("Cue Rate (Multi Species)") +
     NULL)
@@ -174,7 +173,6 @@ dis_diff_model_draws <- diff_model_run$draws(format = "df")
     geom_abline(slope = 1, color = "red", linetype = 2) +
     xlim(0,800) +
     ylim(0,800) +
-    geom_text_repel(box.padding = 0.5, max.overlaps = Inf, aes(label = Label)) +
     xlab("EDR (Single Species)") + 
     ylab("EDR (Multi Species)") +
     NULL)
@@ -197,11 +195,11 @@ write.table(edr_diff_model, file = "data/generated/tau_difference_model.csv", se
 
 
 tiff("output/plots/1vs1.tiff",
-     width = 6, height = 6, res = 600, units = "in")
-ggarrange(removal_plot, distance_plot, nrow = 2, labels = c("A", "B"))
+     width = 6, height = 3, res = 600, units = "in")
+ggarrange(removal_plot, distance_plot, nrow = 1, labels = c("A", "B"))
 dev.off()
 
 png("output/plots/1vs1.png",
-     width = 6, height = 6, res = 600, units = "in")
-ggarrange(removal_plot, distance_plot, nrow = 2, labels = c("A", "B"))
+     width = 6, height = 3, res = 600, units = "in")
+ggarrange(removal_plot, distance_plot, nrow = 1, labels = c("A", "B"))
 dev.off()
