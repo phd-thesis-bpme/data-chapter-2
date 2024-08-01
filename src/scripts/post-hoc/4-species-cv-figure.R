@@ -168,11 +168,10 @@ distance_cv_traits_plot <- ggplot(data = dis_cv_df, aes(x = True_Exp, y = Predic
   geom_abline(slope = 1, color = "red", linetype = 2) +
   xlim(60,150) + ylim(60,150) +
   theme(legend.position = "right",
-        legend.title = "Trait Group") +
+        legend.title = element_blank()) +
   xlab("EDR (Full Data)") +
   ylab("EDR (No Data)") +
   NULL
-
 
 ####### Output ####################################
 
