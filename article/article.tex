@@ -1,49 +1,7 @@
-\documentclass[12pt]{article}
+\chapter{Predicting detection probabilities for rare and undersampled North American landbirds}
 
-\usepackage{setspace}
-\doublespacing
 
-\usepackage{natbib}
-\bibliographystyle{apalike}
-
-\usepackage[margin=1.0in]{geometry}
-
-\usepackage{amsmath}
-
-\usepackage{lineno}
-
-\usepackage{graphicx}
-\linenumbers
-
-%opening
-\title{Predicting detection probabilities for rare and undersampled North American landbirds}
-%\author{
-%	Edwards, Brandon P.M.\\
-%	\and
-%	Gahbauer, Marcel A.\\
-%	\and
-%	Grinde, Alexis\\
-%	\and
-%	Hope, David\\
-%	\and
-%	Knight, Elly C.\\
-%	\and
-%	Michel, Nicole L.\\
-%	\and
-%	Robinson, Barry G.\\
-%	\and
-%	Solymos, Peter\\
-%	\and
-%	Bennett, Joseph R.\\
-%	\and
-%	Smith, Adam C.\\
-%}
-\date{}
-\begin{document}
-
-\maketitle
-
-\begin{abstract}
+\section{abstract}
 	
 	Accurate assessments of population status and trends rely on accounting for probability of detection.
 	However, probability of detection is often unaccounted for or unavailable on a species level. 
@@ -53,8 +11,6 @@
 	We showed that a multi-species model improved precision of detectability estimates for species with low sample size, and even with species up to 1000 observations.
 	However, when there were no data available for a species, the multi-species models presented here tended to be overly conservative in predicting detectability. 
 	Thus, we recommend using these models to 1) provide more precise estimates of detectability for species where there are sufficient data, 2) generate estimates of detectability for species for which we have sparse (but non-zero) data, and 3) improve upon previous estimates of detection probabilities for North American birds by combining this model with survey-level covariates.
-
-\end{abstract}
 
 \section{Introduction}
 
@@ -477,48 +433,46 @@ However, one benefit that we have shown here is that Bayesian models can still d
 For taxa such as butterflies for which some species have reasonable data and most have very little data \citep{lewthwaite_geographical_2022}, a researcher may still be able to glean reasonable estimates of detectability with the little data available, as long as detectability for some similar species has been examined.
 We suggest that this type of model---where information about detectability is shared among species---be tested with taxa that generally have fewer data collected, and we encourage researchers to continue to make use of existing sources of data \citep{binley_minimizing_2023} to inform these models.
 
-\bibliography{refs}
-
 \section{Figures}
 
 \begin{figure}[h]
-	\includegraphics{../output/plots/1vs1.png}
+	\includegraphics{../ch4-multispecies-detectability/output/plots/1vs1.png}
 	\caption{1-to-1 plot comparing cue rates (A) and EDRs (B) estimated from the single-species model vs the multi-species model for each species. Red dashed line denotes the 1-to-1 line. Black line is regression line with posterior draws in grey. Grey dots are individual species.}
 	\label{fig:1vs1}
 \end{figure}
 
 \begin{figure}[h]
-	\includegraphics{../output/plots/sd_comp.png}
+	\includegraphics{../ch4-multispecies-detectability/output/plots/sd_comp.png}
 	\caption{LOESS curves of standard deviations of cue rate (A) and EDR (B) for species modelled by a single-species model (blue lines) and multi-species model (red lines).}
 	\label{fig:sd}
 \end{figure}
 
 \begin{figure}[h]
-	\includegraphics{../output/plots/parameters_plot.png}
+	\includegraphics{../ch4-multispecies-detectability/output/plots/parameters_plot.png}
 	\caption{Group parameter posterior distributions for multi-species removal model (A) and multi-species distance model (B).}
 	\label{fig:params}
 \end{figure}
 
 \begin{figure}[h]
-	\includegraphics{../output/plots/kfold_cv_plot.png}
+	\includegraphics{../ch4-multispecies-detectability/output/plots/kfold_cv_plot.png}
 	\caption{Mean difference in pointwise posterior predictive density for cue rate (A) and EDR (B) vs. log species sample size. Points are mean difference by species. Difference was calculated as multi-species minus single-species, and so positive differences (coloured in red for clarity) represent a multi-species model preference, whereas negative differences (coloured in blue for clarity) represent a single-species model preference. Grey points denote no differences. }
 	\label{fig:cv}
 \end{figure}
 
 \begin{figure}[h]
-	\includegraphics{../output/plots/species_cv_plot.png}
+	\includegraphics{../ch4-multispecies-detectability/output/plots/species_cv_plot.png}
 	\caption{(A) Estimates of cue rate for a species (black dots) given full data versus predictions of cue rate for the same species given no data. (B) Estimates of effective detection radius (EDR) for a species (black dots) given full data versus predictions of EDR for the same species given no data. For both, red dashed line denotes the 1-to-1 line. Black line is regression line with posterior draws in grey.}
 	\label{fig:species_cv}
 \end{figure}
 
 \begin{figure}[h]
-	\includegraphics{../output/plots/species_cv_distance_traits.png}
+	\includegraphics{../ch4-multispecies-detectability/output/plots/species_cv_distance_traits.png}
 	\caption{Estimates of effective detection radius (EDR) for a species (dots) given full data versus predictions of EDR for the same species given no data, focusing in on species with EDRs between 60 m and 150 m. Colours denote discrete trait group combinations of migratory strategy and habitat preference. Red dashed line denotes the 1-to-1 line. Black line is regression line with posterior draws in grey.}
 	\label{fig:distance_cv_traits}
 \end{figure}
 
 \begin{figure}[h]
-	\includegraphics{../output/plots/predictions_figure.png}
+	\includegraphics{../ch4-multispecies-detectability/output/plots/predictions_figure.png}
 	\caption{(A) Cue rates (red circles) and 90\% credible interval (red lines) for seven species of rare and undersampled North American landbirds. Species are 4 letter banding codes: LEPC = Lesser Prairie-chicken (n = 45), SPOW = Spotted Owl (n = 7), BITH = Bicknell's Thrush (n = 0), LCTH = LeConte's Thrasher (n = 1), HASP = Harris's Sparrow (n = 65), TRBL = Tricoloured Blackbird (n = 74), and KIWA = Kirtland's Warbler (n = 0). Black points are cue rate estimates of other similar species with the same migration strategy, with the opacity of the point indicating the strength of the relationship. (B) Effective detection radius (red circles) and 90\% credible interval (red line) for six species of rare and undersampled North American landbirds. Species are 4 letter banding codes: LEPC = Lesser Prairie-chicken (n = 45), SPOW = Spotted Owl (n = 28), BITH = Bicknell's Thrush (n = 0), LCTH = LeConte's Thrasher (n = 1), HASP = Harris's Sparrow (n = 13), KIWA = Kirtland's Warbler (n = 1). Black points are EDR estimates of species with the same migration strategy and habitat preference, and with a mass and pitch within 40\% in either direction.}
 	\label{fig:predictions}
 \end{figure}
